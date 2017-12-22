@@ -7,17 +7,24 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import RegexValidator
+from addons.packages.models import Packages
 # Create your models here.
 
 class Profile(models.Model):
 	phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
 
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	referal_id = models.TextField(max_length=500, blank=True)
-	sponser_id =models.CharField(null=True,max_length=300)
-	package = models.DateField(null=True,blank=True)
+	referal_code = models.TextField(max_length=500, blank=True)
+	sponser_id =models.OneToOneField(User, null=True, related_name='+')
+	package = models.OneToOneField(Packages,null=True)
 	mobile = models.CharField(max_length=15,validators=[phone_regex], blank=True)
-	placement_id = models.CharField(null=True, blank=True, max_length=15)
+	placement_id = models.OneToOneField(User, null=True, related_name='+')
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	bank_name = models.CharField(max_length=20, null=True)
+	account_number = models.CharField(max_length=20, null=True)
+	account_type = models.CharField(max_length=20, null=True)
+	account_name = models.CharField(max_length=20, null=True)
 
 	def __unicode__(self):
 		return "%s" %(self.user)

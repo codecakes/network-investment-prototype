@@ -119,9 +119,13 @@ def logout_fn(request):
 
 def home(request):
     if request.method == 'GET':
+    	context = {
+            'user':'None'
+        }
+        template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
             return HttpResponse("Oopse something went wrong")
         else:
-            return HttpResponse(loader.get_template('dashboard.html').render(request))
+            return HttpResponse(template.render(context,request))
     else:
         return HttpResponse('404 not found')
