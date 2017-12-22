@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+    {% include "head.html" %}
+    {% load static %}
+    {% block body %}
+        <body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
+            {% block main %}
+            {% endblock %}
+            {% include "footer.html" %}
+            {% block js %}
+                {% include "js_src.html" %}
+                <script src="{% static "js/plugins.js" %}"></script>
+                <script src="{% static "js/main.js" %}"></script>
+            {% endblock %}
+        </body>
+    {% endblock %}
+</html>

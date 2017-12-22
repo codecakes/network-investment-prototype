@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block body %}
+    {% block main %}
+    <main>
+        <section class="module">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-5 col-sm-offset-1 mb-sm-40">
+                <h4 class="font-alt">Login</h4>
+                <hr class="divider-w mb-10">
+                <form class="form" name="" id="loginform" method="post" action="/login">
+                {% csrf_token %}
+                <div class="form-group">
+                    <div class="login-input-box">
+                      <input class="form-control" placeholder="Username" id="usernmae" name="username" value="{{ username }}" type="text">
+                    </div>
+                </div> <br>
+                <div class="form-group">
+                  <div class="login-input-box">
+                      <input class="form-control" id="password" name="password" value="{{ username }}" placeholder="Password" type="password">
+                    </div>
+                </div>
+                <br><div class="form-group">
+                    <button class="btn btn-round btn-b">Next</button>
+                  </div>
+                </form>
+              </div>
+              <div class="col-sm-5">
+                <h4 class="font-alt">Register</h4>
+                <hr class="divider-w mb-10">
+              <form name="" id="ragistrationFormMover" method="POST" action="/signup/">
+              {{ signup_form.as_p }}
+              {% csrf_token %}
+              <div class="form-group has-feedback" style="margin-bottom: 0px">
+                <input type="text" id="email_m" class="form-control" name="email_m" value="{{email_m}}" placeholder="E-mail address" />
+              </div><br>
+              <div class="form-group has-feedback" style="margin-bottom: 0px">
+                  <input type="text" id="name_m" class="form-control" name="name_m" value="{{ name_m }}" placeholder="Name" />
+              </div>
+              <div class="form-group has-feedback" style="margin-bottom: 0px">
+                  <input type="text" id="mobile_m" class="form-control" name="mobile_m" value="{{ mobile_m }}" placeholder="Mobile" />
+              </div>
+              <div class="form-group has-feedback" >
+                  <input type="text" id="password_m" class="form-control" name="password_m" value="{{ password_m }}" placeholder="Password" type="password"/>
+              </div>
+              <div class="form-group has-feedback" >
+                  <input type="text" id="confirm_password_m" class="form-control" name="confirm_password_m" value="{{ confirm_password_m }}" placeholder="Confirm Password" type="password"/>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-12">
+                    <button type="submit" id="submit_mover" name="submit" class="form contact-form-button light-form-button oswald light" style="width:85%">Submit</button>
+                </div>
+              </div>
+          </form>
+                <!-- <form id="sigup-form" class="form" method="POST" action="/signup">
+                  <div class="form-group">
+                    <input class="form-control" id="email" type="text" name="email" placeholder="Email"/>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="username" type="text" name="username" placeholder="Username"/>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="password" type="password" name="password" placeholder="Password"/>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="re-password" type="password" name="re-password" placeholder="Re-enter Password"/>
+                  </div>
+                    <div class="form-group">
+                        <input class="form-control" id="sponsor_id" type="text" name="sponsor_id" placeholder="Sponsor ID"/>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" id="placement_id" type="text" name="placement_id" placeholder="Placement ID"/>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" id="mob_num" type="text" name="mob_num" placeholder="Mobile Num"/>
+                    </div>
+                    <div class="form-group">
+                      <button class="btn btn-block btn-round btn-b">Register</button>
+                    </div>
+                </form> -->
+              </div>
+            </div>
+          </div>
+        </section>
+    </main>
+    {% endblock %}
+    {% block js %}
+      {% include "js_src.html" %}
+    {% endblock %}
+{% endblock %}
