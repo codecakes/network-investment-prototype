@@ -2,4 +2,13 @@
 **/**/migrations/*
 venv/
 .idea/*
-# Pipfile.lock
+addons/*/migrations/
+.pyc
+**/*/*.pyc
+**/**/*.pyc
+pyc
+.pyc
+/*.pyc
+**/*.pyc
+migrations/
+pyc
