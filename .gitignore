@@ -2,4 +2,4 @@
 **/**/migrations/*
 venv/
 .idea/*
-Pipfile.lock
+# Pipfile.lock
