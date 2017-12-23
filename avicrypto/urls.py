@@ -20,6 +20,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^', include('addons.accounts.urls', namespace="accounts")),
+    url(r'^package/', include('addons.packages.urls', namespace="package")),
+    url(r'^transaction/', include('addons.transactions.urls', namespace="transaction")),
+    url(r'^wallet/', include('addons.wallet.urls', namespace="wallet")),
     url(r'^admin/', admin.site.urls)
 ]
 

@@ -3,57 +3,90 @@
 {% block body %}
     {% block main %}
     <main>
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li>{{message}}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
         <section class="module">
           <div class="container">
             <div class="row">
               <div class="col-sm-5 col-sm-offset-1 mb-sm-40">
                 <h4 class="font-alt">Login</h4>
                 <hr class="divider-w mb-10">
-                <form class="form" method="POST" action="/login">
-                  <div class="form-group">
-                    <input class="form-control" id="login-username" type="text" name="username" placeholder="Username" required/>
+                <form class="form" name="" id="loginform" method="post" action="/login">
+                {% csrf_token %}
+                <div class="form-group">
+                    <div class="login-input-box">
+                      <input class="form-control" placeholder="Username" id="usernmae" name="username" value="{{ username }}" type="text">
+                    </div>
+                </div> <br>
+                <div class="form-group">
+                  <div class="login-input-box">
+                      <input class="form-control" id="password" name="password" value="{{ username }}" placeholder="Password" type="password">
+                    </div>
+                </div>
+                <br><div class="form-group">
+                    <button class="btn btn-round btn-b">Next</button>
                   </div>
-                  <div class="form-group">
-                    <input class="form-control" id="login-password" type="password" name="password" placeholder="Password" required/>
-                  </div>
-                  <div class="form-group">
-                    <button class="btn btn-round btn-b">Login</button>
-                  </div>
-                  <div class="form-group"><a href="">Forgot Password?</a></div>
                 </form>
               </div>
               <div class="col-sm-5">
                 <h4 class="font-alt">Register</h4>
                 <hr class="divider-w mb-10">
-                <form id="sigup-form" class="form">
+              <form name="" id="ragistrationFormMover" method="POST" action="/signup/">
+              {{ signup_form.as_p }}
+              {% csrf_token %}
+              <div class="form-group has-feedback" style="margin-bottom: 0px">
+                <input type="text" id="email" class="form-control" name="email" value="{{email}}" placeholder="E-mail address" />
+              </div><br>
+              <div class="form-group has-feedback" style="margin-bottom: 0px">
+                  <input type="text" id="name" class="form-control" name="name" value="{{ name }}" placeholder="Name" />
+              </div>
+              <div class="form-group has-feedback" style="margin-bottom: 0px">
+                  <input type="text" id="mobile" class="form-control" name="mobile" value="{{ mobile }}" placeholder="Mobile" />
+              </div>
+              <div class="form-group has-feedback" >
+                  <input type="text" id="password" class="form-control" name="password" value="{{ password }}" placeholder="Password" type="password"/>
+              </div>
+              <div class="form-group has-feedback" >
+                  <input type="text" id="confirm_password" class="form-control" name="confirm_password" value="{{ confirm_password }}" placeholder="Confirm Password" type="password"/>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-12">
+                    <button type="submit" id="submit_mover" name="submit" class="form contact-form-button light-form-button oswald light" style="width:85%">Submit</button>
+                </div>
+              </div>
+          </form>
+                <!-- <form id="sigup-form" class="form" method="POST" action="/signup">
                   <div class="form-group">
-                    <input class="form-control" id="signup-email" type="text" name="email" placeholder="Email"/>
-                    <span id='email-matching-message'></span>
+                    <input class="form-control" id="email" type="text" name="email" placeholder="Email"/>
                   </div>
                   <div class="form-group">
-                    <input class="form-control" id="signup-username" type="text" name="username" placeholder="Username"/>
-                    <span id='username-matching-message'></span>
+                    <input class="form-control" id="username" type="text" name="username" placeholder="Username"/>
                   </div>
                   <div class="form-group">
-                    <input class="form-control" id="signup-password" type="password" name="password" placeholder="Password"/>
-                    <span id='password-matching-message'></span>
+                    <input class="form-control" id="password" type="password" name="password" placeholder="Password"/>
                   </div>
                   <div class="form-group">
-                    <input class="form-control" id="signup-rePassword" type="password" name="re-password" placeholder="Re-enter Password"/><span id='rePassword-matching-message'></span>
+                    <input class="form-control" id="re-password" type="password" name="re-password" placeholder="Re-enter Password"/>
                   </div>
                     <div class="form-group">
-                        <input class="form-control" id="signup-sponsorId" type="text" name="sponsor_id" placeholder="Sponsor ID"/>
+                        <input class="form-control" id="sponsor_id" type="text" name="sponsor_id" placeholder="Sponsor ID"/>
                     </div>
                     <div class="form-group">
-                        <input class="form-control" id="signup-placementId" type="text" name="placement_id" placeholder="Placement ID"/>
+                        <input class="form-control" id="placement_id" type="text" name="placement_id" placeholder="Placement ID"/>
                     </div>
                     <div class="form-group">
-                        <input class="form-control" id="signup-mobileNum" type="text" name="mobile_num" placeholder="Mobile Num"/>
+                        <input class="form-control" id="mob_num" type="text" name="mob_num" placeholder="Mobile Num"/>
                     </div>
                     <div class="form-group">
+                      <button class="btn btn-block btn-round btn-b">Register</button>
                     </div>
-                </form>
-                <button id="register-btn" class="btn btn-block btn-round btn-b">Register</button>
+                </form> -->
               </div>
             </div>
           </div>
