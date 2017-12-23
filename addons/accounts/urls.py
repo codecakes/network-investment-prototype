@@ -22,7 +22,7 @@ urlpatterns = [
 	url(r'^$', views.index, name='index'),
     url(r'^login$', views.login_fn, name='login'),
     url(r'^signup', views.Registration.as_view(), name='signup'),
-    url(r'^dashboard', views.home, name='dashboard'),
-    # url(r'^thanks$', views.thanks, name='thanks'),
+    url(r'^home', views.home, name='dashboard'),
+    url(r'^thanks$', views.thanks, name='thanks'),
     # url(r'logout', views.logout_fn, name='Secure logout'),
 ]

@@ -50,33 +50,41 @@ class Registration(FormView):    # code for template is given below the view's c
             return True
         except ValidationError:
             return False
-    def reset_password(self, user, request):
-	    c = {
-	        'email': user.email,
-	        'domain': request.META['HTTP_HOST'],
-	        'site_name': 'AVI Crypto',
-	        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-	        'user': user,
-	        'token': default_token_generator.make_token(user),
-	        'protocol': 'http',
-	    }
-	    subject_template_name = 'password_reset_subject.txt'
-	    # copied from
-	    # django/contrib/admin/templates/registration/password_reset_subject.txt
-	    # to templates directory
-	    email_template_name = 'registration_password_reset_email.html'
-	    # copied from
-	    # django/contrib/admin/templates/registration/password_reset_email.html
-	    # to templates directory
-	    subject = loader.render_to_string(subject_template_name, c)
-	    # Email subject *must not* contain newlines
-	    subject = ''.join(subject.splitlines())
-	    email = loader.render_to_string(email_template_name, c)
-	    send_mail(subject, email, DEFAULT_FROM_EMAIL,
-	              [user.email], fail_silently=False)
-
     def post(self, request, *args, **kwargs):
+    	form = self.form_class(request.POST)
+    	try:
+    		if form.is_valid():
+    			data_dict = form.cleaned_data
+    			data = form.cleaned_data['email']
+    			if self.validate_email_address(data) is True:
+    				associated_users = User.objects.filter(
+    					Q(email=data) | Q(username=data))
+    				if associated_users.exists():
+    					result = self.form_valid(form)
+    					messages.success(
+    						request, 'User already exists')
+    					return result
+    				else:
+    					user = User.objects.create(username=data_dict['email'], email=data_dict['email'],password=data_dict['password'], first_name=data_dict['name'])
+    					result = self.form_valid(form)
+                        messages.success(
+                            request, 'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
+                        return result
+   #              else:
+   #              	result = self.form_invalid(form)
+   #              	messages.error(
+   #              		request, 'Error')
+   #              	return result
+			# else:
+   #          	result =  self.form_invalid(form)
+			# 	messages.error(
+   #                          request, 'Email is not correct')
+   #              return result
+
+    	except Exception as e:
+    		raise
     	print 'self', self
+    	return self.form_invalid(form)
 
 def login_fn(request):
 	if request.method == 'GET':
