@@ -26,3 +26,4 @@ urlpatterns = [
     url(r'^thanks$', views.thanks, name='thanks'),
     # url(r'logout', views.logout_fn, name='Secure logout'),
 ]
+
