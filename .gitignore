@@ -3,3 +3,4 @@
 venv/
 .idea/*
 # Pipfile.lock
+addons/*/migrations/
