@@ -47,10 +47,10 @@ INSTALLED_APPS = [
     'addons.wallet',
 ]
 
-MIDDLEWARE_CLASSES = (
-    # Simplified static file serving.
-    # https://warehouse.python.org/project/whitenoise/
-    'whitenoise.middleware.WhiteNoiseMiddleware')
+# MIDDLEWARE_CLASSES = (
+#     # Simplified static file serving.
+#     # https://warehouse.python.org/project/whitenoise/
+#     'whitenoise.middleware.WhiteNoiseMiddleware')
 
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -102,12 +102,20 @@ WSGI_APPLICATION = 'avicrypto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['avicrypto_db'],
-        'USER': os.environ['avicrypto_user'],
-        'PASSWORD': os.environ['avicrypto_pwd'],
-        'HOST': os.environ['avicrypto_host'],
+        'NAME': 'avicrypto',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
         'PORT': '5432'
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': os.environ['avicrypto_db'],
+    #     'USER': os.environ['avicrypto_user'],
+    #     'PASSWORD': os.environ['avicrypto_pwd'],
+    #     'HOST': os.environ['avicrypto_host'],
+    #     'PORT': '5432'
+    # }
 }
 
 
@@ -148,21 +156,21 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles'
 
-# STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, 'static'),
-# )
-
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH, 'static'),
+    os.path.join(BASE_DIR, 'static'),
 )
+
+# STATICFILES_DIRS = (
+#     os.path.join(PROJECT_PATH, 'static'),
+# )
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-    'compressor.finders.CompressorFinder'
+   'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'compressor.finders.CompressorFinder'
 )
 
 # django_heroku.settings(locals())
