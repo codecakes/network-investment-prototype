@@ -102,19 +102,26 @@ def login_fn(request):
                 login(request, user)
                 if user.is_staff:
                     if user.is_superuser:
-                        return HttpResponse("User is admin user")
-                    return HttpResponse("usrertype is staff")
+                        return HttpResponseRedirect('/admin')
+                    return HttpResponseRedirect("/home")
                 else:
                     return HttpResponseRedirect('/home')
-            	return HttpResponse("login is ok")
+            	return HttpResponse('/home')
             else:
-            	return HttpResponse("failed inside")
+            	return HttpResponse('/error')
         else:
-        	return HttpResponse("failed outside")
-        return HttpResponse("failed extra outside")
+        	return HttpResponse('/error')
+        return HttpResponse('/error')
 
 def thanks(request):
     template = loader.get_template('thanks.html')
+    context = {
+            'user':'None'
+        }
+    return HttpResponse(template.render(context, request))
+
+def error(request):
+    template = loader.get_template('error.html')
     context = {
             'user':'None'
         }
@@ -132,8 +139,8 @@ def home(request):
         }
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
-            return HttpResponse("Oopse something went wrong")
+            return HttpResponse('/error')
         else:
             return HttpResponse(template.render(context,request))
     else:
-        return HttpResponse('404 not found')
+        return HttpResponse('/error')
