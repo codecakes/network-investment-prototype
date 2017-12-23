@@ -83,7 +83,7 @@ class Registration(FormView):    # code for template is given below the view's c
 
     	except Exception as e:
     		raise
-    	print 'self', self
+    	# print 'self', self
     	return self.form_invalid(form)
 
 def login_fn(request):
