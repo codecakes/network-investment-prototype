@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db.models.query_utils import Q
 from django.views.generic import *
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from addons.accounts.models import Profile
 from forms import signup_form
 # Create your views here.
@@ -106,12 +107,12 @@ def login_fn(request):
                     return HttpResponseRedirect("/home")
                 else:
                     return HttpResponseRedirect('/home')
-            	return HttpResponse('/home')
+            	return HttpResponseRedirect('/home')
             else:
-            	return HttpResponse('/error')
+            	return HttpResponseRedirect('/error')
         else:
-        	return HttpResponse('/error')
-        return HttpResponse('/error')
+        	return HttpResponseRedirect('/error')
+        return HttpResponseRedirect('/error')
 
 def thanks(request):
     template = loader.get_template('thanks.html')
@@ -132,6 +133,7 @@ def logout_fn(request):
    response = HttpResponseRedirect('/')
    return response
 
+@login_required(login_url="/login")
 def home(request):
     if request.method == 'GET':
     	context = {
@@ -139,8 +141,8 @@ def home(request):
         }
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
-            return HttpResponse('/error')
+            return HttpResponseRedirect('/error')
         else:
             return HttpResponse(template.render(context,request))
     else:
-        return HttpResponse('/error')
+        return HttpResponseRedirect('/error')

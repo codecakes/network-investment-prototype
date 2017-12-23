@@ -25,6 +25,6 @@ urlpatterns = [
     url(r'^home', views.home, name='dashboard'),
     url(r'^thanks$', views.thanks, name='thanks'),
     url(r'^error$', views.error, name='Error'),
-    # url(r'logout', views.logout_fn, name='Secure logout'),
+    url(r'^logout$', views.logout_fn, name='Secure logout'),
 ]
 
