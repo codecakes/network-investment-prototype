@@ -61,6 +61,6 @@
     </main>
     {% endblock %}
     {% block js %}
-      {% include "js_src.html" %}
-    {% endblock %}
+          {{ block.super }}
+        {% endblock %}
 {% endblock %}
