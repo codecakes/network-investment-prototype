@@ -15,8 +15,19 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^', include('addons.accounts.urls', namespace="accounts")),
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/', admin.site.urls)
 ]
+
+if not settings.DEBUG:
+    urlpatterns += url('',
+        (r'^static/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.STATIC_ROOT
+        }),
+    )
+
+urlpatterns += static(settings.STATIC_ROOT, document_root=settings.STATIC_ROOT)
