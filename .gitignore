@@ -1,3 +1,5 @@
 *.pyc
 **/**/migrations/*
 venv/
+.idea/*
+Pipfile.lock
