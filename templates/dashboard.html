@@ -1,51 +1,173 @@
 {% extends "base.html" %}
 
 {% block body %}
-    {% block main %}
-    <main>
-        <nav class="navbar navbar-custom navbar-fixed-top one-page" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span
-                            class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
-                            class="icon-bar"></span><span class="icon-bar"></span></button>
-                    <a class="navbar-brand" href="#">AviCrypto</a>
-                </div>
-                <div class="collapse navbar-collapse" id="custom-collapse">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a class="section-scroll" href="#logout">Logout</a></li>
-                        <!--<li><a class="section-scroll" href="#contact">Get In Touch</a></li>-->
-                    </ul>
-                </div>
+{% block main %}
+<main>
+    <nav class="navbar navbar-custom navbar-fixed-top one-page" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span
+                        class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
+                        class="icon-bar"></span><span class="icon-bar"></span></button>
+                <a class="navbar-brand" href="#">AviCrypto</a>
             </div>
-        </nav>
-        <section class="module">
-          <div class="container">
+            <div class="collapse navbar-collapse" id="custom-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a class="section-scroll" href="#logout">Logout</a></li>
+                    <!--<li><a class="section-scroll" href="#contact">Get In Touch</a></li>-->
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <section class="module">
+        <div class="container">
             <div class="row">
-              <div class="col-sm-8 col-sm-offset-2">
-                <h4 class="font-alt mb-0">Dashboard</h4>
-                <hr class="divider-w mt-10 mb-20">
-                <div role="tabpanel">
-                  <ul class="nav nav-tabs font-alt" role="tablist">
-                    <li class="active"><a href="#home" data-toggle="tab"><span class="icon-tools-2"></span>Home</a></li>
-                      <li><a href="#profile" data-toggle="tab"><span class="icon-tools-2"></span>Profile</a></li>
-                      <li><a href="#account" data-toggle="tab"><span class="icon-tools-2"></span>Account</a></li>
-                  </ul>
-                  <div class="tab-content">
-                    <div class="tab-pane active" id="home">
-                        Home
+                <div class="col-sm-8 col-sm-offset-2">
+                    <h4 class="font-alt mb-0">Dashboard</h4>
+                    <hr class="divider-w mt-10 mb-20">
+                    <div role="tabpanel">
+                        <ul class="nav nav-tabs font-alt" role="tablist">
+                            <li><a href="#profile" data-toggle="tab"><span class="icon-tools-2"></span>Profile</a></li>
+                            <li><a href="#account" data-toggle="tab"><span class="icon-tools-2"></span>Account</a></li>
+                            <li><a href="#support" data-toggle="tab"><span class="icon-tools-2"></span>Support</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="profile">
+                                <div class="row" id="profile-summary">
+                                    <p>Profile Summary</p>
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th>Firstname</th>
+                                            <th>Lastname</th>
+                                            <th>Email</th>
+                                            <th>Package</th>
+                                            <th>Mobile Number</th>
+                                            <th>Bank Account Type</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>user.firtname</td>
+                                            <td>user.lastname</td>
+                                            <td>user.email</td>
+                                            <td>user.package.amount</td>
+                                            <td>user.mob_num</td>
+                                            <td>user.account_type</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="account">
+                                <div class="row" id="account-summary">
+                                    <div class="row">
+                                        <h3>Wallet Summary</h3>
+                                        <table>
+                                            <thead>
+                                            <tr>
+                                                <th>Wallet</th>
+                                                <th>Description</th>
+                                                <th>Wallet Amount</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for wallet in user.wallets %}
+                                            <tr>
+                                                <td>user.wallet.wallet_type</td>
+                                                <td>user.wallet.description</td>
+                                                <td>user.wallet.amount</td>
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="row">
+                                        <p>Transactions Summary</p>
+                                        <table>
+                                            <thead>
+                                            <tr>
+                                                <th>Receiver</th>
+                                                <th>Description</th>
+                                                <th>Transaction Amount</th>
+                                                <th>Transaction ID</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for txn in user.transactions %}
+                                            <tr>
+                                                <td>txn.receiver_wallet.user.name</td>
+                                                <td>txn.description</td>
+                                                <td>txn.amount.wallet.amount</td>
+                                                <td>txn.txn_id</td>
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane active" id="support">
+                                <div class="row" id="request-support">
+                                    <section class="module bg-dark-60 request-cta"
+                                             data-background="{% static "images/Layer.png" %}">
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <h2 class="font-alt">Request a call back</h2>
+                                                    <p>Would you like to speak to one of our financial advisers over the
+                                                        phone? Just submit your details and we’ll be in touch shortly.
+                                                        You can also email us if you would prefer.</p>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    <div class="row">
+                                                        <form class="form rqst-form" id="requestACall" role="form"
+                                                              method="post" action="">
+                                                            <div class="form-group col-sm-6 col-xs-12">
+                                                                <input class="form-control input-lg" type="text"
+                                                                       name="name" placeholder="Name"/>
+                                                            </div>
+                                                            <div class="form-group col-sm-6 col-xs-12">
+                                                                <select class="form-control input-lg" name="subject">
+                                                                    <option value="subject1" disabled="" selected="">
+                                                                        Subject
+                                                                    </option>
+                                                                    <option value="BusinessConsulting">Business
+                                                                        consulting
+                                                                    </option>
+                                                                    <option value="InvestAdvisory">Cryto Investment Advisory
+                                                                    </option>
+                                                                    <option value="InvestmentPlanning">Cryto Investment
+                                                                        Planning
+                                                                    </option>
+                                                                    <option value="General">General Support
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group col-sm-6 col-xs-12">
+                                                                <input class="form-control input-lg" type="text"
+                                                                       name="phone" placeholder="Phone Number"/>
+                                                            </div>
+                                                            <div class="form-group col-sm-6 col-xs-12">
+                                                                <button class="btn btn-border-w btn-circle btn-block"
+                                                                        id="racSubmit" type="submit"><i
+                                                                        class="fa fa-paper-plane-o"></i> Submit
+                                                                </button>
+                                                            </div>
+                                                            <div id="requestFormResponse"></div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                      <div class="tab-pane active" id="profile">
-                        Profile
-                    </div>
-                    <div class="tab-pane" id="account">
-                        Account
-                    </div>
-                  </div>
-                </div>
-    </main>
-    {% endblock %}
-    {% block js %}
-          {{ block.super }}
-        {% endblock %}
+</main>
+{% endblock %}
+{% block js %}
+{{ block.super }}
+{% endblock %}
 {% endblock %}
