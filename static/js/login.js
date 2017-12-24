@@ -172,7 +172,9 @@ $(function(){
             data: data,
             success: function(prod_detail) {
                 var data = prod_detail//JSON.parse(prod_detail)
-                console.log(data)
+                alert(data);
+                $("#ragistrationFormMover").reset()
+
             }
         });
        } else {
