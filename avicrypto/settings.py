@@ -147,7 +147,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 print BASE_DIR, PROJECT_PATH
 # STATIC_URL = '/static/'
-STATIC_URL = "https://178.62.252.134/avicrypto/staticfiles/"
+STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
 STATIC_ROOT = 'staticfiles'
 
 # STATICFILES_DIRS = (

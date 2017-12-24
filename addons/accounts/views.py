@@ -12,8 +12,14 @@ from django.core.exceptions import ValidationError
 from django.db.models.query_utils import Q
 from django.views.generic import *
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from addons.accounts.models import Profile
+from addons.transactions.models import Transactions
+from addons.wallet.models import Wallet
+from addons.packages.models import Packages
 from forms import signup_form
+from django.shortcuts import get_object_or_404
+
 # Create your views here.
 
 def index(request):
@@ -106,12 +112,12 @@ def login_fn(request):
                     return HttpResponseRedirect("/home")
                 else:
                     return HttpResponseRedirect('/home')
-            	return HttpResponse('/home')
+            	return HttpResponseRedirect('/home')
             else:
-            	return HttpResponse('/error')
+            	return HttpResponseRedirect('/error')
         else:
-        	return HttpResponse('/error')
-        return HttpResponse('/error')
+        	return HttpResponseRedirect('/error')
+        return HttpResponseRedirect('/error')
 
 def thanks(request):
     template = loader.get_template('thanks.html')
@@ -132,15 +138,37 @@ def logout_fn(request):
    response = HttpResponseRedirect('/')
    return response
 
+@login_required(login_url="/login")
 def home(request):
     if request.method == 'GET':
+        user = request.user
+        user_d = User.objects.filter(id=user.id)
+        packages = Packages.objects.filter(user=request.user)
+        # # import pdb; pdb.set_trace()
+        # # transactions = Transactions.objects.filter(sender_wallet=get_object_or_404(Wallet, owner=request.user))
+        # try:
+        #     # sender_wallet= Wallet.objects.get(owner=request.user)
+        #     transactions = Transactions.objects.filter()
+        # except Transactions.DoesNotExist:
+        #     transactions = None
+        try:
+            wallets = Wallet.objects.filter(owner=request.user)
+        except:
+            wallets = None
+        # profile = Profile.objects.filter(user=request.user)
     	context = {
-            'user':'None'
+            'user':user_d,
+            'wallets':wallets,
+            # # 'profile':profile,
+            # 'transactions':transactions,
+            'packages':packages
         }
+        # import pdb; pdb.set_trace()
+        print context
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
-            return HttpResponse('/error')
+            return HttpResponseRedirect('/error')
         else:
             return HttpResponse(template.render(context,request))
     else:
-        return HttpResponse('/error')
+        return HttpResponseRedirect('/error')

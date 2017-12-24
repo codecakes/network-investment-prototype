@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from django.core.validators import RegexValidator
 from addons.packages.models import Packages
 # Create your models here.
+User._meta.local_fields[4].__dict__['_unique'] = True
 
 class Profile(models.Model):
 	phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")

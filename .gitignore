@@ -14,3 +14,4 @@ migrations/
 pyc
 addons/**/*.pyc
 avicrypto/*.pyc
+pyc
