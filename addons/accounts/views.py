@@ -124,7 +124,8 @@ def thanks(request):
     context = {
             'user':'None'
         }
-    return HttpResponse(template.render(context, request))
+    #return HttpResponse(template.render(context, request))
+    return HttpResponse("THank tou for registration.Admin")
 
 def error(request):
     template = loader.get_template('error.html')
