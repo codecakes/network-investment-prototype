@@ -2,6 +2,7 @@
 
 {% block body %}
     {% block main %}
+    {% load static %}
     <main>
         <nav class="navbar navbar-custom navbar-fixed-top one-page" role="navigation">
             <div class="container">
@@ -47,14 +48,16 @@
                                         </tr>
                                         </thead>
                                         <tbody>
+                                         {% for u in user %}
                                         <tr>
-                                            <td>user.firtname</td>
-                                            <td>user.lastname</td>
-                                            <td>user.email</td>
-                                            <td>user.package.amount</td>
-                                            <td>user.mob_num</td>
-                                            <td>user.account_type</td>
+                                            <td>{{u.firtname}}</td>
+                                            <td>{{u.lastname}}</td>
+                                            <td>{{u.email}}</td>
+                                            <td>{{u.profile.package}}/td>
+                                            <td>{{u.profile.mob_num}}</td>
+                                            <td>{{u.profile.account_type}}</td>
                                         </tr>
+                                        {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
