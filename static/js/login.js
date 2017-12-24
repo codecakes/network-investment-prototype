@@ -1,21 +1,23 @@
 console.log("dvjbvjkbvjkdvjkd")
 $(function(){
-    	$('#signup-password, #signup-rePassword').change(function () {
-    		if($('#signup-password').val() && $('#signup-rePassword').val()){
-	    		if ($('#signup-password').val() == $('#signup-rePassword').val()) {
+    	$('#signup_password, #confirm_password').change(function () {
+    		if($('#signup_password').val() && $('#confirm_password').val()){
+	    		console.log("both val")
+                if ($('#signup_password').val() == $('#confirm_password').val()) {
 	    			$('#rePassword-matching-message').html('Matching').css('color', 'green');
 	    		} else{
-	    			$('#password-matching-message').html('');
+	    			$('#signup_password-matching-message').html('');
 	    			$('#rePassword-matching-message').html('Not Matching').css('color', 'red');
 	    		}
     		} else {
-    			if ($('#signup-password').val()==""){
-		    		$('#password-matching-message').html('Required Field').css('color', 'red');
+                console.log("not")
+    			if ($('#signup_password').val()==""){
+		    		$('#signup_password-matching-message').html('Required Field').css('color', 'red');
 		    	} else {
-		    		$('#password-matching-message').html("");
+		    		$('#signup_password-matching-message').html("");
 		    	}
 
-		    	if ($('#signup-rePassword').val()==""){
+		    	if ($('#confirm_password').val()==""){
 		    		$('#rePassword-matching-message').html('Required Field').css('color', 'red');
 		    	} else {
 		    		$('#rePassword-matching-message').html("");
@@ -23,9 +25,9 @@ $(function(){
     		}
     	});
 
-    	$('#signup-email').on("keyup",function () {
-    		if($('#signup-email').val()){
-	    		if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test($('#signup-email').val()))
+    	$('#email').on("change",function () {
+    		if($('#email').val()){
+	    		if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test($('#email').val()))
 	    		{
 	    			$('#email-matching-message').html('Valid').css('color', 'green');
 	    		} else{
@@ -37,40 +39,53 @@ $(function(){
     		}
     	});
 
-    	$('#signup-username').on("keyup",function () {
-    		if($('#signup-username').val()){
-	    		if (/^[a-zA-Z0-9]+$/.test($('#signup-username').val()))
+    	$('#name').on("change",function () {
+    		if($('#name').val()){
+	    		if (/^[a-zA-Z0-9]+$/.test($('#name').val()))
 	    		{
-	    			$('#username-matching-message').html('Valid').css('color', 'green');
+	    			$('#name-matching-message').html('Valid').css('color', 'green');
 	    		} else {
-	    			$('#username-matching-message').html('Invalid Userrname.use only character and digits only').css('color', 'red');
+	    			$('#name-matching-message').html('Invalid name.use only character and digits only').css('color', 'red');
 	    		}
     		} else {
-    			$('#username-matching-message').html('Required Field').css('color', 'red');
+    			$('#name-matching-message').html('Required Field').css('color', 'red');
     		}
     	});
 
+        $('#mobile').on("change",function () {
+            if($('#mobile').val()){
+                if (/^[0]?[789]\d{9}$/.test($('#mobile').val()))
+                {
+                    $('#mobile-matching-message').html('Valid').css('color', 'green');
+                } else {
+                    $('#mobile-matching-message').html('Invalid mobile.use only character and digits only').css('color', 'red');
+                }
+            } else {
+                $('#mobile-matching-message').html('Required Field').css('color', 'red');
+            }
+        });
+
     var passwordValidation = function(){
-    		if($('#signup-password').val() && $('#signup-rePassword').val()){
-	    		if ($('#signup-password').val() == $('#signup-rePassword').val()) {
+    		if($('#signup_password').val() && $('#confirm_password').val()){
+	    		if ($('#signup_password').val() == $('#confirm_password').val()) {
 	    			$('#rePassword-matching-message').html('Matching').css('color', 'green');
 	    			return true;
 	    		} else{
-	    			$('#password-matching-message').html('');
+	    			$('#signup_password-matching-message').html('');
 	    			$('#rePassword-matching-message').html('Not Matching').css('color', 'red');
 	    			return false;
 	    		}
     		} else {
     			var result = false
-    			if ($('#signup-password').val()==""){
-		    		$('#password-matching-message').html('Required Field').css('color', 'red');
+    			if ($('#signup_password').val()==""){
+		    		$('#signup_password-matching-message').html('Required Field').css('color', 'red');
 		    		result = false;
-		    	} else if ($('#signup-rePassword').val()==""){
+		    	} else if ($('#confirm_password').val()==""){
 		    		$('#rePassword-matching-message').html('Required Field').css('color', 'red');
 		    		result = false;
 		    	} else {
 		    		$('#rePassword-matching-message').html("");
-		    		$('#password-matching-message').html("");
+		    		$('#signup_password-matching-message').html("");
 		    		result = true;
 		    	}
 		    	return result;
@@ -78,8 +93,8 @@ $(function(){
     }
 
     var emailValidation = function(){
-    		if($('#signup-email').val()){
-	    		if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test($('#signup-email').val()))
+    		if($('#email').val()){
+	    		if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test($('#email').val()))
 	    		{
 	    			$('#email-matching-message').html('Valid').css('color', 'green');
 	    			return true
@@ -93,23 +108,42 @@ $(function(){
     		}
     }
 
-    var usernameValidation = function(){
+    var nameValidation = function(){
     		console.log("callllll")
-    		if($('#signup-username').val()){
-	    		if (/^[a-zA-Z0-9]+$/.test($('#signup-username').val()))
+    		if($('#name').val()){
+	    		if (/^[a-zA-Z0-9]+$/.test($('#name').val()))
 	    		{
-	    			$('#username-matching-message').html('Valid').css('color', 'green');
+	    			$('#name-matching-message').html('Valid').css('color', 'green');
 	    			return true
 	    		} else {
 
-		    		$('#username-matching-message').html('Invalid Userrname.use only character and digits only').css('color', 'red');
+		    		$('#name-matching-message').html('Invalid name.use only character and digits only').css('color', 'red');
 		    		return false
 	    		}
     		} else {
-    			$('#username-matching-message').html('Required Field').css('color', 'red');
+    			$('#name-matching-message').html('Required Field').css('color', 'red');
     			return false
     		}
     }
+
+    var mobileValidation = function(){
+            console.log("callllll")
+            if($('#mobile').val()){
+                if (/^[0]?[789]\d{9}$/.test($('#mobile').val()))
+                {
+                    $('#mobile-matching-message').html('Valid').css('color', 'green');
+                    return true
+                } else {
+
+                    $('#mobile-matching-message').html('Invalid mobile.use only character and digits only').css('color', 'red');
+                    return false
+                }
+            } else {
+                $('#mobile-matching-message').html('Required Field').css('color', 'red');
+                return false
+            }
+    }
+
     function getFormData($form){
         var unindexed_array = $form.serializeArray();
         var indexed_array = {};
@@ -120,22 +154,24 @@ $(function(){
 
         return indexed_array;
     }
-    $("#register-btn").click(function(evt){
+
+    $("#submit_mover").click(function(evt){
        console.log("reg click")
        var emailResult =emailValidation();
-       var usernameResult=usernameValidation();
+       var nameResult=nameValidation();
+       var mobileResult=mobileValidation();
        var passwordResult=passwordValidation();
-       console.log(emailResult,usernameResult,passwordResult)
-       var form = $("#sigup-form");
+       console.log(emailResult,nameResult,passwordResult,mobileResult)
+       var form = $("#ragistrationFormMover");
 	   var data = getFormData(form);
 	   console.log("registration data === ", data)
-       if(emailResult && usernameResult && passwordResult){
+       if(emailResult && nameResult && passwordResult && mobileResult){
        	$.ajax({
             type: "POST",
-            url: "/signup",
+            url: "/signup/",
             data: data,
             success: function(prod_detail) {
-                var data = JSON.parse(prod_detail)
+                var data = prod_detail//JSON.parse(prod_detail)
                 console.log(data)
             }
         });
