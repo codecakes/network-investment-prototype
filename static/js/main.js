@@ -7,42 +7,58 @@ console.log('%c Proudly Crafted with ZiOn.', 'background: #222; color: #bada55')
     $(window).on('load', function() {
         $('.loader').fadeOut();
         $('.page-loader').delay(350).fadeOut('slow');
-        var now = new Date(); 
-        var ss = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours()+5, now.getUTCMinutes()+30, now.getUTCSeconds())
-        //var ss = s.toString().split(" GMT")[0
-        var ee = new Date("Fri Dec 22 2017 21:00:00");
+        var countDownTimer = function(){
+            var launchDateArray = [
+                {
+                    "deadLine":"Sun Dec 24 2017 14:00:00",
+                    "message":"Invite and build your Affiliate Network"
+                },
+                {
+                    "deadLine":"Mon Dec 25 2017 09:30:00",
+                    "message":"Network Tree, Account and Wallets"
+                },
+                {
+                    "deadLine":"Wed Dec 27 2017 22:00:00",
+                    "message":"Account Summary"
+                }
+            ]
+            var loadDate = new Date();
+            var lastLaunchDate = new Date(launchDateArray[launchDateArray.length-1].deadLine)
+            if(+loadDate<+lastLaunchDate){
+                $("#countdowntimer").append('<div id="launchMessage"></div><span id="future_date"><span>')
+                var beginDate = new Date(loadDate.getUTCFullYear(), loadDate.getUTCMonth(), loadDate.getUTCDate(),  loadDate.getUTCHours()+5, loadDate.getUTCMinutes()+30, loadDate.getUTCSeconds())
+                var launchDate = "";
+                var printMessage = "";
+                for(var each in launchDateArray){
+                    var indexDate = launchDateArray[each];
+                    var topDate = new Date(indexDate.deadLine);
+                    console.log(loadDate, topDate)
+                    if(+loadDate<=+topDate){
+                        console.log("date")
+                        launchDate = topDate;
+                        printMessage = indexDate.message
+                        break;
+                    }
+                }
+                console.log(beginDate)
+                console.log(launchDate)
+                console.log(printMessage)
+                $("#future_date").countdowntimer({startDate :beginDate,dateAndTime : launchDate,size : "xl"})
+                $("#launchMessage").html(printMessage)
+                setTimeout(function(){
+                    $("#countdowntimer").empty()
+                    countDownTimer();
+                }, diff_minutes(loadDate, launchDate));
+            }
+            function diff_minutes(dt2, dt1) 
+            {
+              var diff =(dt2.getTime() - dt1.getTime());
+              //diff /= 60;
+              return Math.abs(Math.round(diff));
+            }
+        }
 
-        // function diff_minutes(dt2, dt1) 
-        // {
-
-        //   var diff =(dt2.getTime() - dt1.getTime()) / 1000;
-        //   //diff /= 60;
-        //   return Math.abs(Math.round(diff));
-          
-        //  }
-
-
-
-        // function secondsToString(seconds)
-
-        // {
-
-        // var numdays = Math.floor(seconds / 86400);
-
-        // var numhours = Math.floor((seconds % 86400) / 3600);
-
-        // var numminutes = Math.floor(((seconds % 86400) % 3600) / 60);
-
-        // var numseconds = ((seconds % 86400) % 3600) % 60;
-        // console.log(numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds")
-        // return {"days":numdays,"hours":numhours,"minutes" :numminutes, "seconds":numseconds};
-
-        // }
-        // timeDiffObj = secondsToString(diff_minutes(ss, ee))
-        // console.log();
-        // edd = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours()+ timeDiffObj.hours, now.getUTCMinutes()+timeDiffObj.numminutes, now.getUTCSeconds()+ timeDiffObj.numseconds)
-        // var ed = edd.toString().split(" GMT")[0]
-        $("#future_date").countdowntimer({startDate :ss,dateAndTime : ee,size : "xl"})
+        countDownTimer();    
     });
 
     $(document).ready(function() {
