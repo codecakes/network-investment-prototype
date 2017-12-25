@@ -173,8 +173,7 @@ $(function(){
             success: function(prod_detail) {
                 var data = prod_detail//JSON.parse(prod_detail)
                 alert(data);
-                $("#ragistrationFormMover").reset()
-
+                window.location.href = "http://www.avicrypto.us/"
             }
         });
        } else {

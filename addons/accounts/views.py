@@ -125,7 +125,7 @@ def thanks(request):
             'user':'None'
         }
     #return HttpResponse(template.render(context, request))
-    return HttpResponse("THank tou for registration.Admin")
+    return HttpResponse("Thank you for registration.Soon you will receive a conformation mail.")
 
 def error(request):
     template = loader.get_template('error.html')
