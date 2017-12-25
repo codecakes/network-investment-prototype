@@ -20,7 +20,7 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <div class="login-input-box">
-                      <input class="form-control" placeholder="Username" id="usernmae" name="username" value="{{ username }}" type="text" required>
+                      <input class="form-control" placeholder="Username" id="usernmae" name="username" value="{{ username }}" type="email" required>
                     </div>
                 </div> <br>
                 <div class="form-group">
@@ -40,7 +40,7 @@
               {{ signup_form.as_p }}
               {% csrf_token %}
               <div class="form-group has-feedback" style="margin-bottom: 0px">
-                <input type="text" id="email" class="form-control" name="email" value="{{email}}" placeholder="E-mail address" />
+                <input type="email" id="email" class="form-control" name="email" value="{{email}}" placeholder="E-mail address" />
                 <span id='email-matching-message'></span>
               </div><br>
               <div class="form-group has-feedback" style="margin-bottom: 0px">
@@ -52,11 +52,11 @@
                   <span id='mobile-matching-message'></span>
               </div>
               <div class="form-group has-feedback" >
-                  <input type="text" id="signup_password" class="form-control" name="password" value="{{ password }}" placeholder="Password" type="password"/>
+                  <input id="signup_password" class="form-control" name="password" value="{{ password }}" placeholder="Password" type="password"/>
                   <span id='signup_password-matching-message'></span>
               </div>
               <div class="form-group has-feedback" >
-                  <input type="text" id="confirm_password" class="form-control" name="confirm_password" value="{{ confirm_password }}" placeholder="Confirm Password" type="password"/>
+                  <input id="confirm_password" class="form-control" name="confirm_password" value="{{ confirm_password }}" placeholder="Confirm Password" type="password"/>
                   <span id='rePassword-matching-message'></span>
               </div>
 
