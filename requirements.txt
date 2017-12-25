@@ -10,7 +10,9 @@ DateTime==4.2
 decorator==4.1.2
 dj-database-url==0.4.2
 Django==1.11.6
+django-appconf==1.0.2
 django-common-helpers==0.9.1
+django-compressor==2.2
 django-cron==0.5.0
 django-heroku==0.2.0
 djangorestframework==3.7.1
@@ -47,7 +49,9 @@ pyflakes==1.6.0
 Pygments==2.2.0
 python-memcached==1.58
 pytz==2017.3
+rcssmin==1.0.6
 requests==2.18.4
+rjsmin==1.0.12
 scandir==1.6
 shutilwhich==1.1.0
 simplegeneric==0.8.1
