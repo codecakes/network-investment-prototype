@@ -41,11 +41,11 @@ $(function(){
 
     	$('#name').on("change",function () {
     		if($('#name').val()){
-	    		if (/^[a-zA-Z0-9]+$/.test($('#name').val()))
+	    		if (/^[a-zA-Z0-9 ]{2,30}$/.test($('#name').val()))
 	    		{
 	    			$('#name-matching-message').html('Valid').css('color', 'green');
 	    		} else {
-	    			$('#name-matching-message').html('Invalid name.use only character and digits only').css('color', 'red');
+	    			$('#name-matching-message').html('Invalid name.use only character,digits and name only').css('color', 'red');
 	    		}
     		} else {
     			$('#name-matching-message').html('Required Field').css('color', 'red');
@@ -58,7 +58,7 @@ $(function(){
                 {
                     $('#mobile-matching-message').html('Valid').css('color', 'green');
                 } else {
-                    $('#mobile-matching-message').html('Invalid mobile.use only character and digits only').css('color', 'red');
+                    $('#mobile-matching-message').html('Invalid mobile.Provide 10 digit valid mobile number start with 7,8 or 9').css('color', 'red');
                 }
             } else {
                 $('#mobile-matching-message').html('Required Field').css('color', 'red');
@@ -111,13 +111,13 @@ $(function(){
     var nameValidation = function(){
     		console.log("callllll")
     		if($('#name').val()){
-	    		if (/^[a-zA-Z0-9]+$/.test($('#name').val()))
+	    		if (/^[a-zA-Z0-9 ]{2,30}$/.test($('#name').val()))
 	    		{
 	    			$('#name-matching-message').html('Valid').css('color', 'green');
 	    			return true
 	    		} else {
 
-		    		$('#name-matching-message').html('Invalid name.use only character and digits only').css('color', 'red');
+		    		$('#name-matching-message').html('Invalid name.use only character,digits and name only').css('color', 'red');
 		    		return false
 	    		}
     		} else {
@@ -135,7 +135,7 @@ $(function(){
                     return true
                 } else {
 
-                    $('#mobile-matching-message').html('Invalid mobile.use only character and digits only').css('color', 'red');
+                    $('#mobile-matching-message').html('Invalid mobile.Provide 10 digit valid mobile number start with 7,8 or 9').css('color', 'red');
                     return false
                 }
             } else {
@@ -173,7 +173,7 @@ $(function(){
             success: function(prod_detail) {
                 var data = prod_detail//JSON.parse(prod_detail)
                 alert(data);
-                window.location.href = "http://www.avicrypto.us/"
+                window.location.href = "http://www.avicrypto.us/login"
             }
         });
        } else {
