@@ -17,8 +17,9 @@ import os
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 # PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+# BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -47,12 +48,12 @@ INSTALLED_APPS = [
     'addons.wallet',
 ]
 
-MIDDLEWARE_CLASSES = (
+# MIDDLEWARE_CLASSES = (
     # Simplified static file serving.
     # https://warehouse.python.org/project/whitenoise/
-    'whitenoise.middleware.WhiteNoiseMiddleware')
+    # 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -145,19 +146,26 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-print BASE_DIR, PROJECT_PATH
-# STATIC_URL = '/static/'
-STATIC_URL = "https://178.62.252.134/avicrypto/staticfiles/"
-STATIC_ROOT = 'staticfiles'
+# print BASE_DIR, PROJECT_PATH
+# # STATIC_URL = '/static/'
+# STATIC_URL = "https://178.62.252.134/avicrypto/staticfiles/"
+# STATIC_ROOT = 'staticfiles'
+
+# # STATICFILES_DIRS = (
+# #     os.path.join(BASE_DIR, 'static'),
+# # )
 
 # STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, 'static'),
+#     os.path.join(PROJECT_PATH, 'static'),
 # )
 
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH, 'static'),
-)
+STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -168,3 +176,6 @@ STATICFILES_FINDERS = (
 )
 
 # django_heroku.settings(locals())
+
+
+
