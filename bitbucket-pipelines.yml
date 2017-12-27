@@ -8,7 +8,7 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - pip install -U pipenv
           - pip install -r requirements.txt
-          - python migrate --noinput
+          - python manage.py migrate --noinput
         services:
           - database
 definitions:
