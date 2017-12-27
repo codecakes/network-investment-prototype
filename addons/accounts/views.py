@@ -23,7 +23,8 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import sys
 sys.path.append(settings.BASE_DIR)
-# from avicrypto import service
+print sys.path
+from avicrypto import services
 # Create your views here.
 
 def index(request):
@@ -79,7 +80,7 @@ class Registration(FormView):    # code for template is given below the view's c
     					user.set_password(str(data_dict['password']))
                         user.save()
                         body = "Welcome to Avicrypto! "
-                        service.send_email('Wellcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
+                        services.send_email_mailgun('Wellcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
                         result = self.form_valid(form)
                         messages.success(
                             request, 'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
@@ -190,6 +191,11 @@ def support(request):
         context = {'user':'None'}
         return HttpResponse(template.render(context, request))
 
+def network(request):
+    if request.method == 'GET':
+        template = loader.get_template('network.html')
+        context = {'user':'None'}
+        return HttpResponse(template.render(context, request))
 # def simple_upload(request):
 #     if request.method == 'POST' and request.FILES['myfile']:
 #         myfile = request.FILES['myfile']
