@@ -10,8 +10,16 @@
                 <div class="row">
                         <button class="btn btn-round btn-b text-center">Add User</button>
                 </div>
+            <div id="networkContainer">
             <h3>Network Tree</h3>
-            <div></div>
+            	
+            </div>
+            <div class="chart" id="networkTree"></div>
+
         </div>
     </div>
+{% block js %}
+          {{ block.super }}
+        {% endblock %}
 {% endblock %}
+
