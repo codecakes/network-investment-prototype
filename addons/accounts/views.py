@@ -207,6 +207,22 @@ def network(request):
 #         })
 #     return render(request, 'core/simple_upload.html')
 
+def simple_upload(request):
+    if request.method == 'POST' and request.FILES['passfront'] and request.FILES['passback'] and request.FILES['passphoto']:
+        passfront = request.FILES['passfront']
+        passback =  request.FILES['passback']
+        passphoto =  request.FILES['passphoto']
+        fs = FileSystemStorage()
+        filename_passfront = fs.save(passfront.name, passfront)
+        filename_passback = fs.save(passback.name, passback)
+        filename_passphoto = fs.save(passphoto.name, passphoto)
+        uploaded_file_url = fs.url(filename_passfront) or fs.url(filename_passback) or fs.url(filename_passphoto)
+        return render(request, 'simple_upload.html', {
+            'uploaded_file_url': uploaded_file_url
+        })
+    return render(request, 'simple_upload.html')
+
+
 def model_form_upload(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
@@ -215,6 +231,6 @@ def model_form_upload(request):
             return redirect('home')
     else:
         form = DocumentForm()
-    return render(request, 'core/model_form_upload.html', {
+    return render(request, 'model_upload.html', {
         'form': form
     })

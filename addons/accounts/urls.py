@@ -29,5 +29,8 @@ urlpatterns = [
     url(r'^logout$', views.logout_fn, name='Secure logout'),
     url(r'^network$', views.network, name='network'),
     url(r'^support$', views.support, name='support'),
+    url(r'^uploads/simple/$', views.simple_upload, name='simple_upload'),
+    url(r'^uploads/form/$', views.model_form_upload, name='model_form_upload'),
 ]
+
 
