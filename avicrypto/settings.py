@@ -154,10 +154,16 @@ USE_TZ = True
 # # STATICFILES_DIRS = (
 # #     os.path.join(BASE_DIR, 'static'),
 # # )
+# STATIC_URL = '/static/'
+# STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
+# STATIC_ROOT = 'staticfiles'
 
 # STATICFILES_DIRS = (
 #     os.path.join(PROJECT_PATH, 'static'),
 # )
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATIC_URL = '/static/'
 
@@ -175,6 +181,11 @@ STATICFILES_FINDERS = (
     'compressor.finders.CompressorFinder'
 )
 
+mailgun_conf = {
+    'domain': 'avicrypto.us',
+    'key': 'key-1055741f06d43a548bf5def6962b536a',
+    'api': 'https://api.mailgun.net/v3/avicrypto.us/messages'
+}
 # django_heroku.settings(locals())
 
 

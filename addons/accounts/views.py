@@ -16,10 +16,14 @@ from django.contrib.auth.decorators import login_required
 from addons.accounts.models import Profile
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
-from addons.packages.models import Packages
+from addons.packages.models import Packages, User_packages
 from forms import signup_form
 from django.shortcuts import get_object_or_404
-
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+import sys
+sys.path.append(settings.BASE_DIR)
+# from avicrypto import service
 # Create your views here.
 
 def index(request):
@@ -38,7 +42,7 @@ def index(request):
                         (100000, 9.00, 31, 8.00, 4.00, 100000)
                     ]
 		}
-		template = loader.get_template('index.html')
+		template = loader.get_template('index2.html')
 		return HttpResponse(template.render(context,request))
 	if request.method == 'POST':
 		# pass
@@ -71,8 +75,12 @@ class Registration(FormView):    # code for template is given below the view's c
     						request, 'User already exists')
     					return result
     				else:
-    					user = User.objects.create(username=data_dict['email'], email=data_dict['email'],password=data_dict['password'], first_name=data_dict['name'])
-    					result = self.form_valid(form)
+    					user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['name'])
+    					user.set_password(str(data_dict['password']))
+                        user.save()
+                        body = "Welcome to Avicrypto! "
+                        service.send_email('Wellcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
+                        result = self.form_valid(form)
                         messages.success(
                             request, 'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
                         return result
@@ -124,7 +132,8 @@ def thanks(request):
     context = {
             'user':'None'
         }
-    return HttpResponse(template.render(context, request))
+    #return HttpResponse(template.render(context, request))
+    return HttpResponse("Thank you for registration.Soon you will receive a conformation mail.")
 
 def error(request):
     template = loader.get_template('error.html')
@@ -143,27 +152,14 @@ def home(request):
     if request.method == 'GET':
         user = request.user
         user_d = User.objects.filter(id=user.id)
-        packages = Packages.objects.filter(user=request.user)
-        # # import pdb; pdb.set_trace()
-        # # transactions = Transactions.objects.filter(sender_wallet=get_object_or_404(Wallet, owner=request.user))
-        # try:
-        #     # sender_wallet= Wallet.objects.get(owner=request.user)
-        #     transactions = Transactions.objects.filter()
-        # except Transactions.DoesNotExist:
-        #     transactions = None
-        try:
-            wallets = Wallet.objects.filter(owner=request.user)
-        except:
-            wallets = None
-        # profile = Profile.objects.filter(user=request.user)
+        packages = User_packages.objects.filter(user_id=request.user)
+        for l in user_d:    code=l.profile.my_referal_code
     	context = {
             'user':user_d,
-            'wallets':wallets,
-            # # 'profile':profile,
-            # 'transactions':transactions,
+            'request':request,
+            'link':request.META['HTTP_HOST']+'/login?ref='+str(code),
             'packages':packages
         }
-        # import pdb; pdb.set_trace()
         print context
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
@@ -172,3 +168,47 @@ def home(request):
             return HttpResponse(template.render(context,request))
     else:
         return HttpResponseRedirect('/error')
+
+@login_required(login_url="/login")
+def profile(request):
+    if request.method == 'GET':
+        user = request.user
+        context = {
+            'user':user
+        }
+        template = loader.get_template('profile.html')
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/error')
+        else:
+            return HttpResponse(template.render(context,request))
+    else:
+        return HttpResponseRedirect('/error')
+
+def support(request):
+    if request.method == 'GET':
+        template = loader.get_template('support.html')
+        context = {'user':'None'}
+        return HttpResponse(template.render(context, request))
+
+# def simple_upload(request):
+#     if request.method == 'POST' and request.FILES['myfile']:
+#         myfile = request.FILES['myfile']
+#         fs = FileSystemStorage()
+#         filename = fs.save(myfile.name, myfile)
+#         uploaded_file_url = fs.url(filename)
+#         return render(request, 'core/simple_upload.html', {
+#             'uploaded_file_url': uploaded_file_url
+#         })
+#     return render(request, 'core/simple_upload.html')
+
+def model_form_upload(request):
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = DocumentForm()
+    return render(request, 'core/model_form_upload.html', {
+        'form': form
+    })

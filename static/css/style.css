@@ -2926,3 +2926,40 @@ Google map
     width: 100%;
   }
 }
+
+.white-box {
+  background: #fff;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+
+.boxed {
+    background: #F42E2E;
+    width: 235px;
+    padding: 8px;
+    margin: 8px;
+    border: 8px black;
+}
+
+.boxed1 {
+  background: #9FACF3;
+      width: 235px;
+    padding: 8px;
+    margin: 8px;
+  border: 8px black ;
+}
+
+.boxed2 {
+  background: #E9F7EF;
+      width: 260px;
+    padding: 8px;
+    margin: 8px;
+  border: 8px black ;
+}
+.before_icon_margin:{
+ margin-left: 15px !important;
+}
+
+.header-dashboard-custom {
+  background-color: solid blue !important;
+}

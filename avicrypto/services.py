@@ -1,10 +1,11 @@
 import requests
-def send_email(subject, body, receipient_emails, from_email="postmaster"):
-    domain = os.environ['DOMAIN_NAME']
-    return requests.post(
-        "https://api.mailgun.net/v3/%s/messages" %(domain),
-        auth=("api", os.environ['MAILGUN_API_KEY']),
-        data={"from": "AviCrypto <mailgun@%s>" %(domain),
+def send_email_mailgun(subject, body, receipient_emails, from_email="postmaster"):
+    uri = 'https://api.mailgun.net/v3/avicrypto.us/messages'
+    key = 'key-1055741f06d43a548bf5def6962b536a'
+    data = {"from": "AviCrypto <mail@avicrypto.us>",
               "to": receipient_emails,
               "subject": subject,
-              "text": body})
+              "text": body}
+    return requests.post(
+        uri,auth=("api", key),
+        data=data)

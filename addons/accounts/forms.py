@@ -2,7 +2,7 @@ import re
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from models import Profile
+from models import Profile, Document
 
 class signup_form(forms.Form):
 
@@ -17,10 +17,20 @@ class signup_form(forms.Form):
     		user = User.objects.get(username__iexact=self.cleaned_data['email'])
     	except User.DoesNotExist:
     		return self.cleaned_data['email']
-    	raise forms.ValidationError(_("Email already exist"))
+        raise forms.ValidationError(_("Email already exist"))
     
     def clean(self):
         if 'password' in self.cleaned_data and 'confirm_password' in self.cleaned_data:
             if self.cleaned_data['password'] != self.cleaned_data['confirm_password']:
                 raise forms.ValidationError(_("The two password fields did not match."))
         return self.cleaned_data
+
+# class UploadFileForm(forms.Form):
+#     title = forms.CharField(max_length=50)
+#     file = forms.FileField()
+
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ('description', 'document', )

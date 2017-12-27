@@ -1,176 +1,150 @@
-{% extends "base.html" %}
+{% extends "home_root.html" %}
 
-{% block body %}
-    {% block main %}
-    {% load static %}
-    <main>
-        <nav class="navbar navbar-custom navbar-fixed-top one-page" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span
-                            class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
-                            class="icon-bar"></span><span class="icon-bar"></span></button>
-                    <a class="navbar-brand" href="#">AviCrypto</a>
-                </div>
-                <div class="collapse navbar-collapse" id="custom-collapse">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a class="section-scroll" href="/logout">Logout</a></li>
-                        <!--<li><a class="section-scroll" href="#contact">Get In Touch</a></li>-->
-                    </ul>
-                </div>
-        </div>
-    </nav>
-    <section class="module">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-8 col-sm-offset-2">
-                    <h4 class="font-alt mb-0">Dashboard</h4>
-                    <hr class="divider-w mt-10 mb-20">
-                    <div role="tabpanel">
-                        <ul class="nav nav-tabs font-alt" role="tablist">
-                            <li><a href="#profile" data-toggle="tab"><span class="icon-tools-2"></span>Profile</a></li>
-                            <li><a href="#account" data-toggle="tab"><span class="icon-tools-2"></span>Account</a></li>
-                            <li><a href="#support" data-toggle="tab"><span class="icon-tools-2"></span>Support</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="profile">
-                                <div class="row" id="profile-summary">
-                                    <p>Profile Summary</p>
-                                    <table>
-                                        <thead>
-                                        <tr>
-                                            <th>Firstname</th>
-                                            <th>Lastname</th>
-                                            <th>Email</th>
-                                            <th>Package</th>
-                                            <th>Mobile Number</th>
-                                            <th>Bank Account Type</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                         {% for u in user %}
-                                        <tr>
-                                            <td>{{u.firtname}}</td>
-                                            <td>{{u.lastname}}</td>
-                                            <td>{{u.email}}</td>
-                                            <td>{{u.profile.package}}/td>
-                                            <td>{{u.profile.mob_num}}</td>
-                                            <td>{{u.profile.account_type}}</td>
-                                        </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
+{% block contents %}
+
+<div class="tab-content">
+    <div class="tab-pane active" id="dashboard">
+        <div class="row" id="dashboard-summary">
+            <h2>Profile</h2>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+                    <th>Email</th>
+                    <th>Mobile Number</th>
+                    <th>Bank Account Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for u in user %}
+                <tr>
+                    <td>{{u.first_name}}</td>
+                    <td>{{u.last_name}}</td>
+                    <td>{{u.email}}</td>
+                    <td>{{u.profile.mobile}}</td>
+                    <td>{{u.profile.account_type}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p>Refereal Link:   <input type="text" size="40" value="{{link}}" id="referal_link"><button onclick="myFunction()">Copy</button></p>
+            <h2>My Packages</h2>
+            <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Package Name</th>
+                        <th>Description</th>
+                        <td>Price</td>
+                        <th>Status</th>
+                        <th>Start date</th>
+                        <th>Expiry date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in packages %}
+                    <tr>
+                        <td>{{p.package}}</td>
+                        <td>{{p.package.description}}</td>
+                        <td>{{p.package.price}}</td>
+                        <td>{{p.status}}</td>
+                        <td>{{p.start_date}}</td>
+                        <td>{{p.package.expiry_date}}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-4 col-xs-12 boxed">
+                        <div class="white-box">
+                            <div class="m-b-12">
+                                <h2 style="font-weight:bold; text-align:right; font-size:18px;margin-right: 15px;padding-top: 10px;">Hedging Benefit</h2>
+                                        <!--<span>Total Available Balance</span>-->
                             </div>
-                            <div class="tab-pane" id="account">
-                                <div class="row" id="account-summary">
-                                    <div class="row">
-                                        <h3>Wallet Summary</h3>
-                                        <table>
-                                            <thead>
-                                            <tr>
-                                                <th>Wallet</th>
-                                                <th>Description</th>
-                                                <th>Wallet Amount</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% for wallet in user.wallets %}
-                                            <tr>
-                                                <td>user.wallet.wallet_type</td>
-                                                <td>user.wallet.description</td>
-                                                <td>user.wallet.amount</td>
-                                            </tr>
-                                            {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="row">
-                                        <p>Transactions Summary</p>
-                                        <table>
-                                            <thead>
-                                            <tr>
-                                                <th>Receiver</th>
-                                                <th>Description</th>
-                                                <th>Transaction Amount</th>
-                                                <th>Transaction ID</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% for txn in user.transactions %}
-                                            <tr>
-                                                <td>txn.receiver_wallet.user.name</td>
-                                                <td>txn.description</td>
-                                                <td>txn.amount.wallet.amount</td>
-                                                <td>txn.txn_id</td>
-                                            </tr>
-                                            {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane active" id="support">
-                                <div class="row" id="request-support">
-                                    <section class="module bg-dark-60 request-cta"
-                                             data-background="{% static "images/Layer.png" %}">
-                                        <div class="container">
-                                            <div class="row">
-                                                <div class="col-sm-4">
-                                                    <h2 class="font-alt">Request a call back</h2>
-                                                    <p>Would you like to speak to one of our financial advisers over the
-                                                        phone? Just submit your details and we’ll be in touch shortly.
-                                                        You can also email us if you would prefer.</p>
-                                                </div>
-                                                <div class="col-sm-8">
-                                                    <div class="row">
-                                                        <form class="form rqst-form" id="requestACall" role="form"
-                                                              method="post" action="">
-                                                            <div class="form-group col-sm-6 col-xs-12">
-                                                                <input class="form-control input-lg" type="text"
-                                                                       name="name" placeholder="Name"/>
-                                                            </div>
-                                                            <div class="form-group col-sm-6 col-xs-12">
-                                                                <select class="form-control input-lg" name="subject">
-                                                                    <option value="subject1" disabled="" selected="">
-                                                                        Subject
-                                                                    </option>
-                                                                    <option value="BusinessConsulting">Business
-                                                                        consulting
-                                                                    </option>
-                                                                    <option value="InvestAdvisory">Cryto Investment Advisory
-                                                                    </option>
-                                                                    <option value="InvestmentPlanning">Cryto Investment
-                                                                        Planning
-                                                                    </option>
-                                                                    <option value="General">General Support
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="form-group col-sm-6 col-xs-12">
-                                                                <input class="form-control input-lg" type="text"
-                                                                       name="phone" placeholder="Phone Number"/>
-                                                            </div>
-                                                            <div class="form-group col-sm-6 col-xs-12">
-                                                                <button class="btn btn-border-w btn-circle btn-block"
-                                                                        id="racSubmit" type="submit"><i
-                                                                        class="fa fa-paper-plane-o"></i> Submit
-                                                                </button>
-                                                            </div>
-                                                            <div id="requestFormResponse"></div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </section>
-                                </div>
-                            </div>
+                                <ul class="">
+                                    <li><i class="glyphicon glyphicon-file large before_icon_margin" style="font-size: 4em"></i></li>
+                                    <li class="text-right"><span style="font-size:24px;">$</span><span class="counter fontsize_small_media">
+                                    5995</span><br>
+                                    5877.45098039 XRP 
+                                    </li>
+                                </ul>                                    
                         </div>
                     </div>
-</main>
-{% endblock %}
-{% block js %}
-{{ block.super }}
-{% endblock %}
+                    <div class="col-lg-4 col-sm-4 col-xs-12 boxed1">
+                        <div class="white-box">
+                            <div class="m-b-12">
+                                <b><h2  style="text-align:right; font-weight:bold; font-size:18px;margin-right: 15px;padding-top: 10px;"> Account</h2></b>
+                                        <!--<span>Demo Text</span>-->
+                            </div>
+                            <ul class="">
+                                <li><i class="glyphicon glyphicon-star large before_icon_margin" style="font-size: 4em"></i></li>
+                                <li class="text-right"><span style="font-size:24px;">$</span><span class="counter">
+                                315
+                                </span><br>
+                                308.823529412 XRP 
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-4 col-xs-12 boxed2">
+                        <div class="white-box">
+                            <div class="m-b-12">
+                                <h2 class="box-title" style="font-weight:bold; text-align:right; font-size:18px;margin-right: 15px;padding-top: 10px;">Pair Account</h2>
+                                       <!-- <span>Demo Text</span>-->
+                            </div>
+                                <ul class="">
+                                    <li><i class="glyphicon glyphicon-user large before_icon_margin" style="font-size: 4em"></i></li>
+                                    <li class="text-right"><span style="font-size:24px;">$</span><span class="before_icon_margin">
+                                    408
+                                    </span><br> 
+                                    400 XRP</li>
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+            <h2>Member History</h2>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Location</th>
+                    <th>Date of Add </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Hemant Pahuja</td>
+                    <td>hemant@gmail.com</td>
+                    <td>India</td>
+                    <td>2017-12-27</td>
+                </tr>
+                <tr>
+                    <td>Mayank Sachdeva</td>
+                    <td>mayank@gmail.com</td>
+                    <td>India</td>
+                    <td>2017-12-27</td>
+                </tr>
+                {% for u in user %}
+                <tr>
+                    <td>{{u.first_name}}</td>
+                    <td>{{u.last_name}}</td>
+                    <td>{{u.email}}</td>
+                    <td>{{u.profile.package}}/td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function myFunction() {
+       console.log('---') 
+  var copyText = document.getElementById("referal_link");
+  copyText.select();
+  document.execCommand("Copy");
+  alert("Copied the text: " + copyText.value);
+}
+</script>
 {% endblock %}

@@ -8,9 +8,12 @@ class Wallet(models.Model):
 
 	wallet_type_choice = (
 	    ('BN', 'Binary'),
-	    ('DR', 'Direct')
+	    ('DR', 'Direct'),
+	    ('ROI', 'ROI'),
+	    ('AW', 'Avi Wallet')
 	)
-	owner = models.OneToOneField(User, on_delete=models.CASCADE)
+	
+	owner = models.ForeignKey(User,on_delete=models.CASCADE, related_name='+')
 	wallet_type = models.CharField(max_length=100,choices=wallet_type_choice)
 	description =models.CharField(null=True,max_length=300)
 	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
