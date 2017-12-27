@@ -1,0 +1,22 @@
+image: python:2.7.14
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - pip
+        script: # Modify the commands below to build your repository.
+          - pip install -U pipenv
+          - pip install -r requirements.txt
+          - python migrate --noinput
+        services:
+          - database
+definitions:
+  services:
+    database:
+      image: postgres:9.6.6-alpine
+      environment: 
+        POSTGRES_DB: 'pipelines' 
+        POSTGRES_USER: 'postgres'
+        POSTGRES_PASSWORD: 'postgres'
+        
