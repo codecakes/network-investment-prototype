@@ -9,6 +9,12 @@ pipelines:
           - pip install -U pipenv
           - pip install -r requirements.txt
           - python manage.py migrate --noinput
+          - python manage.py migrate --noinput
+          - python manage.py makemigrations accounts
+          - python manage.py makemigrations wallet
+          - python manage.py makemigrations transactions
+          - python manage.py makemigrations packages
+          - python manage.py migrate
         services:
           - database
 definitions:
@@ -16,9 +22,6 @@ definitions:
     database:
       image: postgres:9.6.6-alpine
       environment: 
-        POSTGRES_DB: 'pipelines' 
-        POSTGRES_USER: 'postgres'
-        POSTGRES_PASSWORD: 'postgres'
         avicrypto_db: $avicrypto_db
         avicrypto_user: $avicrypto_user
         avicrypto_pwd: $avicrypto_pwd
