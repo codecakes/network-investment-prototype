@@ -3,9 +3,9 @@
 {% block contents %}
 
 <div class="tab-content">
-    <div class="tab-pane active" id="packages_list">
-        <div class="row" id="packages-summary">
-            <h2>Packages</h2>
+    <div class="tab-pane active" id="packages_b_list">
+        <div class="row" id="packages-b-summary">
+            <h2>Bussiness Packages</h2>
                 <div class="row">
                     <div class="col-lg-4 col-sm-4 col-xs-12 boxed">
                         <div class="white-box">
@@ -19,10 +19,8 @@
                                     <li class="text-right"><span style="font-size:24px;">$</span><span class="counter fontsize_small_media">
                                     Price</span> 
                                     </li>
-                                </ul>  
-                            </div>                                  
+                                </ul>                                    
                         </div>
-                        <button class="btn btn-round btn-b text-center" id=package>Buy</button>
                     </div>
 
                 {% for p in packages %}
@@ -37,10 +35,8 @@
                                     <li class="text-right"><span style="font-size:24px;">$</span><span class="counter fontsize_small_media">
                                     {{p.price}}</span> 
                                     </li>
-                                 </ul>  
-                            </div>                                  
+                                </ul>                                    
                         </div>
-                        <button class="btn btn-round btn-b text-center" id=package_{{p.id}}>Buy</button>
                     </div>
                 {% endfor %}
         </div>

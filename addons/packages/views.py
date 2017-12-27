@@ -66,3 +66,21 @@ class PackagesList(ListView):
             'packages': packages
         }
         return HttpResponse(self.template.render(context, request))
+
+class PackagesBList(ListView):
+    template = loader.get_template('packages_b_list.html')
+    model = Packages
+
+    def get_context_data(self, **kwargs):
+        context = super(PackagesList, self).get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        return context
+
+    def get(self, request):
+        print "get list of Packages", self.template
+        packages = Packages.objects.filter(user=request.user)
+        print packages
+        context = {
+            'packages': packages
+        }
+        return HttpResponse(self.template.render(context, request))

@@ -79,7 +79,7 @@ class Registration(FormView):    # code for template is given below the view's c
     					user.set_password(str(data_dict['password']))
                         user.save()
                         body = "Welcome to Avicrypto! "
-                        service.send_email('Wellcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
+                        # service.send_email('Wellcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
                         result = self.form_valid(form)
                         messages.success(
                             request, 'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
@@ -173,8 +173,9 @@ def home(request):
 def profile(request):
     if request.method == 'GET':
         user = request.user
+        user_d = User.objects.filter(id=user.id)
         context = {
-            'user':user
+            'user':user_d
         }
         template = loader.get_template('profile.html')
         if not request.user.is_authenticated():
