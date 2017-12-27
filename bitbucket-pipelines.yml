@@ -22,7 +22,7 @@ definitions:
     database:
       image: postgres:9.6.6-alpine
       environment: 
-        avicrypto_db: $avicrypto_db
-        avicrypto_user: $avicrypto_user
-        avicrypto_pwd: $avicrypto_pwd
-        avicrypto_host: $avicrypto_host
+        avicrypto_db: "$avicrypto_db"
+        avicrypto_user: "$avicrypto_user"
+        avicrypto_pwd: "$avicrypto_pwd"
+        avicrypto_host: "$avicrypto_host"
