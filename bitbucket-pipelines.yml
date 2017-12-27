@@ -19,7 +19,7 @@ definitions:
         POSTGRES_DB: 'pipelines' 
         POSTGRES_USER: 'postgres'
         POSTGRES_PASSWORD: 'postgres'
-        avicrypto_db: 'postgres'
-        avicrypto_user: 'postgres'
-        avicrypto_pwd: 'postgres'
-        avicrypto_host: 'localhost'
+        avicrypto_db: $avicrypto_db
+        avicrypto_user: $avicrypto_user
+        avicrypto_pwd: $avicrypto_pwd
+        avicrypto_host: $avicrypto_host
