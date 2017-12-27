@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^thanks$', views.thanks, name='thanks'),
     url(r'^error$', views.error, name='Error'),
     url(r'^logout$', views.logout_fn, name='Secure logout'),
+    url(r'^network$', views.network, name='network'),
     url(r'^support$', views.support, name='support'),
 ]
 
