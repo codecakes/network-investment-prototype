@@ -67,3 +67,21 @@ class TransactionsList(ListView):
             'transactions': transactions
         }
         return HttpResponse(self.template.render(context, request))
+
+class TransactionsSummary(ListView):
+    template = loader.get_template('transactions.html')
+    model = Transactions
+
+    def get_context_data(self, **kwargs):
+        context = super(TransactionsSummary, self).get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        return context
+
+    def get(self, request):
+        print "get list of transactions", self.template
+        transactions = Transactions.objects.all()
+        print transactions
+        context = {
+            'transactions': transactions
+        }
+        return HttpResponse(self.template.render(context, request))
