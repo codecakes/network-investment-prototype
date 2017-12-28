@@ -22,6 +22,5 @@ $(function(){
                 var networkTree = new Treant( chart_config );
             }
         });
-        
     }
 })
