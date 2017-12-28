@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from django.core.validators import RegexValidator
 from addons.packages.models import Packages
 import base64, uuid
+from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 User._meta.local_fields[4].__dict__['_unique'] = True
 
@@ -52,6 +53,7 @@ class Profile(models.Model):
 	account_name = models.CharField(max_length=20, null=True)
 	my_referal_code = models.CharField(max_length=20, null=True)
 	status = models.CharField(max_length=50, choices=status_type)
+	# members = ArrayField(ArrayField(models.CharField(max_length=10, blank=True),size=8,),size=8,)
 
 	def __unicode__(self):
 		return "%s" %(self.user)
@@ -76,6 +78,10 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
+
+class Members(models.Model):
+    parent_id = models.ForeignKey(User, related_name='+', null=True)
+    child_id = models.ForeignKey(User, related_name='+', null=True)
 
 class Document(models.Model):
     description = models.CharField(max_length=255, blank=True)
