@@ -79,6 +79,7 @@ class Registration(FormView):    # code for template is given below the view's c
     					user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['name'])
     					user.set_password(str(data_dict['password']))
                         user.save()
+                        update_profile(user, data_dict)
                         body = "Welcome to Avicrypto! "
                         services.send_email_mailgun('Wellcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
                         result = self.form_valid(form)
@@ -103,22 +104,20 @@ class Registration(FormView):    # code for template is given below the view's c
 
 def login_fn(request):
     if request.method == 'GET':
-        # import pdb; pdb.set_trace()
         template = loader.get_template('login.html')
         if 'ref' not in request.GET:
             referal = ''
             sponser_id = ''
-            print '----'
         else:
             referal = request.GET['ref']
-            # import pdb; pdb.set_trace()
             sponser_id = Profile.objects.filter(my_referal_code=referal)
             sponser_id = sponser_id[0].user_auto_id
-            # sponser_id = User.objects.filter(my_referal_code=referal).
+            # placement_id = sponser_id[0].user_auto_id
         context = {
         	'user':'None',
             'referal': referal,
-            'sponser_id':sponser_id
+            'sponser_id':sponser_id,
+            'placement_id':sponser_id
         }
         return HttpResponse(template.render(context,request))
     if request.method == 'POST':
@@ -266,3 +265,13 @@ def model_form_upload(request):
     return render(request, 'model_upload.html', {
         'form': form
     })
+
+
+def update_profile(user, data):
+    profile = Profile.objects.get(user=user)
+    profile.mobile = data['mobile']
+    profile.placement_position = data['placement']
+    profile.placement_id = data['placement_id']
+    profile.referal_code = data['referal']
+    profile.sponcer_id = data['sponcer_id']
+    profile.save()
