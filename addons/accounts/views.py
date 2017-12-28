@@ -21,9 +21,9 @@ from forms import signup_form
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 import sys
 sys.path.append(settings.BASE_DIR)
-print sys.path
 from avicrypto import services
 # Create your views here.
 
@@ -171,6 +171,7 @@ def home(request):
         return HttpResponseRedirect('/error')
 
 @login_required(login_url="/login")
+@csrf_exempt
 def profile(request):
     if request.method == 'GET':
         user = request.user
@@ -183,18 +184,27 @@ def profile(request):
             return HttpResponseRedirect('/error')
         else:
             return HttpResponse(template.render(context,request))
+    if request.method == 'POST':
+        print request
+        import pdb; pdb.set_trace()
+        return HttpResponse('Success')
     else:
         return HttpResponseRedirect('/error')
 
+@csrf_exempt
 def support(request):
     if request.method == 'GET':
         template = loader.get_template('support.html')
         context = {'user':'None'}
         return HttpResponse(template.render(context, request))
+    if request.method == 'POST':
+        # import pdb; pdb.set_trace()
+        services.support_mail('Support Ticket', "Hello, Admin, support ticket generated, please respond", 'jain.atul43@gmail.com', from_email="postmaster")
+        return HttpResponse('Mail sent to adminstrator', content_type="application/json")
 
 
 
-from django.views.decorators.csrf import csrf_exempt
+
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
