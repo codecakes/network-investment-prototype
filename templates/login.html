@@ -59,6 +59,18 @@
               {{ signup_form.as_p }}
               {% csrf_token %}
               <div class="form-group">
+                <input type="text" id="referal" class="form-control" name="referal" value="{{referal}}" placeholder="Referal" />
+              </div>
+              <div class="form-group">
+                <input type="text" id="sponcer_id" class="form-control" name="sponcer_id" value="{{sponser_id}}" placeholder="Sponcer Id" />
+              </div>
+              <div class="form-group">
+                <input type="text" id="placement_id" class="form-control" name="placement_id" value="{{placement_id}}" placeholder="Placement Id" />
+              </div>
+              <div class="form-group">
+                <input type="text" id="placement_position" class="form-control" name="placement_position" value="{{placement_position}}" placeholder="Placement Position" />
+              </div>
+              <div class="form-group">
                 <input type="email" id="email" class="form-control" name="email" value="{{email}}" placeholder="E-mail address" />
                 <span id='email-matching-message'></span>
               </div>
