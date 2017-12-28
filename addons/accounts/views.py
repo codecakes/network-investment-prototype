@@ -102,16 +102,29 @@ class Registration(FormView):    # code for template is given below the view's c
     	return self.form_invalid(form)
 
 def login_fn(request):
-	if request.method == 'GET':
-		template = loader.get_template('login.html')
-		context = {
-			'user':'None'
-		}
-		return HttpResponse(template.render(context,request))
-	if request.method == 'POST':
-		username = request.POST.get('username')
-		password = request.POST.get('password')
-		user = authenticate(username=username, password=password)
+    if request.method == 'GET':
+        # import pdb; pdb.set_trace()
+        template = loader.get_template('login.html')
+        if 'ref' not in request.GET:
+            referal = ''
+            sponser_id = ''
+            print '----'
+        else:
+            referal = request.GET['ref']
+            # import pdb; pdb.set_trace()
+            sponser_id = Profile.objects.filter(my_referal_code=referal)
+            sponser_id = sponser_id[0].user_auto_id
+            # sponser_id = User.objects.filter(my_referal_code=referal).
+        context = {
+        	'user':'None',
+            'referal': referal,
+            'sponser_id':sponser_id
+        }
+        return HttpResponse(template.render(context,request))
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(username=username, password=password)
         if user is not None:
             if user.is_active:
                 login(request, user)
