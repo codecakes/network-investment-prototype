@@ -170,9 +170,9 @@ $(function(){
             url: "/signup/",
             data: data,
             success: function(prod_detail) {
-                var data = prod_detail//JSON.parse(prod_detail)
+                var data = prod_detail;
                 alert(data);
-                window.location.href = "http://www.avicrypto.us/login"
+                window.location.reload();
             }
         });
        } else {
