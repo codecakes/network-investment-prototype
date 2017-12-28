@@ -1,16 +1,25 @@
 {% extends "home_root.html" %}
+
 {% block contents %}
 
-<div>
-    
-</div>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-<div class="tab-pane" id="network">
-    <h1>Add User</h1>
-</div>
+<div class="tab-content">
+    <div class="tab-pane active" id="network_tree">
+        <div class="row" id="network_summary">
+        <br><br>
+            <h2>Networks</h2>
+                <div class="row">
+                        <button class="btn btn-round btn-b text-center">Add User</button>
+                </div>
+            <div id="networkContainer">
+            <h3>Network Tree</h3>
+            	
+            </div>
+            <div class="chart" id="networkTree"></div>
+
+        </div>
+    </div>
+{% block js %}
+          {{ block.super }}
+        {% endblock %}
 {% endblock %}
+

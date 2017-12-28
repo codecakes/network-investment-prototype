@@ -19,7 +19,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 # from django.views.generic.list import ListView
 from django.contrib.auth.models import User
 # from server.accounts.models import Profile
-from models import Packages
+from models import Packages, User_packages
 from forms import packages_form
 
 # Create your views here.
@@ -60,7 +60,26 @@ class PackagesList(ListView):
 
     def get(self, request):
         print "get list of Packages", self.template
-        packages = Packages.objects.filter(user=request.user)
+        packages = Packages.objects.all()
+        # packages = User_packages.objects.filter(user_id=request.user)
+        print packages
+        context = {
+            'packages':packages
+        }
+        return HttpResponse(self.template.render(context, request))
+
+class PackagesBList(ListView):
+    template = loader.get_template('packages_b_list.html')
+    model = Packages
+
+    def get_context_data(self, **kwargs):
+        context = super(PackagesList, self).get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        return context
+
+    def get(self, request):
+        print "get list of Packages", self.template
+        packages = Packages.objects.all()
         print packages
         context = {
             'packages': packages

@@ -3,12 +3,11 @@
 {% block contents %}
 
 <div class="tab-content">
-    <div class="tab-pane active" id="packages_list">
-        <div class="row" id="packages-summary">
+    <div class="tab-pane active" id="packages_b_list">
+        <div class="row" id="packages-b-summary">
         <br>
         <br>
-            <h2>Packages</h2>
-                <div class="row">
+            <h2>Bussiness Packages</h2>
                 {% for p in packages %}
                     <div class="col-sm-4 boxed">
                         <div class="white-box">
@@ -21,7 +20,7 @@
                                     {{p.price}}</span> 
                                     </div>
                             </div>                                  
-                        <button class="btn btn-round btn-b text-center" id=package_{{p.id}}>Upgrade</button>
+                        <!-- <button class="btn btn-round btn-b text-center" id=package_{{p.id}}>Buy</button> -->
                         </div>
                 {% endfor %}
                     </div>

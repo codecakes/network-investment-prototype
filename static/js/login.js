@@ -1,4 +1,3 @@
-console.log("dvjbvjkbvjkdvjkd")
 $(function(){
     	$('#signup_password, #confirm_password').change(function () {
     		if($('#signup_password').val() && $('#confirm_password').val()){
