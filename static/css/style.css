@@ -2932,9 +2932,29 @@ Google map
   margin-bottom: 30px;
   min-height: : 190px;
 }
+.white-box-1 {
+  background: #52b1b1;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+.white-box-2 {
+  background: #adaa4a;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+.white-box-3 {
+  background: #d084a1;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+.white-box-4 {
+  background: #e6e1e1;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
 
 .boxed {
-    background: #F42E2E;
+    background: #fff;
     width: 235px;
     padding: 8px;
     margin: 8px;
@@ -2942,7 +2962,7 @@ Google map
 }
 
 .boxed1 {
-  background: #9FACF3;
+  background: #fff;
       width: 235px;
     padding: 8px;
     margin: 8px;
@@ -2950,7 +2970,7 @@ Google map
 }
 
 .boxed2 {
-  background: #E9F7EF;
+  background: #fff;
       width: 260px;
     padding: 8px;
     margin: 8px;
