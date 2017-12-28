@@ -21,4 +21,5 @@ from . import views
 urlpatterns = [
     url(r'^add/$', views.TransactionsCreate.as_view(), name='transactions_create'),
     url(r'^list/$', views.TransactionsList.as_view(), name='transactions_list'),
+    url(r'^summary/$', views.TransactionsSummary.as_view(), name='transactions_list'),
 ]
