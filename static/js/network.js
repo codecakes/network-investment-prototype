@@ -20,15 +20,23 @@ $(function(){
     $("#newUserAdd").click(function(){
         var newUserForm = $("#addUserForm");
         var newUserData = getFormData(newUserForm);
-        console.log("dataaa ====  ", newUserData)
+        $.ajax({
+             type: "POST",
+             url: "",
+             data: newUserData,
+             success: function(result) {
+                 var data = result;
+                 window.location.reload();
+             }
+         });
     })
 
     if(treeDom.length){
         $.ajax({
             type: "POST",
             url: "/network",
-            success: function(prod_detail) {
-                var data = prod_detail
+            success: function(result) {
+                var data = result
                 var networkData = chart_config = {
                     chart: {
                         container: "#networkTree",
