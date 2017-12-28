@@ -20,15 +20,15 @@ $(function(){
     $("#newUserAdd").click(function(){
         var newUserForm = $("#addUserForm");
         var newUserData = getFormData(newUserForm);
-        $.ajax({
-             type: "POST",
-             url: "",
-             data: newUserData,
-             success: function(result) {
-                 var data = result;
-                 window.location.reload();
-             }
-         });
+        // $.ajax({
+        //      type: "POST",
+        //      url: "",
+        //      data: newUserData,
+        //      success: function(result) {
+        //          var data = result;
+        //          window.location.reload();
+        //      }
+        //  });
     })
 
     if(treeDom.length){
