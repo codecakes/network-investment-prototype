@@ -114,11 +114,24 @@
                     </div>
                         <br>
                         <div class="form-group">
-                            <button class="btn btn-round btn-b">Update</button>
+                            <button id="profile_update" class="btn btn-round btn-b">Update</button>
                         </div>
                 </div>
             </div>
         </div>
     </div>    
 <script type="text/javascript">
+$(function(){
+    $('#profile_update').click(function(){
+        $.ajax({
+            type: "POST",
+            url: "/profile",
+            data:'data'
+            success: function(prod_detail) {
+
+            }
+        }); 
+    });
+});
+</script>
 {% endblock %}
