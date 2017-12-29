@@ -31,6 +31,13 @@ def new_user_text(ref_code, ref_kw):
     }
 
 
+def get_field(model, attr, kw):
+    # get_field(profile, 'sponsor_id', 'id')
+    if getattr(model, attr):
+        return getattr(getattr(model, attr), kw)
+    return None
+
+
 def left_child(members, ref_code):
     if len(members) == 0: return {}
 
@@ -92,8 +99,8 @@ def load_users(user, ref_code):
             "text": {
                 "first_name": user.first_name,
                 "last_name": user.last_name,
-                "sponsor_id": profile.sponser_id.id,
-                "placement_id": profile.placement_id.id,
+                "sponsor_id": profile.sponser_id.id or None,
+                "placement_id": profile.placement_id.id or None,
                 "mobile": profile.mobile,
                 "placement_position": profile.placement_position
             },
