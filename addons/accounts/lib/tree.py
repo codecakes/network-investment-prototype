@@ -2,22 +2,26 @@ from django.contrib.auth.models import User
 from addons.accounts.models import Profile, Members
 
 
+def lower_encode(member, leg_list):
+    val = str.lower(member.child_id.profile.placement_position.encode("utf-8"))
+    return val in leg_list
+
+
 def find_left(member1, member2):
     # member.child_id.profile will give profile object
-    return member1 if member1.child_id.profile.placement_position == "L" else member2
+    return member1 if lower_encode(member1, ('l', 'left')) else member2
 
 
 def find_right(member1, member2):
-    # member.child. here you can pass User models filed
-    return member1 if member1.child_id.profile.placement_position == "R" else member2
+    return member1 if lower_encode(member1, ('r', 'right')) else member2
 
 
 def is_left(member):
-    return member.child_id.profile.placement_position == "L"
+    return lower_encode(member, ('l', 'left'))
 
 
 def is_right(member):
-    return member.child_id.profile.placement_position == "R"
+    lower_encode(member, ('r', 'right'))
 
 
 def new_user_text(ref_code, ref_kw):
@@ -29,6 +33,12 @@ def new_user_text(ref_code, ref_kw):
             "href": ref_code + ref_kw
         }
     }
+
+def get_field(model, attr, kw):
+    # get_field(Profile, 'sponsor_id', 'id')
+    if getattr(model, attr):
+        return getattr(getattr(model, attr), kw)
+    return None
 
 
 def left_child(members, ref_code):
@@ -60,19 +70,6 @@ def load_users(user, ref_code):
     profile = Profile.objects.get(user=user)
     # import pdb; pdb.set_trace()
     user_details = {
-        "name": user.first_name,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "user_auto_id": profile.user_auto_id,
-        "sponsor_id":  None if profile.sponser_id is None else profile.sponser_id.id,
-        "placement_id": None if profile.placement_id is None else profile.placement_id.id,
-        "mobile": profile.mobile,
-        "placement_position": profile.placement_position
-    }
-    members = Members.objects.filter(parent_id=user.id)
-    if len(members) > 0:
-        return {
-            "text": {
                 "name": user.first_name,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
@@ -80,7 +77,11 @@ def load_users(user, ref_code):
                 "placement_id": None if profile.placement_id is None else profile.placement_id.id,
                 "mobile": profile.mobile,
                 "placement_position": profile.placement_position
-            },
+            }
+    members = Members.objects.filter(parent_id=user.id)
+    if len(members) > 0:
+        return {
+            "text": user_details,
             "image": "/static/images/node2.png",
             "link": {
                 "href": profile.href
@@ -92,15 +93,7 @@ def load_users(user, ref_code):
         }
     else:
         return {
-            "text": {
-                "name": user.first_name,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "sponsor_id":  None if profile.sponser_id is None else profile.sponser_id.id,
-                "placement_id": None if profile.placement_id is None else profile.placement_id.id,
-                "mobile": profile.mobile,
-                "placement_position": profile.placement_position
-            },
+            "text": user_details,
             "image": "/static/images/node2.png",
             "link": {
                 "href": profile.href
@@ -110,9 +103,3 @@ def load_users(user, ref_code):
                 new_user_text(ref_code, "&pos=right")
             ]
         }
-
-# def get_field(model, attr, kw):
-#     if getattr(model, attr):
-#         return getattr(getattr(model, attr), kw)
-#     return None
-# get_field(Profile, 'sponsor_id', 'id')
