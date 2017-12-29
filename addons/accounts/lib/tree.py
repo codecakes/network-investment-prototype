@@ -17,7 +17,7 @@ def left_child(members):
     # child_member = find_left(members)
     #  abobe line will raise error for find take exactly 2 argument 1 given , need to correct
     #  here you need to iterate over members list it could be n list 
-    child_member = find_left(members, members)
+    child_member = find_left(*members)
     #  just took string to check
     return load_users(child_member.child_id)
 
@@ -26,8 +26,8 @@ def right_child(members):
     # child_member = find_left(members)
     #  abobe line will raise error for find take exactly 2 argument 1 given , need to correct
     #  here you need to iterate over members list it could be n list
-    child_member = find_right(members, members)
-    # child_member = find_right(*members)
+    # child_member = find_right(members, members)
+    child_member = find_right(*members)
     # type error while using abobe line, check this find_left() argument after * must be an iterable, not Members
     return load_users(child_member.child_id)
 
@@ -47,8 +47,8 @@ def load_users(user):
     # memebers is list of child , right now i am passing only 1 member in each left or right
     if members:
         return {
-            'left' : left_child(members[0]),
-            'right' : right_child(members[0]),
+            'left' : left_child(members),
+            'right' : right_child(members),
             'user': user_details
         
         }
