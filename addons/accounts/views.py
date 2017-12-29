@@ -285,3 +285,14 @@ def update_profile(user, data):
 def traverse_tree(user):
     ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
     return json.dumps(load_users(user, ref_code))
+
+
+def add_user(request, id):
+    if request.method == 'GET':
+        profile = Profile.objects.get(user=id)
+        HttpResponseRedirect('/add/user?ref={}&place={}&pos=right'.format(profile.my_referal_code,profile.user_auto_id))
+    if request.method == 'POST':
+        user = User.objects.creat(request.post)
+        user.save()
+        profile = update_profile(user, data)
+        return HttpResponse('User added successfully to under You')
