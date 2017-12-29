@@ -13,7 +13,7 @@ from django.db.models.query_utils import Q
 from django.views.generic import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from addons.accounts.models import Profile
+from addons.accounts.models import Profile, Members
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
 from addons.packages.models import Packages, User_packages
@@ -26,6 +26,9 @@ import sys
 sys.path.append(settings.BASE_DIR)
 from avicrypto import services
 # Create your views here.
+
+import json
+from lib.tree import load_users
 
 def index(request):
 	if request.method == 'GET':
@@ -275,3 +278,7 @@ def update_profile(user, data):
     profile.referal_code = data['referal']
     profile.sponcer_id = data['sponcer_id']
     profile.save()
+
+
+def traverse_tree(user):
+    return json.dumps(load_users(user))
