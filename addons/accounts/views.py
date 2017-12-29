@@ -201,8 +201,19 @@ def profile(request):
         else:
             return HttpResponse(template.render(context,request))
     if request.method == 'POST':
-        print request
-        import pdb; pdb.set_trace()
+        data = request.POST
+        email = data['email_id']
+        user = User.objects.create(email=email,username=email)
+        user.first_name = data['name']
+        user.save()
+        profile = Profile.objects.get(user=user)
+        sponser_id = Profile.objects.get(user_auto_id=data['refer_id'])
+        placement_id = Profile.objects.get(user_auto_id=data['place_id'])
+        profile.sponser_id=sponser_id.user
+        profile.placement_id = placement_id.user
+        profile.placement = data['placement']
+        profile.save()
+        memeber = Members.objects.create(parent_id=placement_id.user, child_id=user)
         return HttpResponse('Success')
     else:
         return HttpResponseRedirect('/error')
@@ -228,7 +239,6 @@ def network(request):
         context = {'user':'None'}
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
-        print request.method
         data = traverse_tree(request.user)
         # data =  '{"text":{"name":"Mark Hill","title":"Chief executive officer"},"children":[{"text":{"name":"Joe Linux","title":"Chief Technology Officer"},"children":[{"text":{"name":"Ron Blomquist","title":"Chief Information Security Officer"}},{"text":{"name":"Michael Rubin","title":"Chief Innovation Officer","contact":"we@aregreat.com"}}]},{"text":{"name":"Linda May","title":"Chief Business Officer"},"children":[{"text":{"name":"Alice Lopez","title":"Chief Communications Officer"}},{"text":{"name":"Mary Johnson","title":"Chief Brand Officer"},"children":[{"text":{"name":"Erica Reel","title":"Chief Customer Officer"}}]}]}]}'
         return HttpResponse(data)
