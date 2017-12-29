@@ -283,6 +283,5 @@ def update_profile(user, data):
 
 
 def traverse_tree(user):
-    ref_code = "/login?ref={}".format(user.profile.my_referal_code)
-    print ref_code
+    ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
     return json.dumps(load_users(user, ref_code))
