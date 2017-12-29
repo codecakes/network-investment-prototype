@@ -288,8 +288,10 @@ def traverse_tree(user):
     return json.dumps(data)
 
 
+@csrf_exempt
 def add_user(request):
     if request.method == 'GET':
+        print request.GET['pos']
         if 'ref' not in request.GET:
             referal = ''
             sponser_id = ''
@@ -297,12 +299,14 @@ def add_user(request):
             referal = request.GET['ref']
             sponser_id = Profile.objects.filter(my_referal_code=referal)
             sponser_id = sponser_id[0].user_auto_id
+            pos = request.GET['pos']
             # placement_id = sponser_id[0].user_auto_id
         context = {
             'user':'None',
             'referal': referal,
             'sponser_id':sponser_id,
-            'placement_id':sponser_id
+            'placement_id':sponser_id,
+            'pos':pos
         }
         template = loader.get_template('add-user.html')
         if not request.user.is_authenticated():
@@ -310,14 +314,19 @@ def add_user(request):
         else:
             return HttpResponse(template.render(context,request))
     if request.method == 'POST':
-        print request
-        import pdb; pdb.set_trace()
-        return HttpResponse('Success')
-    else:
-        return HttpResponseRedirect('/error')
-    if request.method == 'POST':
-        user = User.objects.creat(request.post)
+        data = request.POST
+        email = data['email_id']
+        user = User.objects.create(email=email,username=email)
+        user.first_name = data['name']
         user.save()
-        profile = update_profile(user, data)
-        return HttpResponse('User added successfully to under You')
+        profile = Profile.objects.get(user=user)
+        sponser_id = Profile.objects.get(user_auto_id=data['refer_id'])
+        placement_id = Profile.objects.get(user_auto_id=data['place_id'])
+        profile.sponser_id=sponser_id.user
+        profile.placement_id = placement_id.user
+        profile.placement = data['placement']
+        profile.save()
+        memeber = Members.objects.create(parent_id=placement_id.user, child_id=user)
+        return HttpResponse('Success')
 
+        # <QueryDict: {u'refer_id': [u'AVI3'], u'placement': [u'left'], u'name': [u'aTUL'], u'email_id': [u'JASVIN@GAMILI.COM'], u'country': [u'India'], u'place_id': [u'AVI3'], u'mob_number': [u'987456325121'], u'drptown': [u'ddELHIO']}
