@@ -191,6 +191,7 @@ def profile(request):
     if request.method == 'GET':
         user = request.user
         user_d = User.objects.filter(id=user.id)
+
         context = {
             'user':user_d
         }
@@ -224,13 +225,12 @@ def support(request):
 def network(request):
     if request.method == 'GET':
         template = loader.get_template('network.html')
-        data = traverse_tree(request.user)
-        print data
         context = {'user':'None'}
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
         print request.method
-        data =  '{"text":{"name":"Mark Hill","title":"Chief executive officer"},"children":[{"text":{"name":"Joe Linux","title":"Chief Technology Officer"},"children":[{"text":{"name":"Ron Blomquist","title":"Chief Information Security Officer"}},{"text":{"name":"Michael Rubin","title":"Chief Innovation Officer","contact":"we@aregreat.com"}}]},{"text":{"name":"Linda May","title":"Chief Business Officer"},"children":[{"text":{"name":"Alice Lopez","title":"Chief Communications Officer"}},{"text":{"name":"Mary Johnson","title":"Chief Brand Officer"},"children":[{"text":{"name":"Erica Reel","title":"Chief Customer Officer"}}]}]}]}'
+        data = traverse_tree(request.user)
+        # data =  '{"text":{"name":"Mark Hill","title":"Chief executive officer"},"children":[{"text":{"name":"Joe Linux","title":"Chief Technology Officer"},"children":[{"text":{"name":"Ron Blomquist","title":"Chief Information Security Officer"}},{"text":{"name":"Michael Rubin","title":"Chief Innovation Officer","contact":"we@aregreat.com"}}]},{"text":{"name":"Linda May","title":"Chief Business Officer"},"children":[{"text":{"name":"Alice Lopez","title":"Chief Communications Officer"}},{"text":{"name":"Mary Johnson","title":"Chief Brand Officer"},"children":[{"text":{"name":"Erica Reel","title":"Chief Customer Officer"}}]}]}]}'
         return HttpResponse(data)
 # def simple_upload(request):
 #     if request.method == 'POST' and request.FILES['myfile']:
@@ -284,15 +284,40 @@ def update_profile(user, data):
 
 def traverse_tree(user):
     ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
-    return json.dumps(load_users(user, ref_code))
+    data = load_users(user, ref_code)
+    return json.dumps(data)
 
 
-def add_user(request, id):
+def add_user(request):
     if request.method == 'GET':
-        profile = Profile.objects.get(user=id)
-        HttpResponseRedirect('/add/user?ref={}&place={}&pos=right'.format(profile.my_referal_code,profile.user_auto_id))
+        if 'ref' not in request.GET:
+            referal = ''
+            sponser_id = ''
+        else:
+            referal = request.GET['ref']
+            sponser_id = Profile.objects.filter(my_referal_code=referal)
+            sponser_id = sponser_id[0].user_auto_id
+            # placement_id = sponser_id[0].user_auto_id
+        context = {
+            'user':'None',
+            'referal': referal,
+            'sponser_id':sponser_id,
+            'placement_id':sponser_id
+        }
+        template = loader.get_template('add-user.html')
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/error')
+        else:
+            return HttpResponse(template.render(context,request))
+    if request.method == 'POST':
+        print request
+        import pdb; pdb.set_trace()
+        return HttpResponse('Success')
+    else:
+        return HttpResponseRedirect('/error')
     if request.method == 'POST':
         user = User.objects.creat(request.post)
         user.save()
         profile = update_profile(user, data)
         return HttpResponse('User added successfully to under You')
+

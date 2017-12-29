@@ -58,12 +58,14 @@ def right_child(members, ref_code):
 def load_users(user, ref_code):
     ref_code = ref_code or ""
     profile = Profile.objects.get(user=user)
+    # import pdb; pdb.set_trace()
     user_details = {
+        "name": user.first_name,
         "first_name": user.first_name,
         "last_name": user.last_name,
         "user_auto_id": profile.user_auto_id,
-        "sponsor_id": profile.sponser_id.id,
-        "placement_id": profile.placement_id.id,
+        "sponsor_id":  None if profile.sponser_id is None else profile.sponser_id.id,
+        "placement_id": None if profile.placement_id is None else profile.placement_id.id,
         "mobile": profile.mobile,
         "placement_position": profile.placement_position
     }
@@ -71,14 +73,15 @@ def load_users(user, ref_code):
     if len(members) > 0:
         return {
             "text": {
+                "name": user.first_name,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
-                "sponsor_id": profile.sponser_id.id,
-                "placement_id": profile.placement_id.id,
+                "sponsor_id":  None if profile.sponser_id is None else profile.sponser_id.id,
+                "placement_id": None if profile.placement_id is None else profile.placement_id.id,
                 "mobile": profile.mobile,
                 "placement_position": profile.placement_position
             },
-            "image": profile.image.url,
+            "image": "/static/images/node2.png",
             "link": {
                 "href": profile.href
             },
@@ -90,14 +93,15 @@ def load_users(user, ref_code):
     else:
         return {
             "text": {
+                "name": user.first_name,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
-                "sponsor_id": profile.sponser_id.id,
-                "placement_id": profile.placement_id.id,
+                "sponsor_id":  None if profile.sponser_id is None else profile.sponser_id.id,
+                "placement_id": None if profile.placement_id is None else profile.placement_id.id,
                 "mobile": profile.mobile,
                 "placement_position": profile.placement_position
             },
-            "image": profile.image.url,
+            "image": "/static/images/node2.png",
             "link": {
                 "href": profile.href
             },
@@ -106,3 +110,9 @@ def load_users(user, ref_code):
                 new_user_text(ref_code, "&pos=right")
             ]
         }
+
+# def get_field(model, attr, kw):
+#     if getattr(model, attr):
+#         return getattr(getattr(model, attr), kw)
+#     return None
+# get_field(Profile, 'sponsor_id', 'id')
