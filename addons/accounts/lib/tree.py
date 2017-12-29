@@ -20,6 +20,17 @@ def is_right(member):
     return member.child_id.profile.placement_position == "R"
 
 
+def new_user_text(ref_code, ref_kw):
+    return {
+        "text": {
+            "name": "Add New User"
+        },
+        "link": {
+            "href": ref_code + ref_kw
+        }
+    }
+
+
 def left_child(members, ref_code):
     if len(members) == 0: return {}
 
@@ -29,15 +40,7 @@ def left_child(members, ref_code):
         child_member = getattr(members[0], 'child_id')
     else:
         child_member = None
-    return load_users(child_member, ref_code) if child_member else {
-                    "text": {
-                       "name": "Add New User",
-                       "desc": "Sign up a new user"
-                     },
-                    "link": {
-                        "href": ref_code
-                    }
-                }
+    return load_users(child_member, ref_code) if child_member else new_user_text(ref_code, "&pos=left")
 
 
 def right_child(members, ref_code):
@@ -49,15 +52,7 @@ def right_child(members, ref_code):
         child_member = getattr(members[0], 'child_id')
     else:
         child_member = None
-    return load_users(child_member, ref_code) if child_member else {
-                    "text": {
-                       "name": "Add New User",
-                       "desc": "Sign up a new user"
-                     },
-                    "link": {
-                        "href": ref_code
-                    }
-                }
+    return load_users(child_member, ref_code) if child_member else new_user_text(ref_code, "&pos=right")
 
 
 def load_users(user, ref_code):
@@ -107,23 +102,7 @@ def load_users(user, ref_code):
                 "href": profile.href
             },
             "children": [
-                {
-                    "text": {
-                       "name": "Add New User",
-                       "desc": "Sign up a new user"
-                     },
-                    "link": {
-                        "href": ref_code
-                    }
-                },
-                {
-                    "text": {
-                       "name": "Add New User",
-                       "desc": "Sign up a new user"
-                     },
-                    "link": {
-                        "href": ref_code
-                    }
-                }
+                new_user_text(ref_code, "&pos=left"),
+                new_user_text(ref_code, "&pos=right")
             ]
         }
