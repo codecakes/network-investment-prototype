@@ -29,7 +29,15 @@ def left_child(members, ref_code):
         child_member = getattr(members[0], 'child_id')
     else:
         child_member = None
-    return load_users(child_member, ref_code) if child_member else {}
+    return load_users(child_member, ref_code) if child_member else {
+                    "text": {
+                       "name": "Add New User",
+                       "desc": "Sign up a new user"
+                     },
+                    "link": {
+                        "href": ref_code
+                    }
+                }
 
 
 def right_child(members, ref_code):
@@ -41,7 +49,15 @@ def right_child(members, ref_code):
         child_member = getattr(members[0], 'child_id')
     else:
         child_member = None
-    return load_users(child_member, ref_code) if child_member else {}
+    return load_users(child_member, ref_code) if child_member else {
+                    "text": {
+                       "name": "Add New User",
+                       "desc": "Sign up a new user"
+                     },
+                    "link": {
+                        "href": ref_code
+                    }
+                }
 
 
 def load_users(user, ref_code):
@@ -92,13 +108,19 @@ def load_users(user, ref_code):
             },
             "children": [
                 {
-                    "text": {},
+                    "text": {
+                       "name": "Add New User",
+                       "desc": "Sign up a new user"
+                     },
                     "link": {
                         "href": ref_code
                     }
                 },
                 {
-                    "text": {},
+                    "text": {
+                       "name": "Add New User",
+                       "desc": "Sign up a new user"
+                     },
                     "link": {
                         "href": ref_code
                     }
