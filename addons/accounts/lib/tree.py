@@ -10,12 +10,12 @@ def find_right(mem1, mem2):
 
 
 def left_child(members):
-       child_member = find_left(members)
+       child_member = find_left(*members)
        return load_users(child_member)
 
 
 def right_child(members):
-       child_member = find_right(members)
+       child_member = find_right(*members)
        return load_users(child_member)
 
 
