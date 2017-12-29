@@ -1,22 +1,34 @@
 from django.contrib.auth.models import User
-from addons.accounts.models import Profile
+from addons.accounts.models import Profile, Members
 
-def find_left(mem1, mem2):
-    return mem1 if mem1.placement_type == "L" else mem2
+def find_left(member, member1):
+    # member.child_id.profile will give profile object 
+    # member.child. here you can pass User models filed 
+    return member if member.child_id.profile.placement_type == "L" else member
 
 
-def find_right(mem1, mem2):
-    return mem1 if mem1.placement_type == "R" else mem2
+def find_right(member, member1):
+    # member.child_id.profile will give profile object 
+    # member.child. here you can pass User models filed
+    return member if member.child_id.profile.placement_type == "R" else member
 
 
 def left_child(members):
-       child_member = find_left(members)
-       return load_users(child_member)
+    # child_member = find_left(members)
+    #  abobe line will raise error for find take exactly 2 argument 1 given , need to correct
+    #  here you need to iterate over members list it could be n list 
+    child_member = find_left(members,'members')
+    #  just took string to check
+    return load_users(child_member.child_id)
 
 
 def right_child(members):
-       child_member = find_right(members)
-       return load_users(child_member)
+    # child_member = find_left(members)
+    #  abobe line will raise error for find take exactly 2 argument 1 given , need to correct
+    #  here you need to iterate over members list it could be n list
+    child_member = find_right(members,'members')
+    #  just took string to check
+    return load_users(child_member.child_id)
 
 
 def load_users(user):
@@ -30,13 +42,16 @@ def load_users(user):
         "mobile": profile.mobile,
         "placement_position": profile.placement_position
     }
-    if user.members:
-         return {
-         "user": user_details,
-         "left": left_child(user.members),
-         "right": right_child(user.members)
-         }
+    members = Members.objects.filter(parent_id=user.id)
+    # memebers is list of child , right now i am passing only 1 member in each left or right
+    if members:
+        return {
+            'left' : left_child(members[0]),
+            'right' : right_child(members[0]),
+            'user': user_details
+        
+        }
     else:
-         return {
-         user: user.details
+        return {
+            'user':user_details
         }

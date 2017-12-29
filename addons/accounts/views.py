@@ -224,6 +224,8 @@ def support(request):
 def network(request):
     if request.method == 'GET':
         template = loader.get_template('network.html')
+        data = traverse_tree(request.user)
+        print data
         context = {'user':'None'}
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
