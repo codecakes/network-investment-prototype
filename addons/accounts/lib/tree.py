@@ -92,12 +92,14 @@ def load_users(user, ref_code):
             },
             "children": [
                 {
-                    "signup": {
+                    "text": {},
+                    "link": {
                         "href": ref_code
                     }
                 },
                 {
-                    "signup": {
+                    "text": {},
+                    "link": {
                         "href": ref_code
                     }
                 }
