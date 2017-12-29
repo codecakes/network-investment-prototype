@@ -53,6 +53,8 @@ class Profile(models.Model):
 	account_name = models.CharField(max_length=20, null=True)
 	my_referal_code = models.CharField(max_length=20, null=True)
 	status = models.CharField(max_length=50, choices=status_type)
+	image = models.FileField(upload_to='documents/', null=True)
+	href = models.CharField(max_length=20, null=True)
 	# members = ArrayField(ArrayField(models.CharField(max_length=10, blank=True),size=8,),size=8,)
 
 	def __unicode__(self):

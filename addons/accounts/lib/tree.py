@@ -20,7 +20,7 @@ def is_right(member):
     return member.child_id.profile.placement_position == "R"
 
 
-def left_child(members):
+def left_child(members, ref_code):
     if len(members) == 0: return {}
 
     if len(members) > 1:
@@ -29,10 +29,10 @@ def left_child(members):
         child_member = getattr(members[0], 'child_id')
     else:
         child_member = None
-    return load_users(child_member) if child_member else {}
+    return load_users(child_member, ref_code) if child_member else {}
 
 
-def right_child(members):
+def right_child(members, ref_code):
     if len(members) == 0: return {}
 
     if len(members) > 1:
@@ -41,11 +41,11 @@ def right_child(members):
         child_member = getattr(members[0], 'child_id')
     else:
         child_member = None
-    print child_member
-    return load_users(child_member) if child_member else {}
+    return load_users(child_member, ref_code) if child_member else {}
 
 
-def load_users(user):
+def load_users(user, ref_code):
+    ref_code = ref_code or ""
     profile = Profile.objects.get(user=user)
     user_details = {
         "first_name": user.first_name,
@@ -57,16 +57,49 @@ def load_users(user):
         "placement_position": profile.placement_position
     }
     members = Members.objects.filter(parent_id=user.id)
-    print "members is {}".format(members)
     if len(members) > 0:
         return {
-            'left' : left_child(members),
-            'right' : right_child(members),
-            'user': user_details
+            "text": {
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "sponsor_id": profile.sponser_id.id,
+                "placement_id": profile.placement_id.id,
+                "mobile": profile.mobile,
+                "placement_position": profile.placement_position
+            },
+            "image": profile.image.url,
+            "link": {
+                "href": profile.href
+            },
+            "children": [
+                left_child(members, ref_code),
+                right_child(members, ref_code)
+            ]
         }
     else:
         return {
-            'user':user_details,
-            'left': {},
-            'right': {}
+            "text": {
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "sponsor_id": profile.sponser_id.id,
+                "placement_id": profile.placement_id.id,
+                "mobile": profile.mobile,
+                "placement_position": profile.placement_position
+            },
+            "image": profile.image.url,
+            "link": {
+                "href": profile.href
+            },
+            "children": [
+                {
+                    "signup": {
+                        "href": ref_code
+                    }
+                },
+                {
+                    "signup": {
+                        "href": ref_code
+                    }
+                }
+            ]
         }

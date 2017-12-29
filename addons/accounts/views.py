@@ -283,4 +283,6 @@ def update_profile(user, data):
 
 
 def traverse_tree(user):
-    return json.dumps(load_users(user))
+    ref_code = "/login?ref={}".format(user.profile.referal_code)
+    print ref_code
+    return json.dumps(load_users(user, ref_code))
