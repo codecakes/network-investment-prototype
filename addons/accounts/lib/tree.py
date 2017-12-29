@@ -4,20 +4,20 @@ from addons.accounts.models import Profile, Members
 def find_left(member, member1):
     # member.child_id.profile will give profile object 
     # member.child. here you can pass User models filed 
-    return member if member.child_id.profile.placement_type == "L" else member
+    return member if member.child_id.profile.placement_type == "L" else member1
 
 
 def find_right(member, member1):
     # member.child_id.profile will give profile object 
     # member.child. here you can pass User models filed
-    return member if member.child_id.profile.placement_type == "R" else member
+    return member if member.child_id.profile.placement_type == "R" else member1
 
 
 def left_child(members):
     # child_member = find_left(members)
     #  abobe line will raise error for find take exactly 2 argument 1 given , need to correct
     #  here you need to iterate over members list it could be n list 
-    child_member = find_left(members,'members')
+    child_member = find_left(members, members)
     #  just took string to check
     return load_users(child_member.child_id)
 
@@ -26,8 +26,9 @@ def right_child(members):
     # child_member = find_left(members)
     #  abobe line will raise error for find take exactly 2 argument 1 given , need to correct
     #  here you need to iterate over members list it could be n list
-    child_member = find_right(members,'members')
-    #  just took string to check
+    child_member = find_right(members, members)
+    # child_member = find_right(*members)
+    # type error while using abobe line, check this find_left() argument after * must be an iterable, not Members
     return load_users(child_member.child_id)
 
 
