@@ -3,18 +3,15 @@
 {% block contents %}
 
 <div class="tab-content">
-    <div class="tab-pane active" id="network_tree">
+    <div class="tab-pane active">
     <br>
-        <h2>Networks</h2>
-        <div class="row" id="addUser-summary">
-	        <div class="row">
-	                <button id="addUserButton" class="btn btn-round btn-b text-center">Add User</button>
-	        </div>
+        <h2>Add user to network</h2>
+        <div class="row" id="addNetworkUser-summary">
             <div class="row">
                 <div class="col-lg-12 col-md-12">
 	                	
-	                	<div id="addUserContainer" class="hiders" style="display:none" >   
-		                    <form id="addUserForm">
+	                	<div id="addNetworkUserContainer" class="hiders">   
+		                    <form id="addNetworkUserForm">
 		                        <div class="form-box" style="margin-top:5px!important; width:100%!important;">
 		                            <div class="form-top">
 		                                <div class="form-top-left">
@@ -29,14 +26,14 @@
 		                                    <div id="have_ref" style="">
 		                                        <div class="form-group"><div class="col-sm-4"><label> Sponsor ID :</label></div>
 		                                            <div class="col-sm-8">
-		                                                <input type="text" name="refer_id" id="newUser-refer_id" class="form-first-name form-control" value=""}>
+		                                                <input type="text" name="refer_id" id="newUser-refer_id" class="form-first-name form-control" value="{{sponser_id}}"}>
 		                                            </div>
 		                                        </div>
 		                                            
 		                                        <div class="form-group">
 		                                                <div class="col-sm-4"> <label>Placement ID :</label></div>
 		                                                    <div class="col-sm-8">
-		                                                        <input type="text" class="form-first-name form-control" name="place_id" id="place_id" value="">
+		                                                        <input type="text" class="form-first-name form-control" name="place_id" id="place_id" value="{{placement_id}}">
 		                                                    </div>
 		                                                </div>
 
@@ -44,9 +41,7 @@
 		                                        <div class="col-sm-4"> <label>Position of placement  :</label></div>
 		                                            <div class="col-sm-8 radio" id="place">
 		                                                <select name="placement" id="placement" >
-		                                                <option value="">Select</option>
-		                                                <option value="l">LEFT</option>
-		                                                <option value="r">RIGHT</option>
+		                                                <option value="{{pos}}" selected="">{{pos | title}}</option>
 		                                                </select>                                      
 		                                            </div>
 		                                        </div>
@@ -107,27 +102,14 @@
 		                        </div>            
 		                    </form>
 			                <div class="form-group">
-			                    <button id="newUserAdd" class="btn btn-round btn-b">Add</button>
+			                    <button id="newNetworkUserAdd" class="btn btn-round btn-b">Add</button>
 			                </div>
 		                </div>
                 </div>
             </div>
         </div>
-        <div class="row" id="network_summary">
-        <br><br>
-            
-            <div id="networkContainer">
-            <h3>Network Tree</h3>
-            	
-            </div>
-            <div class="chart" id="networkTree"></div>
-
-        </div>
     </div>
-
 {% load static %}
 <script src="{% static "lib/jquery/dist/jquery.js" %}"></script>
-<script src="{% static "js/network.js" %}"></script>
-<script src="{% static "lib/treant/Treant.js" %}"></script>
-<script src="{% static "lib/treant/raphael.js" %}"></script>
+<script src="{% static "js/addUser.js" %}"></script>
 {% endblock %}

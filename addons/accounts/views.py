@@ -13,7 +13,7 @@ from django.db.models.query_utils import Q
 from django.views.generic import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from addons.accounts.models import Profile
+from addons.accounts.models import Profile, Members
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
 from addons.packages.models import Packages, User_packages
@@ -26,6 +26,9 @@ import sys
 sys.path.append(settings.BASE_DIR)
 from avicrypto import services
 # Create your views here.
+
+import json
+from lib.tree import load_users
 
 def index(request):
 	if request.method == 'GET':
@@ -188,6 +191,7 @@ def profile(request):
     if request.method == 'GET':
         user = request.user
         user_d = User.objects.filter(id=user.id)
+
         context = {
             'user':user_d
         }
@@ -197,8 +201,19 @@ def profile(request):
         else:
             return HttpResponse(template.render(context,request))
     if request.method == 'POST':
-        print request
-        import pdb; pdb.set_trace()
+        data = request.POST
+        email = data['email_id']
+        user = User.objects.create(email=email,username=email)
+        user.first_name = data['name']
+        user.save()
+        profile = Profile.objects.get(user=user)
+        sponser_id = Profile.objects.get(user_auto_id=data['refer_id'])
+        placement_id = Profile.objects.get(user_auto_id=data['place_id'])
+        profile.sponser_id=sponser_id.user
+        profile.placement_id = placement_id.user
+        profile.placement = data['placement']
+        profile.save()
+        memeber = Members.objects.create(parent_id=placement_id.user, child_id=user)
         return HttpResponse('Success')
     else:
         return HttpResponseRedirect('/error')
@@ -224,8 +239,8 @@ def network(request):
         context = {'user':'None'}
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
-        print request.method
-        data =  '{"text":{"name":"Mark Hill","title":"Chief executive officer"},"children":[{"text":{"name":"Joe Linux","title":"Chief Technology Officer"},"children":[{"text":{"name":"Ron Blomquist","title":"Chief Information Security Officer"}},{"text":{"name":"Michael Rubin","title":"Chief Innovation Officer","contact":"we@aregreat.com"}}]},{"text":{"name":"Linda May","title":"Chief Business Officer"},"children":[{"text":{"name":"Alice Lopez","title":"Chief Communications Officer"}},{"text":{"name":"Mary Johnson","title":"Chief Brand Officer"},"children":[{"text":{"name":"Erica Reel","title":"Chief Customer Officer"}}]}]}]}'
+        data = traverse_tree(request.user)
+        # data =  '{"text":{"name":"Mark Hill","title":"Chief executive officer"},"children":[{"text":{"name":"Joe Linux","title":"Chief Technology Officer"},"children":[{"text":{"name":"Ron Blomquist","title":"Chief Information Security Officer"}},{"text":{"name":"Michael Rubin","title":"Chief Innovation Officer","contact":"we@aregreat.com"}}]},{"text":{"name":"Linda May","title":"Chief Business Officer"},"children":[{"text":{"name":"Alice Lopez","title":"Chief Communications Officer"}},{"text":{"name":"Mary Johnson","title":"Chief Brand Officer"},"children":[{"text":{"name":"Erica Reel","title":"Chief Customer Officer"}}]}]}]}'
         return HttpResponse(data)
 # def simple_upload(request):
 #     if request.method == 'POST' and request.FILES['myfile']:
@@ -275,3 +290,53 @@ def update_profile(user, data):
     profile.referal_code = data['referal']
     profile.sponcer_id = data['sponcer_id']
     profile.save()
+
+
+def traverse_tree(user):
+    ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
+    data = load_users(user, ref_code)
+    return json.dumps(data)
+
+
+@csrf_exempt
+def add_user(request):
+    if request.method == 'GET':
+        print request.GET['pos']
+        if 'ref' not in request.GET:
+            referal = ''
+            sponser_id = ''
+        else:
+            referal = request.GET['ref']
+            sponser_id = Profile.objects.filter(my_referal_code=referal)
+            sponser_id = sponser_id[0].user_auto_id
+            pos = request.GET['pos']
+            # placement_id = sponser_id[0].user_auto_id
+        context = {
+            'user':'None',
+            'referal': referal,
+            'sponser_id':sponser_id,
+            'placement_id':sponser_id,
+            'pos':pos
+        }
+        template = loader.get_template('add-user.html')
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/error')
+        else:
+            return HttpResponse(template.render(context,request))
+    if request.method == 'POST':
+        data = request.POST
+        email = data['email_id']
+        user = User.objects.create(email=email,username=email)
+        user.first_name = data['name']
+        user.save()
+        profile = Profile.objects.get(user=user)
+        sponser_id = Profile.objects.get(user_auto_id=data['refer_id'])
+        placement_id = Profile.objects.get(user_auto_id=data['place_id'])
+        profile.sponser_id=sponser_id.user
+        profile.placement_id = placement_id.user
+        profile.placement = data['placement']
+        profile.save()
+        memeber = Members.objects.create(parent_id=placement_id.user, child_id=user)
+        return HttpResponse('Success')
+
+        # <QueryDict: {u'refer_id': [u'AVI3'], u'placement': [u'left'], u'name': [u'aTUL'], u'email_id': [u'JASVIN@GAMILI.COM'], u'country': [u'India'], u'place_id': [u'AVI3'], u'mob_number': [u'987456325121'], u'drptown': [u'ddELHIO']}

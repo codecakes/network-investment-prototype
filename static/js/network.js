@@ -37,6 +37,7 @@ $(function(){
             url: "/network",
             success: function(result) {
                 var data = result
+                console.log("-------",data)
                 var networkData = chart_config = {
                     chart: {
                         container: "#networkTree",

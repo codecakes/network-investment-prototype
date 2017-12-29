@@ -103,7 +103,7 @@
 			UTIL.addEvent(image, 'error', imgTrigger); // handle broken url-s
 
 			// load event is not fired for cached images, force the load event
-			image.src += "?" + new Date().getTime();
+			//image.src += "?" + new Date().getTime();
 		},
 		isNotLoading: function() {
 			return this.loading.length === 0;
@@ -1100,7 +1100,6 @@
 				// IMAGE
 				if(this.image) {
 					image = document.createElement('img');
-
 					image.src = this.image;
 					node.appendChild(image);
 				}
