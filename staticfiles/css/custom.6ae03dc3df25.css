@@ -1,0 +1,19 @@
+.avi-header-text {
+    font-family: SimSun-ExtB, AdobeInvisFont, MyriadPro-Regular;
+    font-size: 70pt;
+    color: rgba(255, 255, 255, 255);
+    text-align: left;
+}
+
+.avi-small-text {
+    font-family: AlegreyaSans-Regular, AdobeInvisFont, MyriadPro-Regular;
+    font-size: 30pt;
+    color: rgba(255, 255, 255, 255);
+    text-align: left;
+}
+
+/*
+* {
+    border: 1px red solid;
+}
+*/

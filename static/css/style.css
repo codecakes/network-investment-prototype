@@ -2926,3 +2926,60 @@ Google map
     width: 100%;
   }
 }
+
+.white-box {
+  background: #fff;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+.white-box-1 {
+  background: #52b1b1;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+.white-box-2 {
+  background: #adaa4a;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+.white-box-3 {
+  background: #d084a1;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+.white-box-4 {
+  background: #e6e1e1;
+  margin-bottom: 30px;
+  min-height: : 190px;
+}
+
+.boxed {
+    background: #fff;
+    width: 235px;
+    padding: 8px;
+    margin: 8px;
+    border: 8px black;
+}
+
+.boxed1 {
+  background: #fff;
+      width: 235px;
+    padding: 8px;
+    margin: 8px;
+  border: 8px black ;
+}
+
+.boxed2 {
+  background: #fff;
+      width: 260px;
+    padding: 8px;
+    margin: 8px;
+  border: 8px black ;
+}
+.before_icon_margin:{
+ margin-left: 15px !important;
+}
+
+.header-dashboard-custom {
+  background-color: solid blue !important;
+}

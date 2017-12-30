@@ -21,5 +21,6 @@ from . import views
 urlpatterns = [
     url(r'^add/$', views.PackagesCreate.as_view(), name='packages_create'),
     url(r'^list/$', views.PackagesList.as_view(), name='packages_list'),
+    url(r'^business/$', views.PackagesBList.as_view(), name='packages_list'),
 ]
 

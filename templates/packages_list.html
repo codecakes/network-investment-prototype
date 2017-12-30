@@ -1,9 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>AviCrypto</title>
-</head>
-<body>
-<H1>Tnanks for registering with us!</H1>
-</body>
-</html>
+{% extends "home_root.html" %}
+
+{% block contents %}
+
+<div class="tab-content">
+    <div class="tab-pane active" id="packages_list">
+        <div class="row" id="packages-summary">
+        <br>
+        <br>
+            <h2>Packages</h2>
+                <div class="row">
+                {% for p in packages %}
+                    <div class="col-sm-4 boxed">
+                        <div class="white-box-4">
+                            <div class="m-b-12">
+                                <h2 style="font-weight:bold; text-align:center; font-size:18px;margin-right: 15px;padding-top: 10px;">{{p.package_name}}</h2>
+                            </div>
+                                    <div class="text-center"><span>Code : </span><span>{{p.package_code}}</span></div>
+                                    <div class="text-center"><span>Description : </span><span>{{p.description}}</span></div>
+                                    <div class="text-center"><span style="font-size:24px;">$</span><span class="counter fontsize_small_media">
+                                    {{p.price}}</span> 
+                                    </div>
+                            </div>                                  
+                        <button class="btn btn-round btn-b text-center" id=package_{{p.id}}>Upgrade</button>
+                        </div>
+                {% endfor %}
+                    </div>
+        </div>
+    </div>
+{% endblock %}

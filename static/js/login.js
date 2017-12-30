@@ -1,5 +1,22 @@
-console.log("dvjbvjkbvjkdvjkd")
 $(function(){
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        };
+        var referCode = getUrlParameter("ref");
+        $("#referal").val(referCode)
+        var posCode = getUrlParameter("pos");
+        $("#placement_position").val(posCode)
     	$('#signup_password, #confirm_password').change(function () {
     		if($('#signup_password').val() && $('#confirm_password').val()){
 	    		console.log("both val")
@@ -171,9 +188,9 @@ $(function(){
             url: "/signup/",
             data: data,
             success: function(prod_detail) {
-                var data = prod_detail//JSON.parse(prod_detail)
+                var data = prod_detail;
                 alert(data);
-                window.location.href = "http://www.avicrypto.us/login"
+                window.location.reload();
             }
         });
        } else {

@@ -17,8 +17,9 @@ import os
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 # PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+# BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -47,10 +48,10 @@ INSTALLED_APPS = [
     'addons.wallet',
 ]
 
-MIDDLEWARE_CLASSES = (
+# MIDDLEWARE_CLASSES = (
     # Simplified static file serving.
     # https://warehouse.python.org/project/whitenoise/
-    'whitenoise.middleware.WhiteNoiseMiddleware')
+    # 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -145,19 +146,33 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-print BASE_DIR, PROJECT_PATH
+# print BASE_DIR, PROJECT_PATH
+# # STATIC_URL = '/static/'
+# STATIC_URL = "https://178.62.252.134/avicrypto/staticfiles/"
+# STATIC_ROOT = 'staticfiles'
+
+# # STATICFILES_DIRS = (
+# #     os.path.join(BASE_DIR, 'static'),
+# # )
 # STATIC_URL = '/static/'
-STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
-STATIC_ROOT = 'staticfiles'
+# STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
+# STATIC_ROOT = 'staticfiles'
 
 # STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, 'static'),
+#     os.path.join(PROJECT_PATH, 'static'),
 # )
 
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH, 'static'),
-)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# STATIC_URL = '/static/'
+STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -167,4 +182,12 @@ STATICFILES_FINDERS = (
     'compressor.finders.CompressorFinder'
 )
 
+mailgun_conf = {
+    'domain': 'avicrypto.us',
+    'key': 'key-1055741f06d43a548bf5def6962b536a',
+    'api': 'https://api.mailgun.net/v3/avicrypto.us/messages'
+}
 # django_heroku.settings(locals())
+
+
+
