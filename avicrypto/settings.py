@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     # https://warehouse.python.org/project/whitenoise/
     # 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -165,7 +165,8 @@ USE_TZ = True
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
+STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Extra places for collectstatic to find static files.
