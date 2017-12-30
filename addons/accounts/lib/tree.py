@@ -80,6 +80,7 @@ def right_child(members, ref_code):
 
 
 def load_users(user, ref_code):
+    icon = "/static/images/node2.png"
     ref_code = ref_code or ""
     profile = Profile.objects.get(user=user)
     # import pdb; pdb.set_trace()
@@ -96,7 +97,7 @@ def load_users(user, ref_code):
     if len(members) > 0:
         return {
             "text": user_details,
-            "image": profile.model_pic.url,
+            "image": icon,
             "link": {
                 "href": profile.href
             },
@@ -108,7 +109,7 @@ def load_users(user, ref_code):
     else:
         return {
             "text": user_details,
-            "image": profile.model_pic.url,
+            "image": icon,
             "link": {
                 "href": profile.href
             },
