@@ -334,7 +334,10 @@ def add_user(request):
         placement_id = Profile.objects.get(user_auto_id=data['place_id'])
         profile.sponser_id=sponser_id.user
         profile.placement_id = placement_id.user
-        profile.placement = data['placement']
+        if data['placement'] == 'left':
+            profile.placement_position = 'L'
+        else:      
+           profile.placement_position = 'R'
         profile.save()
         memeber = Members.objects.create(parent_id=placement_id.user, child_id=user)
         return HttpResponse('Success')
