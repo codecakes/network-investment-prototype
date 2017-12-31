@@ -74,17 +74,18 @@ class Registration(FormView):  # code for template is given below the view's cod
             if form.is_valid():
                 data_dict = form.cleaned_data
                 data = form.cleaned_data['email']
+
                 if self.validate_email_address(data) is True:
                     associated_users = User.objects.filter(
                         Q(email=data) | Q(username=data))
                     if associated_users.exists():
                         result = self.form_valid(form)
-                        messages.success(
-                            request, 'User already exists')
+                        messages.success(request, 'User already exists')
                         return result
                     else:
                         user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['name'])
                         user.set_password(str(data_dict['password']))
+
                 user.save()
                 update_profile(user, request.POST)
                 body = "Welcome to Avicrypto! "
@@ -94,47 +95,42 @@ class Registration(FormView):  # code for template is given below the view's cod
                     request,
                     'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
                 return result
-        #              else:
-        #              	result = self.form_invalid(form)
-        #              	messages.error(
-        #              		request, 'Error')
-        #              	return result
-        # else:
-        #          	result =  self.form_invalid(form)
-        # 	messages.error(
-        #                          request, 'Email is not correct')
-        #              return result
-
         except Exception as e:
             raise
-        # print 'self', self
+
         return self.form_invalid(form)
 
 
 def login_fn(request):
+
     if request.method == 'GET':
         template = loader.get_template('login.html')
         if 'ref' not in request.GET:
-            referal = ''
-            sponser_id = ''
+            context = {
+                'referal': "",
+                'sponser_id': "",
+                'placement_user_left_id': "",
+                'placement_user_right_id': ""
+            }
         else:
             referal = request.GET['ref']
-            sponser_id = Profile.objects.filter(my_referal_code=referal)
-            sponser_id = sponser_id[0].user_auto_id
-            # placement_id = sponser_id[0].user_auto_id
-        context = {
-            'user': 'None',
-            'referal': referal,
-            'sponser_id': sponser_id,
-            'placement_id': sponser_id
-        }
+            sponser = Profile.objects.get(my_referal_code=referal)
+            sponser_id = sponser.user_auto_id
+            placement_users = find_min_max(sponser.user)
+
+            context = {
+                'referal': referal,
+                'sponser_id': sponser_id,
+                'placement_user_left_id': placement_users[0].profile.user_auto_id,
+                'placement_user_right_id': placement_users[1].profile.user_auto_id
+            }
         return HttpResponse(template.render(context, request))
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print request.POST
         user = authenticate(username=username, password=password)
-        print user
+
         if user is not None:
             if user.is_active:
                 login(request, user)
@@ -179,13 +175,11 @@ def logout_fn(request):
 def home(request):
     if request.method == 'GET':
         user = request.user
-        user_d = User.objects.filter(id=user.id)
-        packages = User_packages.objects.filter(user_id=request.user)
-        for l in user_d:    code = l.profile.my_referal_code
+        packages = User_packages.objects.filter(user=user)
+        print packages[1].expiry_date
+
         context = {
-            'user': user_d,
-            'request': request,
-            'link': request.META['HTTP_HOST'] + '/login?ref=' + str(code),
+            'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
             'packages': packages
         }
 
@@ -203,48 +197,44 @@ def home(request):
 def profile(request):
     if request.method == 'GET':
         user = request.user
-        user_d = User.objects.filter(id=user.id)
 
         context = {
-            'user': user_d
+            'user': user
         }
+
         template = loader.get_template('profile.html')
+
         if not request.user.is_authenticated():
             return HttpResponseRedirect('/error')
         else:
             return HttpResponse(template.render(context, request))
+
     if request.method == 'POST':
-        data = request.POST
-        email = data['email_id']
-        user = User.objects.create(email=email, username=email)
-        user.first_name = data['name']
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
         user.save()
-        profile = Profile.objects.get(user=user)
-        sponser_id = Profile.objects.get(user_auto_id=data['refer_id'])
-        placement_id = Profile.objects.get(user_auto_id=data['place_id'])
-        profile.sponser_id = sponser_id.user
-        profile.placement_id = placement_id.user
-        profile.placement = data['placement']
-        profile.save()
-        memeber = Members.objects.create(parent_id=placement_id.user, child_id=user)
         return HttpResponse('Success')
     else:
         return HttpResponseRedirect('/error')
 
-
+@login_required(login_url="/login")
 @csrf_exempt
 def support(request):
     if request.method == 'GET':
         template = loader.get_template('support.html')
-        context = {'user': 'None'}
+        context = {
+            'user': 'None'
+        }
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
-        # import pdb; pdb.set_trace()
-        services.support_mail('Support Ticket', "Hello, Admin, support ticket generated, please respond",
-                              'jain.atul43@gmail.com', from_email="postmaster")
+        services.support_mail('Support Ticket', "Hello, Admin, support ticket generated, please respond", 'jain.atul43@gmail.com', from_email="postmaster")
         return HttpResponse('Mail sent to adminstrator', content_type="application/json")
 
-
+@login_required(login_url="/login")
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
@@ -308,12 +298,18 @@ def update_profile(user, data):
     placement_position = data.get('placement_position', "L")
 
     if referal_code:
-        user_object = User.objects.get(my_referal_code=referal_code)
-        if user_object:
+        sponser_user = Profile.objects.get(my_referal_code=referal_code)
+        if sponser_user:
+            placement_users = find_min_max(sponser_user.user)
+
+            if placement_position == "L":
+                profile.placement_id = placement_users[0]
+            else:
+                profile.placement_id = placement_users[1]
+
             profile.placement_position = placement_position
-            profile.placement_id = User.objects.get(user_auto_id=placement_id)
             profile.referal_code = referal_code
-            profile.sponcer_id = user_object
+            profile.sponcer_id = sponser_user.user
 
     profile.save()
 

@@ -37,7 +37,7 @@ class Profile(models.Model):
 		('NA', 'Non-Active'),
 		('C', 'Confirmed'),
 		('NC', 'Non-Confirmed')
-		)
+	)
 	user_auto_id = models.CharField(max_length=500, default=increment_user_id, null=True, blank=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	referal_code = models.CharField(max_length=20, blank=True)
