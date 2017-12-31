@@ -325,7 +325,7 @@ def add_user(request):
             sponser_id = Profile.objects.filter(my_referal_code=referal)
             sponser_id = sponser_id[0].user_auto_id
             pos = request.GET['pos']
-            placement_id = request.GET['parent_placement_id']8
+            placement_id = request.GET['parent_placement_id']
         context = {
             'user': 'None',
             'referal': referal,
