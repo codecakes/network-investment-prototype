@@ -29,7 +29,7 @@ from avicrypto import services
 # Create your views here.
 
 import json
-from lib.tree import load_users
+from lib.tree import load_users, find_min_max
 
 
 def index(request):
@@ -325,7 +325,7 @@ def add_user(request):
             sponser_id = Profile.objects.filter(my_referal_code=referal)
             sponser_id = sponser_id[0].user_auto_id
             pos = request.GET['pos']
-            placement_id = request.GET['parent_placement_id']
+            placement_id = request.GET['parent_placement_id']8
         context = {
             'user': 'None',
             'referal': referal,
