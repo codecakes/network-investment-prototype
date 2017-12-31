@@ -33,7 +33,7 @@ class PackagesCreate(CreateView):
         return super(PackagesCreate, self).form_valid(form)
     
     def get(self, request):
-        context ={
+        context = {
             'form':self.form_class
         }
         return HttpResponse(self.template.render(context, request))

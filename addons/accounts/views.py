@@ -83,11 +83,10 @@ class Registration(FormView):  # code for template is given below the view's cod
                             request, 'User already exists')
                         return result
                     else:
-                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'],
-                                                   first_name=data_dict['name'])
+                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['name'])
                         user.set_password(str(data_dict['password']))
                 user.save()
-                update_profile(user, data_dict)
+                update_profile(user, request.POST)
                 body = "Welcome to Avicrypto! "
                 services.send_email_mailgun('Wellcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
                 result = self.form_valid(form)
@@ -133,7 +132,9 @@ def login_fn(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+        print request.POST
         user = authenticate(username=username, password=password)
+        print user
         if user is not None:
             if user.is_active:
                 login(request, user)
@@ -187,7 +188,7 @@ def home(request):
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(code),
             'packages': packages
         }
-        print context
+
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
             return HttpResponseRedirect('/error')
@@ -299,11 +300,21 @@ def model_form_upload(request):
 
 def update_profile(user, data):
     profile = Profile.objects.get(user=user)
-    profile.mobile = data['mobile']
-    profile.placement_position = data['placement']
-    profile.placement_id = data['placement_id']
-    profile.referal_code = data['referal']
-    profile.sponcer_id = data['sponcer_id']
+    profile.mobile = data.get('mobile', None)
+
+    referal_code = data.get('referal', None)
+    sponcer_id = data.get('sponcer_id', None)
+    placement_id = data.get('placement_id', None)
+    placement_position = data.get('placement_position', "L")
+
+    if referal_code:
+        user_object = User.objects.get(my_referal_code=referal_code)
+        if user_object:
+            profile.placement_position = placement_position
+            profile.placement_id = User.objects.get(user_auto_id=placement_id)
+            profile.referal_code = referal_code
+            profile.sponcer_id = user_object
+
     profile.save()
 
 
@@ -316,7 +327,7 @@ def traverse_tree(user):
 @csrf_exempt
 def add_user(request):
     if request.method == 'GET':
-        print request.GET['pos']
+
         if 'ref' not in request.GET:
             referal = ''
             sponser_id = ''

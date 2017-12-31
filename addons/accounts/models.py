@@ -16,14 +16,14 @@ User._meta.local_fields[4].__dict__['_unique'] = True
 def increment_user_id():
     last_user_id = Profile.objects.all().order_by('user_auto_id').last()
     if last_user_id is  None:
-    	return 'AVI000001'
+    	return 'AVI000000001'
     # if not last_user_id.user_auto_id:
-    #      return 'AVI000001'
+    #      return 'AVI000000001'
     else:
 	    user_id_no = last_user_id.user_auto_id
 	    user_id_int = int(user_id_no.split('AVI')[-1])
 	    new_user_id_int = user_id_int + 1
-	    new_user_id_no = 'AVI' + str(new_user_id_int)
+	    new_user_id_no = 'AVI' + str(new_user_id_int).zfill(9)
 	    return new_user_id_no
 
 class Profile(models.Model):

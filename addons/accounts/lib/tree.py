@@ -87,15 +87,17 @@ def load_users(user, ref_code):
     profile = Profile.objects.get(user=user)
     # import pdb; pdb.set_trace()
     user_details = {
-                "name": user.first_name,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "sponsor_id":  None if profile.sponser_id is None else profile.sponser_id.id,
-                "placement_id": None if profile.placement_id is None else profile.placement_id.id,
-                "mobile": profile.mobile,
-                "placement_position": profile.placement_position
-            }
+        "name": user.first_name,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "sponsor_id":  None if profile.sponser_id is None else profile.sponser_id.id,
+        "placement_id": None if profile.placement_id is None else profile.placement_id.id,
+        "mobile": profile.mobile,
+        "placement_position": profile.placement_position
+    }
+
     members = Members.objects.filter(parent_id=user.id)
+
     if len(members) > 0:
         return {
             "text": user_details,
