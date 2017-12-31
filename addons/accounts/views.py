@@ -29,7 +29,7 @@ from avicrypto import services
 # Create your views here.
 
 import json
-from lib.tree import load_users
+from lib.tree import load_users, find_min_max
 
 
 def index(request):
