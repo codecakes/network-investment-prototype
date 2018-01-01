@@ -176,7 +176,7 @@ def home(request):
     if request.method == 'GET':
         user = request.user
         packages = User_packages.objects.filter(user=user)
-        print packages[1].expiry_date
+        # print packages[1].expiry_date
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
