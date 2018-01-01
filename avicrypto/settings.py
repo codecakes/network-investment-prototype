@@ -103,10 +103,10 @@ WSGI_APPLICATION = 'avicrypto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': "avicrypto",
-        'USER': "postgres",
-        'PASSWORD': "password",
-        'HOST': "localhost",
+        'NAME': os.environ["avicrypto_db"],
+        'USER': os.environ["avicrypto_user"],
+        'PASSWORD': os.environ["avicrypto_pwd"],
+        'HOST': os.environ["avicrypto_host"],
         'PORT': '5432'
     }
 }
