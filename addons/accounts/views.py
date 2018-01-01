@@ -231,7 +231,7 @@ def support(request):
         }
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
-        services.support_mail('Support Ticket', request.POST.get("description", ""), 'jain.atul43@gmail.com', from_email="postmaster")
+        services.support_mail('Support Ticket', request.POST.get("description", ""), 'harshulkaushik9@gmail.com', from_email="postmaster")
         return HttpResponse('Mail sent to adminstrator', content_type="application/json")
 
 @login_required(login_url="/login")
