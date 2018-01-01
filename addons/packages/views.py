@@ -16,38 +16,39 @@ from django.contrib import messages
 from django.views.generic import ListView
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.utils import timezone
 # from django.views.generic.list import ListView
 from django.contrib.auth.models import User
 # from server.accounts.models import Profile
 from models import Packages, User_packages
 from forms import packages_form
+from datetime import date
+
+def add_years(d, years):
+    try:
+        return d.replace(year = d.year + years)
+    except ValueError:
+        return d + (date(d.year + years, 3, 1) - date(d.year, 3, 1))
 
 # Create your views here.
-class PackagesCreate(CreateView):
-    template = loader.get_template('packages.html')
-    form_class = packages_form
-    model = Packages
+def PackagesCreate(request):
+    context = {
+        "packages": Packages.objects.all()
+    }
 
-    def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        return super(PackagesCreate, self).form_valid(form)
-    
-    def get(self, request):
-        context ={
-            'form':self.form_class
-        }
-        return HttpResponse(self.template.render(context, request))
-    def post(self, request):
-        form = self.form_class(request.POST)
-        try:
-            if form.is_valid():
-                data = form.cleaned_data
-                post = form.save(commit=False)
-                post.save()
-                return HttpResponse("OK")
-        except Exception, e:
-            print e
-        return HttpResponse("Error")
+    if request.method == "POST":
+        user = request.user
+        package_id = request.POST.get("package", "1")
+        duration = int(request.POST.get("duration", 1))
+
+        package = Packages.objects.get(id=package_id)
+        expiry_date = add_years(timezone.now(), duration) 
+
+        user_package = User_packages(package=package, user=user, duration=duration, status="NA", expiry_date=expiry_date)
+        user_package.save()
+
+    template = loader.get_template('packages.html')
+    return HttpResponse(template.render(context, request))
 
 class PackagesList(ListView):
     template = loader.get_template('packages_list.html')
@@ -59,10 +60,7 @@ class PackagesList(ListView):
         return context
 
     def get(self, request):
-        print "get list of Packages", self.template
         packages = Packages.objects.all()
-        # packages = User_packages.objects.filter(user_id=request.user)
-        print packages
         context = {
             'packages':packages
         }
@@ -78,9 +76,7 @@ class PackagesBList(ListView):
         return context
 
     def get(self, request):
-        print "get list of Packages", self.template
         packages = Packages.objects.all()
-        print packages
         context = {
             'packages': packages
         }
