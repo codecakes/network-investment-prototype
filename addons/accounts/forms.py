@@ -7,7 +7,8 @@ from models import Profile, Document
 class signup_form(forms.Form):
 
     email = forms.CharField(label='Email', max_length=100)
-    name = forms.CharField(label='Name', max_length=100)
+    first_name = forms.CharField(label='First Name', max_length=100)
+    last_name = forms.CharField(label='Last Name', max_length=100)
     mobile = forms.CharField(label='Mobile', max_length=100)
     password = forms.CharField(label="Password", max_length=100)
     confirm_password = forms.CharField(label="Confirm Password", max_length=100)

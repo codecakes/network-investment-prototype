@@ -83,7 +83,7 @@ class Registration(FormView):  # code for template is given below the view's cod
                         messages.success(request, 'User already exists')
                         return result
                     else:
-                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['name'])
+                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['first_name'], last_name=data_dict['last_name'])
                         user.set_password(str(data_dict['password']))
 
                 user.save()
