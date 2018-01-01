@@ -22,7 +22,7 @@ from django.contrib.auth.models import User
 # from server.accounts.models import Profile
 from models import Packages, User_packages
 from forms import packages_form
-from datetime import date
+import datetime
 
 def add_years(d, years):
     try:
@@ -32,6 +32,7 @@ def add_years(d, years):
 
 # Create your views here.
 def PackagesCreate(request):
+
     context = {
         "packages": Packages.objects.all()
     }
@@ -42,9 +43,9 @@ def PackagesCreate(request):
         duration = int(request.POST.get("duration", 1))
 
         package = Packages.objects.get(id=package_id)
-        expiry_date = add_years(timezone.now(), duration) 
+        expiry_date = timezone.now() + datetime.timedelta(weeks=package.no_payout)
 
-        user_package = User_packages(package=package, user=user, duration=duration, status="NA", expiry_date=expiry_date)
+        user_package = User_packages(package=package, user=user, duration=package.no_payout, status="NA", expiry_date=expiry_date)
         user_package.save()
 
     template = loader.get_template('packages.html')
