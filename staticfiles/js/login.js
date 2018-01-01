@@ -14,6 +14,17 @@ $(function() {
     }
   };
 
+  function getFormData($form) {
+    var unindexed_array = $form.serializeArray();
+    var indexed_array = {};
+
+    $.map(unindexed_array, function(n, i) {
+      indexed_array[n["name"]] = n["value"];
+    });
+
+    return indexed_array;
+  };
+
 	$("#placement_position").change(function() {
 		if($(this).val() == 'R') {
 			$("#placement_id_right").css("display", "block")
@@ -75,19 +86,37 @@ $(function() {
     }
   });
 
-  $("#name").on("change", function() {
-    if ($("#name").val()) {
-      if (/^[a-zA-Z0-9 ]{2,30}$/.test($("#name").val())) {
-        $("#name-matching-message")
+  $("#first_name").on("change", function() {
+    if ($("#first_name").val()) {
+      if (/^[a-zA-Z0-9 ]{2,30}$/.test($("#first_name").val())) {
+        $("#first_name-matching-message")
           .html("Valid")
           .css("color", "green");
       } else {
-        $("#name-matching-message")
+        $("#first_name-matching-message")
           .html("Invalid name.use only character,digits and name only")
           .css("color", "red");
       }
     } else {
-      $("#name-matching-message")
+      $("#first_name-matching-message")
+        .html("Required Field")
+        .css("color", "red");
+    }
+  });
+
+  $("#last_name").on("change", function() {
+    if ($("#last_name").val()) {
+      if (/^[a-zA-Z0-9 ]{2,30}$/.test($("#last_name").val())) {
+        $("#last_name-matching-message")
+          .html("Valid")
+          .css("color", "green");
+      } else {
+        $("#last_name-matching-message")
+          .html("Invalid name.use only character,digits and name only")
+          .css("color", "red");
+      }
+    } else {
+      $("#last_name-matching-message")
         .html("Required Field")
         .css("color", "red");
     }
@@ -171,21 +200,42 @@ $(function() {
     }
   };
 
-  var nameValidation = function() {
-    if ($("#name").val()) {
-      if (/^[a-zA-Z0-9 ]{2,30}$/.test($("#name").val())) {
-        $("#name-matching-message")
+  var firstNameValidation = function() {
+    if ($("#first_name").val()) {
+      if (/^[a-zA-Z0-9 ]{2,30}$/.test($("#first_name").val())) {
+        $("#first_name-matching-message")
           .html("Valid")
           .css("color", "green");
         return true;
       } else {
-        $("#name-matching-message")
+        $("#first_name-matching-message")
           .html("Invalid name.use only character,digits and name only")
           .css("color", "red");
         return false;
       }
     } else {
-      $("#name-matching-message")
+      $("#first_name-matching-message")
+        .html("Required Field")
+        .css("color", "red");
+      return false;
+    }
+  };
+
+  var lastNameValidation = function() {
+    if ($("#last_name").val()) {
+      if (/^[a-zA-Z0-9 ]{2,30}$/.test($("#last_name").val())) {
+        $("#last_name-matching-message")
+          .html("Valid")
+          .css("color", "green");
+        return true;
+      } else {
+        $("#last_name-matching-message")
+          .html("Invalid name.use only character,digits and name only")
+          .css("color", "red");
+        return false;
+      }
+    } else {
+      $("#last_name-matching-message")
         .html("Required Field")
         .css("color", "red");
       return false;
@@ -215,25 +265,15 @@ $(function() {
     }
   };
 
-  function getFormData($form) {
-    var unindexed_array = $form.serializeArray();
-    var indexed_array = {};
-
-    $.map(unindexed_array, function(n, i) {
-      indexed_array[n["name"]] = n["value"];
-    });
-
-    return indexed_array;
-  }
-
   $("#submit_mover").click(function(evt) {
     var emailResult = emailValidation();
-    var nameResult = nameValidation();
+    var firstNameResult = firstNameValidation();
+    var lastNameResult = lastNameValidation();
     var mobileResult = mobileValidation();
     var passwordResult = passwordValidation();
     var form = $("#ragistrationFormMover");
     var data = getFormData(form);
-    if (emailResult && nameResult && passwordResult && mobileResult) {
+    if (emailResult && firstNameResult && lastNameResult && passwordResult && mobileResult) {
       $.ajax({
         type: "POST",
         url: "/signup/",
@@ -244,7 +284,6 @@ $(function() {
           window.location.reload();
         }
       });
-    } else {
     }
   });
 });
