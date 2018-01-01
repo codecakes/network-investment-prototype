@@ -5,11 +5,36 @@
             <div class="row">
                 <br>
                 <br>
-                <h1>My Fixed Deposit Plans</h1>
 
-                <div class="col-md-12">
+                <div class="row multi-columns-row">
+
+                    {% for package in packages %}
+                        <div class="col-sm-6 col-md-4 col-lg-4">
+                            <div class="price-table font-alt">
+                                <h4>{{package.package_name}}</h4>
+                                <div class="borderline"></div>
+                                <p class="price">
+                                    <span>$</span>{{package.price}}
+                                </p>
+                                <ul class="price-details">
+                                    <li>{{package.payout}} PAY-OUT %</li>
+                                    <li>{{package.directout}} DIRECT OUT</li>
+                                    <li>{{package.binary_payout}} BINARY PAY-OUT</li>
+                                    <li>{{package.capping}} CAPPING (USD)</li>
+                                    <li>{{package.no_payout}} NO OF PAY-OUT</li>
+                                    <li>{{package.loyality}} LOYALITY</li>
+                                    <li>{{package.roi}} ROI IN USD</li>
+                                </ul>
+                                <!-- <a class="btn btn-d btn-round" href="#" package-id="{{package.id}}">Buy</a> -->
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+
+                <!-- <div class="col-md-12">
                     <form class="registration-form" method="post">
-						{% csrf_token %}
+                        {% csrf_token %}
                         <div class="form-box">
                             <div class="form-top">
                                 <div class="form-top-left">
@@ -33,22 +58,22 @@
                                             <label>Package Type: </label>
                                         </div>
                                         <div class="col-sm-8">
-											<select name="package" id="package">
-												{% for p in packages %}
-													<option value="{{p.id}}">{{p.package_name}}</option>
-												{% endfor %}
-											</select>
+                                            <select name="package" id="package">
+                                                {% for p in packages %}
+                                                <option value="{{p.id}}">{{p.package_name}}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
-								</div>
-								<br>
-								<div class="form-group">
-									<button class="btn btn-round btn-b" type="submit">Save</button>
-								</div>
+                                </div>
+                                <br>
+                                <div class="form-group">
+                                    <button class="btn btn-round btn-b" type="submit">Save</button>
+                                </div>
                             </div>
                         </div>
                     </form>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
