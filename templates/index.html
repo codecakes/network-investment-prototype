@@ -1,34 +1,43 @@
-{% extends "base.html" %}
-
-{% block body %}
-    {% load static %}
-    <main>
-      <div class="page-loader">
+{% extends "base.html" %} {% block body %} {% load static %}
+<main>
+    <div class="page-loader">
         <div class="loader">Loading...</div>
     </div>
     <nav class="navbar navbar-custom navbar-transparent navbar-fixed-top one-page" role="navigation">
         <div class="container">
             <div class="navbar-header">
-                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse"><span
-                        class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
-                        class="icon-bar"></span><span class="icon-bar"></span></button>
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#custom-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
                 <a class="navbar-brand" href="index.html">AviCrypto</a>
             </div>
             <div class="collapse navbar-collapse" id="custom-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#totop">Home</a></li>
-                    <li><a class="section-scroll" href="#about">Who We Are</a></li>
-                    <li><a class="section-scroll" href="#works">What We Do</a></li>
-                    <li><a class="section-scroll" href="#contact">Get In Touch</a></li>
-                    <li><a class="btn btn-d btn-round" href="/login">Sign Up/Login</a></li>
+                    <li>
+                        <a href="#totop">Home</a>
+                    </li>
+                    <li>
+                        <a class="section-scroll" href="#about">Who We Are</a>
+                    </li>
+                    <li>
+                        <a class="section-scroll" href="#works">What We Do</a>
+                    </li>
+                    <li>
+                        <a class="section-scroll" href="#contact">Get In Touch</a>
+                    </li>
+                    <li>
+                        <a class="btn btn-d btn-round" href="/login">Sign Up/Login</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <!--      <section class="home-section home-full-height bg-dark bg-gradient" id="home" data-background="static/images/Layer.jpg">-->
-    <section class="home-section home-full-height bg-dark" id="home"
-             data-background="{% static "images/Layer.png" %}">
+    <section class="home-section home-full-height bg-dark" id="home" data-background="{% static " images/Layer.png " %}">
         <div class="titan-caption">
             <div class="caption-content">
                 <div class="font-alt mb-30 titan-title-size-1">Welcome To AVI CRYPTO</div>
@@ -47,21 +56,21 @@
                         <div class="row multi-columns-row">
                             <div class="col-md-3 col-sm-6 col-xs-12">
                                 <div class="alt-features-item">
-                                    <img src="{% static "images/img_who.svg" %}">
+                                    <img src="{% static " images/img_who.svg " %}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-xs-12 module-subtitle font-serif">
                                 <article>
-                                    AVICRYPTO is a leading national provider of world’s fastest, safest and cheapest
-                                    payment solutions which is Crypto for independent businesses. We’ve built the
-                                    company from the inside out, putting service at the center of everything we do. It’s
-                                    a high-touch, high-tech, end-to- end system that delivers quality, value, and
-                                    profitability to our investors, Merchant, Trader's & when You win, we win !
+                                    AVICRYPTO is a leading national provider of world’s fastest, safest and cheapest payment solutions which is Crypto for independent
+                                    businesses. We’ve built the company from the inside out, putting service at the center
+                                    of everything we do. It’s a high-touch, high-tech, end-to- end system that delivers quality,
+                                    value, and profitability to our investors, Merchant, Trader's & when You win, we win
+                                    !
                                 </article>
                             </div>
                             <div class="col-md-3 col-sm-6 col-xs-12">
                                 <div class="alt-features-item">
-                                    <img src="{% static "images/img_who.svg" %}">
+                                    <img src="{% static " images/img_who.svg " %}">
                                 </div>
                             </div>
                         </div>
@@ -80,8 +89,9 @@
                 <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title font-alt"><a data-toggle="collapse" data-parent="#accordion"
-                                                                href="#accordion1">Crypto buying & Selling</a></h4>
+                            <h4 class="panel-title font-alt">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#accordion1">Crypto buying & Selling</a>
+                            </h4>
                         </div>
                         <div class="panel-collapse collapse in" id="accordion1">
                             <div class="panel-body">
@@ -91,9 +101,9 @@
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse"
-                                                                data-parent="#accordion" href="#accordion2">Crypto
-                                Payment Gateway</a></h4>
+                            <h4 class="panel-title font-alt">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#accordion2">Crypto Payment Gateway</a>
+                            </h4>
                         </div>
                         <div class="panel-collapse collapse" id="accordion2">
                             <div class="panel-body">
@@ -103,9 +113,10 @@
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse"
-                                                                data-parent="#accordion" href="#accordion3">Crypto
-                                Trading</a></h4>
+                            <h4 class="panel-title font-alt">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#accordion3">Crypto Trading
+                                </a>
+                            </h4>
                         </div>
                         <div class="panel-collapse collapse" id="accordion3">
                             <div class="panel-body">
@@ -115,9 +126,9 @@
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse"
-                                                                data-parent="#accordion" href="#accordion4">Crypto
-                                Saving Account</a></h4>
+                            <h4 class="panel-title font-alt">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#accordion4">Crypto Saving Account</a>
+                            </h4>
                         </div>
                         <div class="panel-collapse collapse" id="accordion4">
                             <div class="panel-body">
@@ -127,9 +138,10 @@
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse"
-                                                                data-parent="#accordion" href="#accordion5">Fixed
-                                Deposit</a></h4>
+                            <h4 class="panel-title font-alt">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#accordion5">Fixed Deposit
+                                </a>
+                            </h4>
                         </div>
                         <div class="panel-collapse collapse" id="accordion5">
                             <div class="panel-body">
@@ -139,14 +151,14 @@
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title font-alt"><a class="collapsed" data-toggle="collapse"
-                                                                data-parent="#accordion" href="#accordion6">Investment
-                                On Initial Coin Offering</a></h4>
+                            <h4 class="panel-title font-alt">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#accordion6">Investment On Initial Coin Offering</a>
+                            </h4>
                         </div>
                         <div class="panel-collapse collapse" id="accordion6">
                             <div class="panel-body">
-                                We will find best option in <b>Initial Coin Offering (ICO)</b> for you and let you
-                                invest there
+                                We will find best option in
+                                <b>Initial Coin Offering (ICO)</b> for you and let you invest there
                             </div>
                         </div>
                     </div>
@@ -155,47 +167,60 @@
                 <div class="row multi-columns-row">
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
-                            <div class="features-icon"><span class="icon-wallet"></span></div>
+                            <div class="features-icon">
+                                <span class="icon-wallet"></span>
+                            </div>
                             <h3 class="features-title font-alt">Crypto buying & Selling</h3>
-                            <p>A simple & easy way to buy & Sell Crypto Currency is by using the Centralized
-                                Currency</p>
+                            <p>A simple & easy way to buy & Sell Crypto Currency is by using the Centralized Currency
+                            </p>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
-                            <div class="features-icon"><span class="icon-wallet"></span></div>
+                            <div class="features-icon">
+                                <span class="icon-wallet"></span>
+                            </div>
                             <h3 class="features-title font-alt">Crypto Payment Gateway</h3>
                             <p>Offer your customers the world’s fastest, safest and cheapest payment option</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
-                            <div class="features-icon"><span class="icon-tools"></span></div>
+                            <div class="features-icon">
+                                <span class="icon-tools"></span>
+                            </div>
                             <h3 class="features-title font-alt">Crypto Trading</h3>
-                            <p>Our experts in industry will be with you when you while trading on Crypto at
-                                AVICRYPTO</p>
+                            <p>Our experts in industry will be with you when you while trading on Crypto at AVICRYPTO
+                            </p>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
-                            <div class="features-icon"><span class="icon-gears"></span></div>
+                            <div class="features-icon">
+                                <span class="icon-gears"></span>
+                            </div>
                             <h3 class="features-title font-alt">Crypto Saving Account</h3>
                             <p>Interest on your Exchange wallet will let your saving earn for you</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
-                            <div class="features-icon"><span class="icon-gears"></span></div>
+                            <div class="features-icon">
+                                <span class="icon-gears"></span>
+                            </div>
                             <h3 class="features-title font-alt">Fixed Deposit</h3>
                             <p>Get Weekly Returns on Your One time Fixed Deposit at AVICRYPTO</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <div class="features-item">
-                            <div class="features-icon"><span class="icon-gears"></span></div>
+                            <div class="features-icon">
+                                <span class="icon-gears"></span>
+                            </div>
                             <h3 class="features-title font-alt">Investment On Initial Coin Offering</h3>
-                            <p>We will find best option in <b>Initial Coin Offering (ICO)</b> for you and let you invest
-                                there</p>
+                            <p>We will find best option in
+                                <b>Initial Coin Offering (ICO)</b> for you and let you invest there
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -214,23 +239,24 @@
                 <div class="row multi-columns-row">
 
                     {% for avi_price, payout, num_payout, binary, direct, cap in packages %}
-                        <div class="col-sm-6 col-md-3 col-lg-3">
-                            <div class="price-table font-alt">
-                                <h4>Avi {{ avi_price }}</h4>
-                                <div class="borderline"></div>
-                                <p class="price"><span>$</span>{{ avi_price }}
-                                </p>
-                                <ul class="price-details">
-                                    <li>Weekly Payout: {{ payout }} %</li>
-                                    <li>Loyalty : 5 %</li>
-                                    <li>No. of Payout : {{ num_payout }}</li>
-                                    <li>Binary : {{ binary }} %</li>
-                                    <li>Direct : {{ direct }} %</li>
-                                    <li>Capping: $ {{ cap }}</li>
-                                </ul>
-                                <a class="btn btn-d btn-round" href="/login">Sign Up</a>
-                            </div>
+                    <div class="col-sm-6 col-md-3 col-lg-3">
+                        <div class="price-table font-alt">
+                            <h4>Avi {{ avi_price }}</h4>
+                            <div class="borderline"></div>
+                            <p class="price">
+                                <span>$</span>{{ avi_price }}
+                            </p>
+                            <ul class="price-details">
+                                <li>Weekly Payout: {{ payout }} %</li>
+                                <li>Loyalty : 5 %</li>
+                                <li>No. of Payout : {{ num_payout }}</li>
+                                <li>Binary : {{ binary }} %</li>
+                                <li>Direct : {{ direct }} %</li>
+                                <li>Capping: $ {{ cap }}</li>
+                            </ul>
+                            <a class="btn btn-d btn-round" href="/login">Sign Up</a>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
@@ -249,11 +275,11 @@
                         <div class="callout-btn-box">
                             <form id="subscription-form" role="form" method="post" action="">
                                 <div class="input-group">
-                                    <input class="form-control" type="email" id="email" name="email"
-                                           placeholder="Your Email"
-                                           data-validation-required-message="Please enter your email address."
-                                           required="required"/><span class="input-group-btn">
-                        <button class="btn btn-g btn-round" id="subscription-form-submit" type="submit">Submit</button></span>
+                                    <input class="form-control" type="email" id="email" name="email" placeholder="Your Email" data-validation-required-message="Please enter your email address."
+                                        required="required" />
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-g btn-round" id="subscription-form-submit" type="submit">Submit</button>
+                                    </span>
                                 </div>
                             </form>
                             <div class="text-center" id="subscription-response"></div>
@@ -275,21 +301,18 @@
                         <form id="contactForm" role="form" method="post" action="">
                             <div class="form-group">
                                 <label class="sr-only" for="name">Name</label>
-                                <input class="form-control" type="text" id="name" name="name" placeholder="Your Name*"
-                                       required="required" data-validation-required-message="Please enter your name."/>
+                                <input class="form-control" type="text" id="name" name="name" placeholder="Your Name*" required="required" data-validation-required-message="Please enter your name."
+                                />
                                 <p class="help-block text-danger"></p>
                             </div>
                             <div class="form-group">
                                 <label class="sr-only" for="email">Email</label>
-                                <input class="form-control" type="email" id="email" name="email"
-                                       placeholder="Your Email*" required="required"
-                                       data-validation-required-message="Please enter your email address."/>
+                                <input class="form-control" type="email" id="email" name="email" placeholder="Your Email*" required="required" data-validation-required-message="Please enter your email address."
+                                />
                                 <p class="help-block text-danger"></p>
                             </div>
                             <div class="form-group">
-                                <textarea class="form-control" rows="7" id="message" name="message"
-                                          placeholder="Your Message*" required="required"
-                                          data-validation-required-message="Please enter your message."></textarea>
+                                <textarea class="form-control" rows="7" id="message" name="message" placeholder="Your Message*" required="required" data-validation-required-message="Please enter your message."></textarea>
                                 <p class="help-block text-danger"></p>
                             </div>
                             <div class="text-center">
@@ -309,24 +332,34 @@
                     <div class="col-sm-3">
                         <div class="widget">
                             <h5 class="widget-title font-alt">About AviCrypto</h5>
-                            <article>AVICRYPTO is a leading national provider of world’s fastest, safest, cheapest &
-                                endless payment solutions for independent businesses.
-                                We’ve built the company from the inside out, putting service at the center of everything
-                                we do.
-                                It’s a high-touch, high-tech, end-to- end system that delivers quality, value, and
-                                profitability to our investors, Merchant, Trader's & when You win, we win !
+                            <article>AVICRYPTO is a leading national provider of world’s fastest, safest, cheapest & endless payment
+                                solutions for independent businesses. We’ve built the company from the inside out, putting
+                                service at the center of everything we do. It’s a high-touch, high-tech, end-to- end system
+                                that delivers quality, value, and profitability to our investors, Merchant, Trader's & when
+                                You win, we win !
                             </article>
-                            <p>Email:<a href="#">info@avicrypto.us</a></p>
+                            <p>Email:
+                                <a href="#">info@avicrypto.us</a>
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <hr class="divider-d">
-        {% block js %}
-          {{ block.super }}
-        {% endblock %}
-      </div>
-    </main>
-    {% endblock %}
-{% endblock %}
+
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-body">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider-d"> {% block js %} {{ block.super }} {% endblock %}
+    </div>
+</main>
+{% endblock %} {% endblock %}

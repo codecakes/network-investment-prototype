@@ -2,53 +2,56 @@
 
 {% block contents %}
 
+<br />
+<br />
+
+
 <div class="tab-pane" id="account">
-        <div class="row" id="account-summary">
-            <div class="row">
-                <h3>Wallet Summary</h3>
-                <table class="table table-bordered table-striped">
-                    <thead>
+    <div class="row" id="account-summary">
+        <div class="row">
+            <h3>Wallet Summary</h3>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Wallet</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Wallet Amount</th>
+                </tr>
+                </thead>
+                <tbody>
                     <tr>
-                        <th>Wallet</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                        <th>Wallet Amount</th>
+                        <td>
+                            <p>Wallet Summary is empty</p>
+                        </td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>3802ee33-1449-4f87-8235-9baff4129568</td>
-                        <td>Binary</td>
-                        <td>This is test wallet</td>
-                        <td>1000</td>
-                    </tr>
-                    {% for wallet in user.wallets %}
-                    <tr>
-                        <td>user.wallet.wallet_type</td>
-                        <td>user.wallet.type</td>
-                        <td>user.wallet.description</td>
-                        <td>user.wallet.amount</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="row">
-                <h3>Transactions Summary</h3>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th>Transation ID</th>
-                        <th>Receiver Wallet</th>
-                        <th>Sender Wallet</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
+                <!-- {% for wallet in user.wallets %}
+                <tr>
+                    <td>user.wallet.wallet_type</td>
+                    <td>user.wallet.type</td>
+                    <td>user.wallet.description</td>
+                    <td>user.wallet.amount</td>
+                </tr>
+                {% endfor %} -->
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <h3>Transactions Summary</h3>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Transation ID</th>
+                    <th>Receiver Wallet</th>
+                    <th>Sender Wallet</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr>
                         <td>899df031-7077-4d99-a2f3-d7fa1188ba54</td>
                         <td>3802ee33-1449-4f87-8235-9baff4129568</td>
                         <th>d4dee707-79d5-445e-a990-5f0330054501</th>
@@ -67,24 +70,29 @@
                         <td>txn.type</td>
                         <td>txn.status</td>
                     </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="row">
-                <h3>Package Summary</h3>
-                <table class="table table-bordered table-striped">
-                    <thead>
+                    {% endfor %} -->
                     <tr>
-                        <th>Package Name</th>
-                        <th>Description</th>
-                        <td>Price</td>
-                        <th>Status</th>
-                        <th>Expiry date</th>
+                        <td>
+                            <p>Transactions Summary is empty</p>
+                        </td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <h3>Package Summary</h3>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Package Name</th>
+                    <th>Description</th>
+                    <td>Price</td>
+                    <th>Status</th>
+                    <th>Expiry date</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr>
                         <td>100</td>
                         <td>This is dummy package</td>
                         <td>100</td>
@@ -99,10 +107,15 @@
                         <td>txn.amount.wallet.amount</td>
                         <td>txn.txn_id</td>
                     </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                    {% endfor %} -->
+                    <tr>
+                        <td>
+                            <p>Package Summary is empty</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
 </div>
 {% endblock %}

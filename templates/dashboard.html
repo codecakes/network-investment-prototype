@@ -1,140 +1,141 @@
-{% extends "home_root.html" %}
-
-{% block contents %}
+{% extends "home_root.html" %} {% block contents %}
 
 <div class="tab-content">
     <div class="tab-pane active" id="dashboard">
         <div class="row" id="dashboard-summary">
             <br>
-        <br>
+            <br>
             <h2>Dashboard</h2>
             <table class="table table-bordered table-striped">
                 <thead>
-                <tr>
-                    <th>Firstname</th>
-                    <th>Lastname</th>
-                    <th>Email</th>
-                    <th>Mobile Number</th>
-                    <th>Bank Account Type</th>
-                </tr>
+                    <tr>
+                        <th>Firstname</th>
+                        <th>Lastname</th>
+                        <th>Email</th>
+                        <th>Mobile Number</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {% for u in user %}
-                <tr>
-                    <td>{{u.first_name}}</td>
-                    <td>{{u.last_name}}</td>
-                    <td>{{u.email}}</td>
-                    <td>{{u.profile.mobile}}</td>
-                    <td>{{u.profile.account_type}}</td>
-                </tr>
-                {% endfor %}
+                    <tr>
+                        <td>{{user.first_name}}</td>
+                        <td>{{user.last_name}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{user.profile.mobile}}</td>
+                    </tr>
                 </tbody>
             </table>
-            <p>Refereal Link:   <input type="text" size="40" value="{{link}}" id="referal_link"><button onclick="myFunction()">Copy</button></p>
+            <p>
+                Refereal Link:
+                <input type="text" size="40" value="{{link}}" id="referal_link">
+                <button onclick="myFunction()">Copy</button>
+            </p>
             <h2>My Packages</h2>
             <table class="table table-bordered table-striped">
-                    <thead>
+                <thead>
                     <tr>
                         <th>Package Name</th>
                         <th>Description</th>
                         <td>Price</td>
                         <th>Status</th>
-                        <th>Start date</th>
-                        <th>Expiry date</th>
                     </tr>
-                    </thead>
-                    <tbody>
+                </thead>
+                <tbody>
                     {% for p in packages %}
-                    <tr>
-                        <td>{{p.package}}</td>
-                        <td>{{p.package.description}}</td>
-                        <td>{{p.package.price}}</td>
-                        <td>{{p.status}}</td>
-                        <td>{{p.start_date}}</td>
-                        <td>{{p.package.expiry_date}}</td>
-                    </tr>
+                        <tr>
+                            <td>{{p.package.package_name}}</td>
+                            <td>{{p.package.description}}</td>
+                            <td>{{p.package.price}}</td>
+                            <td>{{p.status}}</td>
+                        </tr>
                     {% endfor %}
-                    </tbody>
-                </table>
-                <div class="row">
-                    <div class="col-lg-4 col-sm-4 col-xs-12 boxed">
-                        <div class="white-box-1">
-                            <div class="m-b-12">
-                                <h2 style="font-weight:bold; text-align:right; font-size:18px;margin-right: 15px;padding-top: 10px;">Hedging Benefit</h2>
-                                        <!--<span>Total Available Balance</span>-->
-                            </div>
-                                <ul class="">
-                                    <li><i class="glyphicon glyphicon-file large before_icon_margin" style="font-size: 4em"></i></li>
-                                    <li class="text-right"><span style="font-size:24px;">$</span><span class="counter fontsize_small_media">
-                                    5995</span><br>
-                                    5877.45098039 XRP 
-                                    </li>
-                                </ul>                                    
+                </tbody>
+            </table>
+            <div class="row">
+                <div class="col-lg-4 col-sm-4 col-xs-12 boxed">
+                    <div class="white-box-1">
+                        <div class="m-b-12">
+                            <h2 style="font-weight:bold; text-align:right; font-size:18px;margin-right: 15px;padding-top: 10px;">Hedging Benefit</h2>
+                            <!--<span>Total Available Balance</span>-->
                         </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-4 col-xs-12 boxed1">
-                        <div class="white-box-2">
-                            <div class="m-b-12">
-                                <b><h2  style="text-align:right; font-weight:bold; font-size:18px;margin-right: 15px;padding-top: 10px;"> Account</h2></b>
-                                        <!--<span>Demo Text</span>-->
-                            </div>
-                            <ul class="">
-                                <li><i class="glyphicon glyphicon-star large before_icon_margin" style="font-size: 4em"></i></li>
-                                <li class="text-right"><span style="font-size:24px;">$</span><span class="counter">
-                                315
-                                </span><br>
-                                308.823529412 XRP 
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-4 col-xs-12 boxed2">
-                        <div class="white-box-3">
-                            <div class="m-b-12">
-                                <h2 class="box-title" style="font-weight:bold; text-align:right; font-size:18px;margin-right: 15px;padding-top: 10px; font-color:white;">Pair Account</h2>
-                                       <!-- <span>Demo Text</span>-->
-                            </div>
-                                <ul class="">
-                                    <li><i class="glyphicon glyphicon-user large before_icon_margin" style="font-size: 4em"></i></li>
-                                    <li class="text-right"><span style="font-size:24px;">$</span><span class="before_icon_margin">
-                                    408
-                                    </span><br> 
-                                    400 XRP</li>
-                                </ul>
-                        </div>
+                        <ul class="">
+                            <li>
+                                <i class="glyphicon glyphicon-file large before_icon_margin" style="font-size: 4em"></i>
+                            </li>
+                            <li class="text-right">
+                                <span style="font-size:24px;">$</span>
+                                <span class="counter fontsize_small_media">
+                                    5995</span>
+                                <br> 5877.45098039 XRP
+                            </li>
+                        </ul>
                     </div>
                 </div>
+                <div class="col-lg-4 col-sm-4 col-xs-12 boxed1">
+                    <div class="white-box-2">
+                        <div class="m-b-12">
+                            <b>
+                                <h2 style="text-align:right; font-weight:bold; font-size:18px;margin-right: 15px;padding-top: 10px;">Account</h2>
+                            </b>
+                            <!--<span>Demo Text</span>-->
+                        </div>
+                        <ul class="">
+                            <li>
+                                <i class="glyphicon glyphicon-star large before_icon_margin" style="font-size: 4em"></i>
+                            </li>
+                            <li class="text-right">
+                                <span style="font-size:24px;">$</span>
+                                <span class="counter">
+                                    315
+                                </span>
+                                <br> 308.823529412 XRP
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-4 col-xs-12 boxed2">
+                    <div class="white-box-3">
+                        <div class="m-b-12">
+                            <h2 class="box-title" style="font-weight:bold; text-align:right; font-size:18px;margin-right: 15px;padding-top: 10px; font-color:white;">Pair Account</h2>
+                            <!-- <span>Demo Text</span>-->
+                        </div>
+                        <ul class="">
+                            <li>
+                                <i class="glyphicon glyphicon-user large before_icon_margin" style="font-size: 4em"></i>
+                            </li>
+                            <li class="text-right">
+                                <span style="font-size:24px;">$</span>
+                                <span class="before_icon_margin">
+                                    408
+                                </span>
+                                <br> 400 XRP
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <h2>Member History</h2>
             <table class="table table-bordered table-striped">
                 <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>ID</th>
-                    <th>Location</th>
-                    <th>Date of Add </th>
-                </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>ID</th>
+                        <th>Location</th>
+                        <th>Date of Add </th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>Hemant Pahuja</td>
-                    <td>hemant@gmail.com</td>
-                    <td>India</td>
-                    <td>2017-12-27</td>
-                </tr>
-                <tr>
-                    <td>Mayank Sachdeva</td>
-                    <td>mayank@gmail.com</td>
-                    <td>India</td>
-                    <td>2017-12-27</td>
-                </tr>
-                {% for u in user %}
-                <tr>
-                    <td>{{u.first_name}}</td>
-                    <td>{{u.last_name}}</td>
-                    <td>{{u.email}}</td>
-                    <td>{{u.profile.package}}/td>
-                </tr>
-                {% endfor %}
+                    <tr>
+                        <td>Hemant Pahuja</td>
+                        <td>hemant@gmail.com</td>
+                        <td>India</td>
+                        <td>2017-12-27</td>
+                    </tr>
+                    <tr>
+                        <td>Mayank Sachdeva</td>
+                        <td>mayank@gmail.com</td>
+                        <td>India</td>
+                        <td>2017-12-27</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -142,11 +143,9 @@
 </div>
 <script type="text/javascript">
     function myFunction() {
-       console.log('---') 
-  var copyText = document.getElementById("referal_link");
-  copyText.select();
-  document.execCommand("Copy");
-  alert("Copied the text: " + copyText.value);
-}
-</script>
-{% endblock %}
+        var copyText = document.getElementById("referal_link");
+        copyText.select();
+        document.execCommand("Copy");
+        alert("Copied the text: " + copyText.value);
+    }
+</script> {% endblock %}
