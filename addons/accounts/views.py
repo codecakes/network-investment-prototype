@@ -227,11 +227,11 @@ def support(request):
     if request.method == 'GET':
         template = loader.get_template('support.html')
         context = {
-            'user': 'None'
+            'user': request.user
         }
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
-        services.support_mail('Support Ticket', "Hello, Admin, support ticket generated, please respond", 'jain.atul43@gmail.com', from_email="postmaster")
+        services.support_mail('Support Ticket', request.POST.get("description", ""), 'jain.atul43@gmail.com', from_email="postmaster")
         return HttpResponse('Mail sent to adminstrator', content_type="application/json")
 
 @login_required(login_url="/login")
