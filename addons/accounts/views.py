@@ -83,7 +83,7 @@ class Registration(FormView):  # code for template is given below the view's cod
                         messages.success(request, 'User already exists')
                         return result
                     else:
-                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['name'])
+                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['first_name'], last_name=data_dict['last_name'])
                         user.set_password(str(data_dict['password']))
 
                 user.save()
@@ -176,7 +176,7 @@ def home(request):
     if request.method == 'GET':
         user = request.user
         packages = User_packages.objects.filter(user=user)
-        print packages[1].expiry_date
+        # print packages[1].expiry_date
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
@@ -227,11 +227,11 @@ def support(request):
     if request.method == 'GET':
         template = loader.get_template('support.html')
         context = {
-            'user': 'None'
+            'user': request.user
         }
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
-        services.support_mail('Support Ticket', "Hello, Admin, support ticket generated, please respond", 'jain.atul43@gmail.com', from_email="postmaster")
+        services.support_mail('Support Ticket', request.POST.get("description", ""), 'harshulkaushik9@gmail.com', from_email="postmaster")
         return HttpResponse('Mail sent to adminstrator', content_type="application/json")
 
 @login_required(login_url="/login")

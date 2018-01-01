@@ -1,11 +1,11 @@
 {% extends "base.html" %} {% block body %} {% block main %}
 <main>
 	{% if messages %}
-	<ul class="messages">
-		{% for message in messages %}
-		<li>{{message}}</li>
-		{% endfor %}
-	</ul>
+		<ul class="messages">
+			{% for message in messages %}
+				<li>{{ message }}</li>
+			{% endfor %}
+		</ul>
 	{% endif %}
 	<nav class="navbar navbar-custom navbar-fixed-top one-page" role="navigation">
 		<div class="container">
@@ -82,16 +82,20 @@
 							</select>
 						</div>
 						<div class="form-group">
-							<input type="text" id="placement_id_left" class="form-control" name="placement_id_left" value="{{placement_user_left_id}}" placeholder="Placement Id" readonly/>
-							<input type="text" id="placement_id_right" class="form-control" name="placement_id_right" value="{{placement_user_right_id}}" placeholder="Placement Id" readonly style="display: none;"/>
+							<input type="text" id="placement_id_left" class="form-control" name="placement_id_left" value="{{ placement_user_left_id }}" placeholder="Placement Id" readonly/>
+							<input type="text" id="placement_id_right" class="form-control" name="placement_id_right" value="{{ placement_user_right_id }}" placeholder="Placement Id" readonly style="display: none;"/>
 						</div>
 						<div class="form-group">
-							<input type="email" id="email" class="form-control" name="email" value="{{email}}" placeholder="E-mail address" />
+							<input type="email" id="email" class="form-control" name="email" value="{{ email }}" placeholder="E-mail address" />
 							<span id='email-matching-message'></span>
 						</div>
 						<div class="form-group">
-							<input type="text" id="name" class="form-control" name="name" value="{{ name }}" placeholder="Name" />
-							<span id='name-matching-message'></span>
+							<input type="text" id="first_name" class="form-control" name="first_name" value="{{ first_name }}" placeholder="First Name" />
+							<span id='first_name-matching-message'></span>
+						</div>
+						<div class="form-group">
+							<input type="text" id="last_name" class="form-control" name="last_name" value="{{ last_name }}" placeholder="Last Name" />
+							<span id='last_name-matching-message'></span>
 						</div>
 						<div class="form-group">
 							<input type="text" id="mobile" class="form-control" name="mobile" value="{{ mobile }}" placeholder="Mobile" />
