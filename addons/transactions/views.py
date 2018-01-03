@@ -60,9 +60,7 @@ class TransactionsList(ListView):
         return context
 
     def get(self, request):
-        print "get list of transactions", self.template
         transactions = Transactions.objects.filter(sender_wallet=request.user)
-        print transactions
         context = {
             'transactions': transactions
         }
@@ -78,9 +76,7 @@ class TransactionsSummary(ListView):
         return context
 
     def get(self, request):
-        print "get list of transactions", self.template
         transactions = Transactions.objects.all()
-        print transactions
         context = {
             'transactions': transactions
         }

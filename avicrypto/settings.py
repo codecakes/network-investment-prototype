@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     # https://warehouse.python.org/project/whitenoise/
     # 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -103,10 +103,10 @@ WSGI_APPLICATION = 'avicrypto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['avicrypto_db'],
-        'USER': os.environ['avicrypto_user'],
-        'PASSWORD': os.environ['avicrypto_pwd'],
-        'HOST': os.environ['avicrypto_host'],
+        'NAME': os.environ["avicrypto_db"],
+        'USER': os.environ["avicrypto_user"],
+        'PASSWORD': os.environ["avicrypto_pwd"],
+        'HOST': os.environ["avicrypto_host"],
         'PORT': '5432'
     }
 }
@@ -165,7 +165,8 @@ USE_TZ = True
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
+STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Extra places for collectstatic to find static files.

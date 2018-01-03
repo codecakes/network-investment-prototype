@@ -1,9 +1,4 @@
-{% extends "home_root.html" %}
-{% block contents %}
-{% load static %}
-<div>
-    
-</div>
+{% extends "home_root.html" %} {% block contents %} {% load static %}
 </br>
 </br>
 </br>
@@ -11,84 +6,64 @@
 </br>
 </br>
 <div class="tab-pane" id="support">
-        <div class="row" id="request-support">
-            <section class="module bg-dark-60 request-cta"
-                     data-background="{% static " images
-            /Layer.png" %}">
+    <div class="row" id="request-support">
+        <section class="module bg-dark-60 request-cta" data-background="{% static " images /Layer.png " %}">
             <div class="container">
                 <div class="row">
                     <div class="col-sm-4">
                         <h2 class="font-alt">Request a call back</h2>
-                        <p>Would you like to speak to one of our financial advisers over the
-                            phone? Just submit your details and we’ll be in touch shortly.
-                            You can also email us if you would prefer.</p>
+                        <p>Would you like to speak to one of our financial advisers over the phone? Just submit your details and we’ll be in touch shortly. You can also email us if you would prefer.</p>
                     </div>
                     <div class="col-sm-8">
                         <div class="row">
-                            <form class="form rqst-form" id="requestACall" role="form"
-                                  method="post" action="">
+                            <form class="form rqst-form" id="requestACall" role="form" method="post" action="">
                                 <div class="form-group col-sm-6 col-xs-12">
-                                    <input class="form-control input-lg" id="name" type="text"
-                                           name="name" placeholder="Name"/>
+                                    <input class="form-control input-lg" type="text" value="{{user.first_name}}" readonly/>
                                 </div>
                                 <div class="form-group col-sm-6 col-xs-12">
-                                    <select class="form-control input-lg" name="subject" id="subject">
-                                        <option value="subject1" disabled="" selected="">
-                                            Subject
-                                        </option>
-                                        <option value="BusinessConsulting">Business
-                                            consulting
-                                        </option>
-                                        <option value="InvestAdvisory">Cryto Investment Advisory
-                                        </option>
-                                        <option value="InvestmentPlanning">Cryto Investment
-                                            Planning
-                                        </option>
-                                        <option value="General">General Support
-                                        </option>
-                                    </select>
+                                    <input class="form-control input-lg" type="text" value="{{user.last_name}}" readonly/>
                                 </div>
                                 <div class="form-group col-sm-6 col-xs-12">
-                                    <input class="form-control input-lg" type="text"
-                                           name="phone" id="phone" placeholder="Phone Number"/>
+                                    <input class="form-control input-lg" type="text" value="{{user.profile.mobile}}" readonly/>
+                                </div>
+                                <div class="form-group col-sm-6 col-xs-12">
+                                    <input class="form-control input-lg" type="text" value="{{user.email}}" readonly/>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <textarea id="description" name="description" placeholder="Description" style="width: 100%; height: 150px; color: black;"></textarea>
                                 </div>
                             </form>
-                                <div class="form-group col-sm-6 col-xs-12">
-                                    <button class="btn btn-border-w btn-circle btn-block"
-                                            id="racSubmit" type="submit"><i
-                                            class="fa fa-paper-plane-o"></i> Submit
-                                    </button>
-                                </div>
-                                <div id="requestFormResponse"></div>
+                            <div class="form-group col-sm-6 col-xs-12">
+                                <button class="btn btn-border-w btn-circle btn-block" id="racSubmit" type="submit">
+                                    <i class="fa fa-paper-plane-o"></i> Submit
+                                </button>
+                            </div>
+                            <div id="requestFormResponse"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            </section>
-        </div>
+        </section>
+    </div>
 </div>
 <script src="{% static "lib/jquery/dist/jquery.js" %}"></script>
 <script type="text/javascript">
-$('#racSubmit').click(function(){
-    ticket_data = {
-        'name': $("name").val(),
-        'phone': $('phone').val(),
-        'subject':$("[subject]:selected").attr("value")
-    }
-    $.ajax({
-        url: "/support",
-        contentType: "application/json; charset=UTF-8",
-        // data:ticket_data,
-        data: JSON.stringify(ticket_data),
-        dataType: "JSON",
-        type: "POST",
-        error: function(res) {
-            console.log(res);
-        },
-        success: function(res) {
-            console.log(res);    
+    $('#racSubmit').click(function () {
+
+        var data = {
+            'description': $("#description").val()
         }
-    }); 
-});
-</script>
-{% endblock %}
+        $.ajax({
+            url: "/support",
+            data: data,
+            dataType: "json",
+            type: "POST",
+            error: function (res) {
+                alert("Error in Mail Sent. Please try after some time.")
+            },
+            success: function (res) {
+                alert("Mail Sent.")
+            }
+        });
+    });
+</script> {% endblock %}

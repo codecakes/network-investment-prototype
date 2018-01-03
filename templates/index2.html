@@ -47,7 +47,7 @@
         <link id="color-scheme" href="{% static "css/colors/default.css" %}" rel="stylesheet">
         <link href="{% static "css/custom.css" %}" rel="stylesheet">
     </head>
-    
+
     {% block body %}
 
         <body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
@@ -74,6 +74,20 @@
             </div>
         </div>
     </nav>
+
+    <div id="welcomeModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Welcome 2018!</h4>
+                </div>
+                <div class="modal-body">
+                    <image src="{% static "images/offer.jpeg" %}"></image>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!--      <section class="home-section home-full-height bg-dark bg-gradient" id="home" data-background="static/images/Layer.jpg">-->
     <section class="home-section home-full-height bg-dark" id="home"
@@ -386,8 +400,14 @@
     </footer>
         {% block js %}
             {% include "js_src.html" %}
+            {% load static %}
             <script src="{% static "js/plugins.js" %}"></script>
             <script src="{% static "js/main.js" %}"></script>
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $("#welcomeModal").modal('show');
+                });
+            </script>
         {% endblock %}
         </body>
     {% endblock %}

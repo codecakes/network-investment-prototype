@@ -1,0 +1,41 @@
+image: python:2.7.14
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - pip
+        script: # Modify the commands below to build your repository.
+          - pip install -U pipenv
+          - pip install -r requirements.txt
+          - python manage.py migrate --noinput
+          - python manage.py migrate --noinput
+          - python manage.py makemigrations accounts
+          - python manage.py makemigrations wallet
+          - python manage.py makemigrations transactions
+          - python manage.py makemigrations packages
+          - python manage.py migrate
+          - mkdir -p staticfiles && mkdir -p media
+          - python manage.py collectstatic --noinput
+          - pwd_dir=$(pwd)
+          - cd .. && git clone git@github.com:codecakes/avi.github.io.git
+          - cd avi.github.io && cp -R $pwd_dir/staticfiles ./
+          - git config --global user.email $AKUL_GITHUB_EMAIL
+          - git config --global user.name $AKUL_GITHUB_USER
+          - echo $(git status)
+          - rm staticfiles/lib/owl.carousel/docs_src/templates/pages/docs/dev-buildin-plugins.hbs
+          - rm staticfiles/lib/owl.carousel/docs_src/templates/pages/docs/dev-buildin-plugins.dc8accba73a0.hbs
+          - git add * && git commit -am "updated staticfiles"
+          - echo $(git status)
+          - git push
+        services:
+          - database
+definitions:
+  services:
+    database:
+      image: postgres:9.6.6-alpine
+      environment: 
+        avicrypto_db: "postgres"
+        avicrypto_user: "postgres"
+        avicrypto_pwd: "postgres"
+        avicrypto_host: "localhost"
