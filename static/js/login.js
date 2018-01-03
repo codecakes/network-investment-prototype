@@ -274,14 +274,18 @@ $(function() {
     var form = $("#ragistrationFormMover");
     var data = getFormData(form);
     if (emailResult && firstNameResult && lastNameResult && passwordResult && mobileResult) {
+      $("#pageLoader, #loader").show()
       $.ajax({
         type: "POST",
         url: "/signup/",
         data: data,
         success: function(prod_detail) {
-          var data = prod_detail;
-          alert(data);
-          window.location.reload();
+          $("#pageLoader, #loader").hide()
+          setTimeout(function() {
+            var data = prod_detail;
+            alert(data);
+            window.location.reload();
+          }, 500)
         }
       });
     }

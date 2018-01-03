@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^uploads/simple/$', views.simple_upload, name='simple_upload'),
     url(r'^uploads/form/$', views.model_form_upload, name='model_form_upload'),
     url(r'^add/user/', views.add_user, name='profile'),
+    url(r'^reset-password/(?P<token>.+)$', views.reset_password, name='reset_password'),
     # url(r'^add/user/(?P<id>[a-zA-Z0-9]{0,30})/$',views.add_user, name='add_user'),
 ]
 
