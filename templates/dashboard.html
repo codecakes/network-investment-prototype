@@ -64,9 +64,15 @@
                             </li>
                             <li class="text-right">
                                 <span style="font-size:24px;">$</span>
-                                <span class="counter fontsize_small_media">
-                                    5995</span>
-                                <br> 5877.45098039 XRP
+                                <span id="roi-payout" class="counter fontsize_small_media">
+                                    <!--this should be taken from the users balance-->
+                                    0
+                                </span>
+                                <br>
+                                <div id="xrp-roi"></div>
+                                <div id="eth-roi"></div>
+                                <div id="btc-roi"></div>
+                                <div id="inr-roi"></div>
                             </li>
                         </ul>
                     </div>
@@ -75,7 +81,7 @@
                     <div class="white-box-2">
                         <div class="m-b-12">
                             <b>
-                                <h2 style="text-align:right; font-weight:bold; font-size:18px;margin-right: 15px;padding-top: 10px;">Account</h2>
+                                <h2 style="text-align:right; font-weight:bold; font-size:18px;margin-right: 15px;padding-top: 10px;">Direct Payout</h2>
                             </b>
                             <!--<span>Demo Text</span>-->
                         </div>
@@ -85,10 +91,15 @@
                             </li>
                             <li class="text-right">
                                 <span style="font-size:24px;">$</span>
-                                <span class="counter">
-                                    315
+                                <span id="direct-payout" class="counter">
+                                    <!--this should be taken from the users balance-->
+                                    0
                                 </span>
-                                <br> 308.823529412 XRP
+                                <br>
+                                <div id="xrp-direct"></div>
+                                <div id="eth-direct"></div>
+                                <div id="btc-direct"></div>
+                                <div id="inr-direct"></div>
                             </li>
                         </ul>
                     </div>
@@ -105,10 +116,15 @@
                             </li>
                             <li class="text-right">
                                 <span style="font-size:24px;">$</span>
-                                <span class="before_icon_margin">
-                                    408
+                                <span id="binary-payout" class="before_icon_margin">
+                                    <!--this should be taken from the users balance-->
+                                    0
                                 </span>
-                                <br> 400 XRP
+                                <br>
+                                <div id="xrp-binary"></div>
+                                <div id="eth-binary"></div>
+                                <div id="btc-binary"></div>
+                                <div id="inr-binary"></div>
                             </li>
                         </ul>
                     </div>
@@ -142,6 +158,10 @@
         </div>
     </div>
 </div>
+
+{% load static %}
+<script src="{% static "lib/jquery/dist/jquery.js" %}"></script>
+
 <script type="text/javascript">
     function myFunction() {
         var copyText = document.getElementById("referal_link");
@@ -149,4 +169,71 @@
         document.execCommand("Copy");
         alert("Copied the text: " + copyText.value);
     }
-</script> {% endblock %}
+</script>
+
+<script>
+    var exchSettings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=BTC%2CXRP%2CINR%2CETH",
+      "method": "GET",
+      "headers": {}
+    };
+
+    function fetchRates() {
+        $.ajax(exchSettings).done(function (response) {
+            // console.log(response);
+            // update div tags
+            let
+                btc = response.BTC,
+                eth = response.ETH,
+                xrp = response.XRP,
+                inr = response.XRP,
+                roiVal = parseInt($("#roi-payout").text()),
+                binaryVal = parseInt($("#binary-payout").text()),
+                directVal = parseInt($("#direct-payout").text()),
+                btcRoi = roiVal * btc,
+                ethRoi = roiVal * eth,
+                xrpRoi = roiVal * xrp,
+                inrRoi = roiVal * inr,
+                btcBinary = binaryVal * btc,
+                ethBinary = binaryVal * eth,
+                xrpBinary = binaryVal * xrp,
+                inrBinary = binaryVal * inr,
+                btcDirect = directVal * btc,
+                ethDirect = directVal * eth,
+                xrpDirect = directVal * xrp,
+                inrDirect = directVal * inr;
+
+
+            $("#btc-roi").text(`BTC: ${btcRoi}`);
+            $("#eth-roi").text(`ETH: ${ethRoi}`);
+            $("#xrp-roi").text(`XRP: ${xrpRoi}`);
+            $("#inr-roi").text(`INR: ${inrRoi}`);
+
+            $("#btc-binary").text(`BTC: ${btcBinary}`);
+            $("#eth-binary").text(`ETH: ${ethBinary}`);
+            $("#xrp-binary").text(`XRP: ${xrpBinary}`);
+            $("#inr-binary").text(`INR: ${inrBinary}`);
+
+            $("#btc-direct").text(`BTC: ${btcDirect}`);
+            $("#eth-direct").text(`ETH: ${ethDirect}`);
+            $("#xrp-direct").text(`XRP: ${xrpDirect}`);
+            $("#inr-direct").text(`INR: ${inrDirect}`);
+
+        });
+    }
+
+    function stopOnUnload(intId) {
+      clearInterval(intId);
+    };
+
+    intId = setInterval(fetchRates, 5000);
+
+
+    window.onbeforeunload = function(evt) {
+        stopOnUnload(intId);
+    };
+
+</script>
+{% endblock %}

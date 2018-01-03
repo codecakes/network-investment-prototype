@@ -1,1 +1,1 @@
-web: gunicorn avicrypto.wsgi --log-file -
+web: newrelic-admin run-program gunicorn avicrypto.wsgi --log-file -
