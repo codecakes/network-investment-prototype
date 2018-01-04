@@ -10,8 +10,9 @@ from django.core.validators import RegexValidator
 from addons.packages.models import Packages
 import base64, uuid
 from django.contrib.postgres.fields import ArrayField
+
 # Create your models here.
-User._meta.local_fields[4].__dict__['_unique'] = True
+# User._meta.local_fields[4].__dict__['_unique'] = True
 
 def increment_user_id():
     last_user_id = Profile.objects.all().order_by('user_auto_id').last()

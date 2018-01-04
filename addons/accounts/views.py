@@ -22,6 +22,7 @@ from django.shortcuts import get_object_or_404
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
 import sys
 import hashlib
@@ -36,26 +37,20 @@ from lib.tree import load_users, find_min_max
 
 
 def index(request):
-    if request.method == 'GET':
-        # import pdb; pdb.set_trace()
-        context = {
-            'User': 'None',
-            'packages': [
-                (100, 4.00, 36, 5.00, 3.00, 100),
-                (500, 5.00, 35, 5.50, 3.00, 500),
-                (1000, 7.00, 35, 6.00, 3.50, 1000),
-                (5000, 7.50, 35, 6.50, 3.75, 5000),
-                (10000, 8.00, 33, 7.00, 4.00, 20000),
-                (35000, 8.25, 32, 7.50, 4.00, 50000),
-                (50000, 8.50, 32, 8.50, 4.00, 75000),
-                (100000, 9.00, 31, 8.00, 4.00, 100000)
-            ]
-        }
-        template = loader.get_template('index2.html')
-        return HttpResponse(template.render(context, request))
-    if request.method == 'POST':
-        # pass
-        return HttpResponse("index post")
+    context = {
+        'packages': [
+            (100, 4.00, 36, 5.00, 3.00, 100),
+            (500, 5.00, 35, 5.50, 3.00, 500),
+            (1000, 7.00, 35, 6.00, 3.50, 1000),
+            (5000, 7.50, 35, 6.50, 3.75, 5000),
+            (10000, 8.00, 33, 7.00, 4.00, 20000),
+            (35000, 8.25, 32, 7.50, 4.00, 50000),
+            (50000, 8.50, 32, 8.50, 4.00, 75000),
+            (100000, 9.00, 31, 8.00, 4.00, 100000)
+        ]
+    }
+    template = loader.get_template('website.html')
+    return HttpResponse(template.render(context, request))
 
 
 class Registration(FormView):  # code for template is given below the view's code
@@ -227,7 +222,7 @@ def profile(request):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
-        return HttpResponse('Success')
+        return HttpResponse(json.dumps({"status": "success"}))
     else:
         return HttpResponseRedirect('/error')
 
@@ -248,12 +243,11 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
+        context = {}
         template = loader.get_template('network.html')
-        context = {'user': 'None'}
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
         data = traverse_tree(request.user)
-        # data =  '{"text":{"name":"Mark Hill","title":"Chief executive officer"},"children":[{"text":{"name":"Joe Linux","title":"Chief Technology Officer"},"children":[{"text":{"name":"Ron Blomquist","title":"Chief Information Security Officer"}},{"text":{"name":"Michael Rubin","title":"Chief Innovation Officer","contact":"we@aregreat.com"}}]},{"text":{"name":"Linda May","title":"Chief Business Officer"},"children":[{"text":{"name":"Alice Lopez","title":"Chief Communications Officer"}},{"text":{"name":"Mary Johnson","title":"Chief Brand Officer"},"children":[{"text":{"name":"Erica Reel","title":"Chief Customer Officer"}}]}]}]}'
         return HttpResponse(data)
 
 

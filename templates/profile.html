@@ -1,141 +1,117 @@
-{% extends "home_root.html" %} {% load static %} {% block contents %}
-<div class="tab-content">
-    <div class="tab-pane active" id="profile">
-        <div class="row" id="profile-summary">
-            <div class="row">
-                <br>
-                <br>
-                <h1> Profile</h1>
+{% extends "base.html" %}
 
-                <div class="col-md-12">
-                    <form class="registration-form">
-                        <div class="form-box">
-                            <div class="form-top">
-                                <div class="form-top-left">
-                                    <h3>Network Detail </h3>
-                                </div>
-                            </div>
-                            <div class="form-bottom">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label>Sponsor ID :</label>
-                                        </div>
-                                        <div class="col-sm-8">
+{% load static %}
+
+{% block content %}
+
+<div class="content-header"></div>
+
+<div class="content-body">
+    <section id="profile-form">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title" id="horz-layout-basic">Profile</h4>
+                    </div>
+                    <div class="card-body collapse in">
+                        <div class="card-block">
+                            <form id="profile_form" class="form form-horizontal">
+                                <div class="form-body">
+                                    <h4 class="form-section"><i class="icon-head"></i> Network Detail</h4>
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="projectinput1">Sponsor ID</label>
+                                        <div class="col-md-9">
                                             {{user.profile.sponser_id}}
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label>Placement ID :</label>
-                                        </div>
-                                        <div class="col-sm-8">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="projectinput2">Placement ID</label>
+                                        <div class="col-md-9">
                                             {{user.profile.placement_id}}
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label>Position of placement :</label>
-                                        </div>
-                                        <div class="col-sm-8">
+    
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="projectinput3">Position of placement</label>
+                                        <div class="col-md-9">
                                             {{user.profile.placement_position}}
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="form-box">
-                            <div class="form-top">
-                                <div class="form-top-left">
-                                    <h3>Personal Detail</h3>
-                                </div>
-                                <br>
-                            </div>
-                            <div class="form-bottom">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label> *First Name :</label>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="first_name" placeholder="First Name" class="form-control" id="first_name" value="{{user.first_name}}">
+                                    <h4 class="form-section"><i class="icon-clipboard4"></i> Personal Detail</h4>
+    
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="first_name">*First Name</label>
+                                        <div class="col-md-9">
+                                            <input type="text" id="first_name" class="form-control" placeholder="First Name" name="first_name" value="{{user.first_name}}" required>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label> *Last Name :</label>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="last_name" placeholder="Last Name" class="form-control" id="last_name" value="{{user.last_name}}">
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="last_name">*Last Name</label>
+                                        <div class="col-md-9">
+                                            <input type="text" id="last_name" class="form-control" placeholder="Last Name" name="last_name" value="{{user.last_name}}" required>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label>* Country :</label>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            {{country.country_name}}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label>* Mobile No. :</label>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            {{user.profile.mobile}}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label>* Email :</label>
-                                        </div>
-                                        <div class="col-sm-8">
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="last_name">Email</label>
+                                        <div class="col-md-9">
                                             {{user.email}}
                                         </div>
                                     </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="last_name">Mobile</label>
+                                        <div class="col-md-9">
+                                            {{user.profile.mobile}}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="last_name">Country</label>
+                                        <div class="col-md-9">
+                                            {{country.country_name}}
+                                        </div>
+                                    </div>
+    
+
                                 </div>
-                            </div>
+    
+                                <div class="form-actions">
+                                    <button id="profile_update" type="submit" class="btn btn-primary">
+                                        <i class="icon-check2"></i> Save
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                </div>
-                <br>
-                <div class="form-group">
-                    <button id="profile_update" class="btn btn-round btn-b">Update</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>
+{% endblock %}
 
-<script src="{% static "lib/jquery/dist/jquery.js" %}"></script>
+{% block page_javascript %}
 <script type="text/javascript">
-
-    $('#profile_update').click(function () {
+    $('#profile_form').submit(function(event) {
+        event.preventDefault()
         var data = {
             "first_name": $("#first_name").val(),
             "last_name": $("#last_name").val()
         }
+
         $.ajax({
             type:"POST",
             url:"/profile",
             dataType: 'json',
             data: data,
-            success: function (data) {
-                console.log(data,"---")
+            success: function(data) {
+                toastr.success("update", "Profile updated.")
             }
         });
     });
-</script> {% endblock %}
+</script>
+{% endblock %}
