@@ -1,8 +1,33 @@
-{% extends "home_root.html" %}
+{% extends "base.html" %}
 
-{% block contents %}
+{% load static %}
 
-<div class="tab-content">
+{% block page_stylesheet %}
+    <link rel="stylesheet" type="text/css" href="{% static 'js/treant/Treant.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content-header row">
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-block">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="chart" id="networkTree"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <div class="tab-content">
     <div class="tab-pane active" id="network_tree">
     <br>
         <h2>My Network</h2>
@@ -16,10 +41,11 @@
 
         </div>
     </div>
+</div> -->
+{% endblock %}
 
-{% load static %}
-<script src="{% static "lib/jquery/dist/jquery.js" %}"></script>
-<script src="{% static "js/network.js" %}"></script>
-<script src="{% static "lib/treant/Treant.js" %}"></script>
-<script src="{% static "lib/treant/raphael.js" %}"></script>
+{% block page_javascript %}
+<script src="{% static 'js/treant/raphael.js' %}"></script>
+<script src="{% static 'js/treant/Treant.js' %}"></script>
+<script src="{% static 'js/pages/network.js' %}"></script>
 {% endblock %}

@@ -10,8 +10,9 @@ from django.core.validators import RegexValidator
 from addons.packages.models import Packages
 import base64, uuid
 from django.contrib.postgres.fields import ArrayField
+
 # Create your models here.
-User._meta.local_fields[4].__dict__['_unique'] = True
+# User._meta.local_fields[4].__dict__['_unique'] = True
 
 def increment_user_id():
     last_user_id = Profile.objects.all().order_by('user_auto_id').last()
@@ -41,15 +42,11 @@ class Profile(models.Model):
 	user_auto_id = models.CharField(max_length=500, default=increment_user_id, null=True, blank=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	referal_code = models.CharField(max_length=20, blank=True)
-	# sponser_id =models.OneToOneField(User, null=True, related_name='+')
 	sponser_id = models.ForeignKey(User,on_delete=models.CASCADE, related_name='+', null=True)
-	# package = models.OneToOneField(Packages,null=True)
+	country = models.CharField(max_length=5, default=None, null=True, blank=True)
 	mobile = models.CharField(max_length=15,validators=[phone_regex], blank=True)
 	placement_id = models.ForeignKey(User,on_delete=models.CASCADE, related_name='+', null=True)
-	# placement_id = models.OneToOneField(User, null=True, related_name='+')
 	placement_position = models.CharField(max_length=100,choices=placement_type, null=True)
-	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)
 	bank_name = models.CharField(max_length=20, null=True)
 	account_number = models.CharField(max_length=20, null=True)
 	account_type = models.CharField(max_length=20, null=True)
@@ -58,7 +55,9 @@ class Profile(models.Model):
 	status = models.CharField(max_length=50, choices=status_type)
 	model_pic = models.ImageField(upload_to = 'media/pic_folder', default = 'media/pic_folder/None/no-img.jpg')
 	href = models.CharField(max_length=20, null=True)
-	# members = ArrayField(ArrayField(models.CharField(max_length=10, blank=True),size=8,),size=8,)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	token = models.CharField(max_length=100, default=None, null=True, blank=True)
 
 	def __unicode__(self):
 		return "%s" %(self.user)

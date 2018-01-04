@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from urllib2 import urlparse
 # import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -108,6 +109,19 @@ DATABASES = {
         'PASSWORD': os.environ["avicrypto_pwd"],
         'HOST': os.environ["avicrypto_host"],
         'PORT': '5432'
+    }
+}
+
+# using redis for caches
+REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL'))
+CACHES = {
+    "default": {
+         "BACKEND": "redis_cache.RedisCache",
+         "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
+         "OPTIONS": {
+             "PASSWORD": REDIS_URL.password,
+             "DB": 0,
+         }
     }
 }
 
