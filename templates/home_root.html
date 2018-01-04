@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block body %} {% block main %}
+{% extends "base.html" %} {% block body %} {% block main %} {% load static %}
 <main>
     <nav class="navbar navbar-custom navbar-fixed-top one-page" role="navigation">
         <div class="container">
@@ -9,7 +9,10 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">AviCrypto</a>
+                <a class="navbar-brand" href="#">
+                    <img style="display: inline-block;" width="33" src="{% static 'images/logo.png' %}" />
+                    AviCrypto
+                </a>
             </div>
             <div class="collapse navbar-collapse" id="custom-collapse">
                 <ul class="nav navbar-nav">
