@@ -52,12 +52,12 @@ class Profile(models.Model):
 	account_type = models.CharField(max_length=20, null=True)
 	account_name = models.CharField(max_length=20, null=True)
 	my_referal_code = models.CharField(max_length=20, null=True)
-	token = models.CharField(max_length=100, default=None, null=True, blank=True)
 	status = models.CharField(max_length=50, choices=status_type)
 	model_pic = models.ImageField(upload_to = 'media/pic_folder', default = 'media/pic_folder/None/no-img.jpg')
 	href = models.CharField(max_length=20, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	token = models.CharField(max_length=100, default=None, null=True, blank=True)
 
 	def __unicode__(self):
 		return "%s" %(self.user)

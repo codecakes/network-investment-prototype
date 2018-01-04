@@ -62,6 +62,7 @@
 					<div class="card-body collapse in">
 						<div class="card-block">
 							<form id="registerForm" class="form-horizontal form-simple" novalidate>
+								{% csrf_token %}
 								{% if request.GET.ref %}
 									<fieldset class="form-group position-relative has-icon-left">
 										<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" readonly value="{{referal}}"/>
