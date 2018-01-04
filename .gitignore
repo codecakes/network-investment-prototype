@@ -16,3 +16,4 @@ addons/**/*.pyc
 avicrypto/*.pyc
 pyc
 media/
+staticfiles/
