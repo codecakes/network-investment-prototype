@@ -21,7 +21,7 @@
 						<div class="card-block">
 							<form id="loginForm" method="post" action="" class="form-horizontal form-simple" novalidate>
 								{% csrf_token %}
-								<fieldset class="form-group position-relative has-icon-left mb-0">
+								<fieldset class="form-group position-relative has-icon-left">
 									<input type="text" class="form-control form-control-lg input-lg" name="username" placeholder="Your Username" required>
 									<div class="form-control-position">
 										<i class="icon-head"></i>
@@ -62,38 +62,40 @@
 					<div class="card-body collapse in">
 						<div class="card-block">
 							<form id="registerForm" class="form-horizontal form-simple" novalidate>
-								<fieldset class="form-group position-relative has-icon-left mb-0">
-									<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" readonly value="{{referal}}"/>
-									<div class="form-control-position">
-										<i class="icon-head"></i>
-									</div>
-									<div class="help-block font-small-3"></div>
-								</fieldset>
-								<fieldset class="form-group position-relative has-icon-left mb-0">
-									<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" readonly value="{{sponser_id}}"/>
-									<div class="form-control-position">
-										<i class="icon-head"></i>
-									</div>
-									<div class="help-block font-small-3"></div>
-								</fieldset>
-								<fieldset class="form-group position-relative has-icon-left mb-0">
-									<label for="placement_position">Position</label>
-									<select name="placement_position" id="placement_position" class="form-control input-lg">
-										<option value="L">LEFT</option>
-										<option value="R">RIGHT</option>
-									</select>
-								</fieldset>
-								<fieldset class="form-group position-relative has-icon-left">
-									<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" readonly value="{{ placement_user_left_id }}"/>
-									<input type="text" style="display:none;" name="placement_id_left" id="placement_id_right" class="form-control input-lg" placeholder="Placement ID" readonly value="{{ placement_user_right_id }}" />
-									<div class="form-control-position">
-										<i class="icon-head"></i>
-									</div>
-									<div class="help-block font-small-3"></div>
-								</fieldset>
+								{% if request.GET.ref %}
+									<fieldset class="form-group position-relative has-icon-left">
+										<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" readonly value="{{referal}}"/>
+										<div class="form-control-position">
+											<i class="icon-head"></i>
+										</div>
+										<div class="help-block font-small-3"></div>
+									</fieldset>
+									<fieldset class="form-group position-relative has-icon-left">
+										<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" readonly value="{{sponser_id}}"/>
+										<div class="form-control-position">
+											<i class="icon-head"></i>
+										</div>
+										<div class="help-block font-small-3"></div>
+									</fieldset>
+									<fieldset class="form-group position-relative has-icon-left">
+										<label for="placement_position">Position</label>
+										<select name="placement_position" id="placement_position" class="form-control input-lg">
+											<option value="L">LEFT</option>
+											<option value="R">RIGHT</option>
+										</select>
+									</fieldset>
+									<fieldset class="form-group position-relative has-icon-left">
+										<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" readonly value="{{ placement_user_left_id }}"/>
+										<input type="text" style="display:none;" name="placement_id_left" id="placement_id_right" class="form-control input-lg" placeholder="Placement ID" readonly value="{{ placement_user_right_id }}" />
+										<div class="form-control-position">
+											<i class="icon-head"></i>
+										</div>
+										<div class="help-block font-small-3"></div>
+									</fieldset>
+								{% endif %}
 								<div class="row">
 									<div class="col-xs-12 col-sm-6 col-md-6">
-										<fieldset class="form-group position-relative has-icon-left mb-0">
+										<fieldset class="form-group position-relative has-icon-left">
 											<input type="text" name="first_name" id="first_name" class="form-control input-lg" placeholder="First Name" required data-validation-required-message="Please enter First Name.">
 											<div class="form-control-position">
 												<i class="icon-head"></i>
@@ -102,7 +104,7 @@
 										</fieldset>
 									</div>
 									<div class="col-xs-12 col-sm-6 col-md-6">
-										<fieldset class="form-group position-relative has-icon-left mb-0">
+										<fieldset class="form-group position-relative has-icon-left">
 											<input type="text" name="last_name" id="last_name" class="form-control input-lg" placeholder="Last Name" required data-validation-required-message="Please enter Last Name.">
 											<div class="form-control-position">
 												<i class="icon-head"></i>
@@ -111,7 +113,7 @@
 										</fieldset>
 									</div>
 								</div>
-								<fieldset class="form-group position-relative has-icon-left mb-0">
+								<fieldset class="form-group position-relative has-icon-left">
 									<input type="email" name="email" id="email" class="form-control input-lg" placeholder="Email Address" required
 									data-validation-required-message="Please enter email address.">
 									<div class="form-control-position">
@@ -119,7 +121,7 @@
 									</div>
 									<div class="help-block font-small-3"></div>
 								</fieldset>
-								<fieldset class="form-group position-relative has-icon-left mb-0">
+								<fieldset class="form-group position-relative has-icon-left">
 									<input type="text" name="mobile" id="mobile" class="form-control input-lg" placeholder="Mobile Number" pattern="^[0]?[789]\d{9}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number.">
 									<div class="form-control-position">
 										<i class="icon-mobile"></i>
@@ -128,8 +130,8 @@
 								</fieldset>
 								<div class="row">
 									<div class="col-xs-12 col-sm-6 col-md-6">
-										<fieldset class="form-group position-relative has-icon-left mb-0">
-											<input type="password" name="password" id="password" class="form-control input-lg mb-0" placeholder="Password" required>
+										<fieldset class="form-group position-relative has-icon-left">
+											<input type="password" name="password" id="password" class="form-control input-lg" placeholder="Password" required>
 											<div class="form-control-position">
 												<i class="icon-key3"></i>
 											</div>
@@ -137,8 +139,8 @@
 										</fieldset>
 									</div>
 									<div class="col-xs-12 col-sm-6 col-md-6">
-										<fieldset class="form-group position-relative has-icon-left mb-0">
-											<input type="password" name="confirm_password" id="confirm_password" class="form-control input-lg mb-0" placeholder="Confirm Password"
+										<fieldset class="form-group position-relative has-icon-left">
+											<input type="password" name="confirm_password" id="confirm_password" class="form-control input-lg" placeholder="Confirm Password"
 										 data-validation-matches-match="password" data-validation-matches-message="Password &amp; Confirm Password must be the same.">
 											<div class="form-control-position">
 												<i class="icon-key3"></i>
@@ -147,7 +149,7 @@
 										</fieldset>
 									</div>
 								</div>
-								<fieldset class="form-group position-relative has-icon-left mb-0">
+								<fieldset class="form-group position-relative has-icon-left">
 									<label for="country">Country</label>
 									<select name="country" id="country" class="form-control input-lg">
 										<option data-code="+93" value="AF">Afghanistan</option>

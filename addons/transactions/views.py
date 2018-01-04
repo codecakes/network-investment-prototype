@@ -19,6 +19,8 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 # from django.views.generic.list import ListView
 from django.contrib.auth.models import User
 # from server.accounts.models import Profile
+
+from addons.packages.models import Packages, User_packages
 from models import Transactions
 from forms import transactions_form
 
@@ -76,8 +78,11 @@ class TransactionsSummary(ListView):
         return context
 
     def get(self, request):
+        user = request.user
         transactions = Transactions.objects.all()
+        packages = User_packages.objects.filter(user=user)
         context = {
+            'packages': packages,
             'transactions': transactions
         }
         return HttpResponse(self.template.render(context, request))

@@ -222,7 +222,7 @@ def profile(request):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
-        return HttpResponse('Success')
+        return HttpResponse(json.dumps({"status": "success"}))
     else:
         return HttpResponseRedirect('/error')
 
@@ -243,12 +243,11 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
+        context = {}
         template = loader.get_template('network.html')
-        context = {'user': 'None'}
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
         data = traverse_tree(request.user)
-        # data =  '{"text":{"name":"Mark Hill","title":"Chief executive officer"},"children":[{"text":{"name":"Joe Linux","title":"Chief Technology Officer"},"children":[{"text":{"name":"Ron Blomquist","title":"Chief Information Security Officer"}},{"text":{"name":"Michael Rubin","title":"Chief Innovation Officer","contact":"we@aregreat.com"}}]},{"text":{"name":"Linda May","title":"Chief Business Officer"},"children":[{"text":{"name":"Alice Lopez","title":"Chief Communications Officer"}},{"text":{"name":"Mary Johnson","title":"Chief Brand Officer"},"children":[{"text":{"name":"Erica Reel","title":"Chief Customer Officer"}}]}]}]}'
         return HttpResponse(data)
 
 
