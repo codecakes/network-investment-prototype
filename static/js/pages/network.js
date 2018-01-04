@@ -7,11 +7,9 @@ $(function() {
       url: "/network",
       success: function(result) {
         var data = result;
-        console.log("-------", data);
-        var networkData = (chart_config = {
+        var chart_config = {
           chart: {
             container: "#networkTree",
-
             connectors: {
               type: "step"
             },
@@ -20,7 +18,7 @@ $(function() {
             }
           },
           nodeStructure: JSON.parse(data)
-        });
+        };
         var networkTree = new Treant(chart_config);
       }
     });
