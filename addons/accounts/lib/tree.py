@@ -115,7 +115,7 @@ def load_users(user, ref_code):
             "text": user_details,
             "image": icon,
             "link": {
-                "href": profile.href
+                "href": "#" # profile.href
             },
             "children": [
                 new_user_text(ref_code, ("pos=left", "parent_placement_id=%s" %(profile.user_auto_id))),
