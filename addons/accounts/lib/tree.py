@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from addons.accounts.models import Profile, Members
 from django.conf import settings
-import urllib2
+from urllib2 import urlparse
 
 
 def lower_encode(member, leg_list):
@@ -82,7 +82,7 @@ def right_child(members, ref_code):
 
 
 def load_users(user, ref_code):
-    icon = urllib2.urlparse.urljoin(getattr(settings, "STATIC_URL", "/static"), "images/node2.png")
+    icon = urlparse.urljoin(getattr(settings, "STATIC_URL", "/static"), "images/node2.png")
     ref_code = ref_code or ""
     profile = Profile.objects.get(user=user)
     # import pdb; pdb.set_trace()
@@ -115,7 +115,7 @@ def load_users(user, ref_code):
             "text": user_details,
             "image": icon,
             "link": {
-                "href": "#" # profile.href
+                "href": urlparse.urljoin("https://www.avicrypto.com", "/network") + "#"  # profile.href
             },
             "children": [
                 new_user_text(ref_code, ("pos=left", "parent_placement_id=%s" %(profile.user_auto_id))),
