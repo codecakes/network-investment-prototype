@@ -115,7 +115,7 @@ def load_users(user, ref_code):
             "text": user_details,
             "image": icon,
             "link": {
-                "href": urlparse.urljoin("https://www.avicrypto.com", "/network") + "#"  # profile.href
+                "href": urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"  # profile.href
             },
             "children": [
                 new_user_text(ref_code, ("pos=left", "parent_placement_id=%s" %(profile.user_auto_id))),
