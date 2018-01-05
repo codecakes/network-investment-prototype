@@ -1,9 +1,7 @@
-from django.contrib.auth.models import User
 from addons.accounts.models import Profile, Members
 from django.conf import settings
 from urllib2 import urlparse
-from functools import wraps, update_wrapper
-
+from functools import wraps
 
 def lower_encode(member, leg_list):
     val = str.lower(member.child_id.profile.placement_position.encode("utf-8"))
