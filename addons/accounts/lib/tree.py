@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from addons.accounts.models import Profile, Members
 from django.conf import settings
 from urllib2 import urlparse
+from functools import wraps, update_wrapper
 
 
 def lower_encode(member, leg_list):
@@ -81,7 +82,51 @@ def right_child(members, ref_code):
         "pos=right", get_placement_id(parent)))
 
 
+def load_next_subtree(level=4):
+    """Decorator for Stateless expandable subtree given a user"""
+    def decorate_wrap(func):
+        func.level = level
+
+        @wraps(func)
+        def func_wrapper(user, ref_code):
+            """
+            continues load_users if level not reached else stops with invite users
+
+            :type ref_code: str
+            :type user: object
+            """
+            print func.level
+            print user, ref_code
+            icon = urlparse.urljoin(getattr(settings, "STATIC_URL", "/static"), "images/node2.png")
+            profile = Profile.objects.get(user=user)
+            # import pdb; pdb.set_trace()
+            user_details = {
+                "name": user.first_name,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "sponsor_id": None if profile.sponser_id is None else profile.sponser_id.id,
+                "placement_id": None if profile.placement_id is None else profile.placement_id.id,
+                "mobile": profile.mobile,
+                "placement_position": profile.placement_position
+            }
+            if func.level > 0:
+                func.level -= 1
+                return func(user, ref_code)
+            return {
+                "text": user_details,
+                "image": icon,
+                "link": {
+                    "href": urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"  # profile.href
+                },
+                "children": []
+            }
+        return func_wrapper
+    return decorate_wrap
+
+
+@load_next_subtree(level=4)
 def load_users(user, ref_code):
+    """Generates json tree of users"""
     icon = urlparse.urljoin(getattr(settings, "STATIC_URL", "/static"), "images/node2.png")
     ref_code = ref_code or ""
     profile = Profile.objects.get(user=user)
