@@ -200,11 +200,13 @@ def profile(request):
     if request.method == 'GET':
         user = request.user
         country_json = json.load(open('country.json'))
-        country = (item for item in country_json if item["country_code"] == user.profile.country).next()
+        country = ""
+        if user.profile.country:
+            country = (item for item in country_json if item["country_code"] == user.profile.country).next()
 
         context = {
-            'user': user,
-            'country': country
+            'user_country': country,
+            "countries": country_json
         }
 
         template = loader.get_template('profile.html')
@@ -217,11 +219,16 @@ def profile(request):
     if request.method == 'POST':
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
+        country = request.POST.get("country", "US")
 
         user = request.user
         user.first_name = first_name
         user.last_name = last_name
         user.save()
+
+        user.profile.country = country
+        user.profile.save()
+
         return HttpResponse(json.dumps({"status": "success"}))
     else:
         return HttpResponseRedirect('/error')

@@ -72,11 +72,13 @@
                                     <div class="form-group row">
                                         <label class="col-md-3 label-control" for="last_name">Country</label>
                                         <div class="col-md-9">
-                                            {{country.country_name}}
+                                            <select name="country" id="country" class="form-control">
+                                                {% for country in countries %}
+                                                    <option {% if user.profile.country == country.country_code %}selected{% endif %} data-code="{{country.dialling_code}}" value="{{country.country_code}}">{{country.country_name}}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
-    
-
                                 </div>
     
                                 <div class="form-actions">
@@ -100,7 +102,8 @@
         event.preventDefault()
         var data = {
             "first_name": $("#first_name").val(),
-            "last_name": $("#last_name").val()
+            "last_name": $("#last_name").val(),
+            "country": $("#country").val()
         }
 
         $.ajax({
