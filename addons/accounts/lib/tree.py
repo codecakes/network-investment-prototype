@@ -103,7 +103,7 @@ def load_users(user, ref_code):
             "text": user_details,
             "image": icon,
             "link": {
-                "href": profile.href
+                "href": urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"
             },
             "children": [
                 left_child(members, ref_code),
