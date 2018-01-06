@@ -1,4 +1,4 @@
-{% load static %}
+{% load staticfiles %}
 
 <!DOCTYPE html>
 <html lang="en-US" dir="ltr">
@@ -75,10 +75,10 @@
                             <a href="#totop">Home</a>
                         </li>
                         <li>
-                            <a class="section-scroll" href="#about">Who We Are</a>
+                            <a class="section-scroll" href="#works">What We Do</a>
                         </li>
                         <li>
-                            <a class="section-scroll" href="#works">What We Do</a>
+                            <a class="section-scroll" href="#pricing">Fixed Deposit Plan</a>
                         </li>
                         <li>
                             <a class="section-scroll" href="#contact">Get In Touch</a>
@@ -109,7 +109,7 @@
         <section class="home-section home-full-height bg-dark" id="home" data-background="{% static 'site/images/Layer.png' %}">
             <div class="titan-caption">
                 <div class="caption-content">
-                    <div class="font-alt mb-30 titan-title-size-1">Welcome To AVI CRYPTO</div>
+                    <div class="font-alt mb-30 titan-title-size-1">Welcome To AVICRYPTO</div>
                     <div class="font-alt mb-40 titan-title-size-4">World's Largest Crypto Exchange Coming Soon</div>
                     <div id="countdowntimer"></div>
                     <a class="section-scroll btn btn-border-w btn-round" href="#about">Learn More</a>
@@ -117,36 +117,6 @@
             </div>
         </section>
         <div class="main">
-            <section class="module" id="about">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6 col-sm-offset-3">
-                            <h2 class="module-title font-alt">Who We Are</h2>
-                            <div class="row multi-columns-row">
-                                <div class="col-md-3 col-sm-6 col-xs-12">
-                                    <div class="alt-features-item">
-                                        <img src="{% static 'site/images/img_who.svg' %}">
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-xs-12 module-subtitle font-serif">
-                                    <article>
-                                        AVICRYPTO is a leading national provider of world’s fastest, safest, cheapest & endless payment solutions for independent
-                                        businesses. We’ve built the company from the inside out, putting service at the center
-                                        of everything we do. It’s a high-touch, high-tech, end-to- end system that delivers
-                                        quality, value, and profitability to our investors, Merchant, Trader's & when You
-                                        win, we win !
-                                    </article>
-                                </div>
-                                <div class="col-md-3 col-sm-6 col-xs-12">
-                                    <div class="alt-features-item">
-                                        <img src="{% static 'site/images/img_who.svg' %}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
             <section class="module pb-0" id="works">
                 <div class="container">
                     <div class="row">
@@ -234,7 +204,7 @@
 
                     </div>
                     <div class="row multi-columns-row">
-                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
                             <div class="features-item">
                                 <div class="features-icon">
                                     <span class="icon-wallet"></span>
@@ -244,7 +214,7 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
                             <div class="features-item">
                                 <div class="features-icon">
                                     <span class="icon-wallet"></span>
@@ -253,7 +223,7 @@
                                 <p>Offer your customers the world’s fastest, safest and cheapest payment option</p>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
                             <div class="features-item">
                                 <div class="features-icon">
                                     <span class="icon-tools"></span>
@@ -263,7 +233,7 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
                             <div class="features-item">
                                 <div class="features-icon">
                                     <span class="icon-gears"></span>
@@ -272,7 +242,7 @@
                                 <p>Interest on your Exchange wallet will let your saving earn for you</p>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
                             <div class="features-item">
                                 <div class="features-icon">
                                     <span class="icon-gears"></span>
@@ -281,7 +251,7 @@
                                 <p>Get Weekly Returns on Your One time Fixed Deposit at AVICRYPTO</p>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
                             <div class="features-item">
                                 <div class="features-icon">
                                     <span class="icon-gears"></span>
@@ -297,12 +267,11 @@
 
             </section>
 
-            <section class="module" id="pricing">
+            <section class="module" id="pricing" style="background-color:#070e29;">
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-6 col-sm-offset-3">
-                            <h2 class="module-title font-alt">Packages</h2>
-                            <div class="module-subtitle font-serif">Member Packages</div>
+                            <h2 style="color: white;" class="module-title font-alt">Fixed Deposit Plans</h2>
                         </div>
                     </div>
                     <div class="row multi-columns-row">
@@ -313,7 +282,7 @@
                                 <h4>Avi 100</h4>
                                 <div class="borderline"></div>
                                 <p class="price">
-                                    <span>$</span>100
+                                    $100
                                 </p>
                                 <ul class="price-details">
                                     <li>Weekly Payout: 4.0 %</li>
@@ -332,7 +301,7 @@
                                 <h4>Avi 500</h4>
                                 <div class="borderline"></div>
                                 <p class="price">
-                                    <span>$</span>500
+                                    $500
                                 </p>
                                 <ul class="price-details">
                                     <li>Weekly Payout: 5.0 %</li>
@@ -351,7 +320,7 @@
                                 <h4>Avi 1000</h4>
                                 <div class="borderline"></div>
                                 <p class="price">
-                                    <span>$</span>1000
+                                    $1000
                                 </p>
                                 <ul class="price-details">
                                     <li>Weekly Payout: 7.0 %</li>
@@ -370,7 +339,7 @@
                                 <h4>Avi 5000</h4>
                                 <div class="borderline"></div>
                                 <p class="price">
-                                    <span>$</span>5000
+                                    $5000
                                 </p>
                                 <ul class="price-details">
                                     <li>Weekly Payout: 7.5 %</li>
@@ -389,7 +358,7 @@
                                 <h4>Avi 10000</h4>
                                 <div class="borderline"></div>
                                 <p class="price">
-                                    <span>$</span>10000
+                                    $10000
                                 </p>
                                 <ul class="price-details">
                                     <li>Weekly Payout: 8.0 %</li>
@@ -408,7 +377,7 @@
                                 <h4>Avi 35000</h4>
                                 <div class="borderline"></div>
                                 <p class="price">
-                                    <span>$</span>35000
+                                    $35000
                                 </p>
                                 <ul class="price-details">
                                     <li>Weekly Payout: 8.25 %</li>
@@ -427,13 +396,13 @@
                                 <h4>Avi 50000</h4>
                                 <div class="borderline"></div>
                                 <p class="price">
-                                    <span>$</span>50000
+                                    $50000
                                 </p>
                                 <ul class="price-details">
                                     <li>Weekly Payout: 8.5 %</li>
                                     <li>Loyalty : 5 %</li>
                                     <li>No. of Payout : 32</li>
-                                    <li>Binary : 8.5 %</li>
+                                    <li>Binary : 8 %</li>
                                     <li>Direct : 4.0 %</li>
                                     <li>Capping: $ 75000</li>
                                 </ul>
@@ -446,7 +415,7 @@
                                 <h4>Avi 100000</h4>
                                 <div class="borderline"></div>
                                 <p class="price">
-                                    <span>$</span>100000
+                                    $100000
                                 </p>
                                 <ul class="price-details">
                                     <li>Weekly Payout: 9.0 %</li>
@@ -464,7 +433,7 @@
                 </div>
             </section>
 
-            <div class="module-small bg-dark">
+            <!-- <div class="module-small bg-dark">
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-6 col-md-6 col-lg-4 col-lg-offset-2">
@@ -489,7 +458,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <section class="module" id="contact">
                 <div class="container">
                     <div class="row">
@@ -528,22 +497,27 @@
                 </div>
             </section>
 
-            <div class="module-small bg-dark">
+            <div class="module-small" style="background-color:#070e29;">
                 <div class="container">
                     <div class="row">
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             <div class="widget">
                                 <h5 class="widget-title font-alt">About AviCrypto</h5>
-                                <article>AVICRYPTO is a leading national provider of world’s fastest, safest, cheapest & endless payment
+                                <article>
+                                    AVICRYPTO is a leading national provider of world’s fastest, safest, cheapest & endless payment
                                     solutions for independent businesses. We’ve built the company from the inside out, putting
                                     service at the center of everything we do. It’s a high-touch, high-tech, end-to- end
                                     system that delivers quality, value, and profitability to our investors, Merchant, Trader's
                                     & when You win, we win !
                                 </article>
-                                <p>Email:
-                                    <a href="#">info@avicrypto.us</a>
-                                </p>
                             </div>
+                        </div>
+                        <div class="col-sm-5"></div>
+                        <div class="col-sm-3 text-right">
+                            <h5 class="widget-title font-alt">Avicrypto Exchange Bank</h5>
+                            <p class="mb-0">401-403 Howard St, San Francisco CA 94105, United States</p>
+                            <h5 class="widget-title font-alt">AVICRYPTO TRCHNOLOGIES .INC</h5>
+                            <p class="mb-0">info@avicrypto.us</p>
                         </div>
                     </div>
                 </div>
@@ -551,15 +525,15 @@
             <hr class="divider-d">
         </div>
     </main>
-    <footer class="footer bg-dark">
+    <footer class="footer" style="background-color:#070e29;">
         <div class="container">
             <div class="row">
                 <div class="col-sm-6">
                     <p class="copyright font-alt">&copy; 2017&nbsp;
-                        <a href="index.html">AviCrypto</a>, All Rights Reserved</p>
+                        <a style="color:white;" href="index.html">AviCrypto</a>, All Rights Reserved</p>
                 </div>
                 <div class="col-sm-6">
-                    <div class="footer-social-links">
+                    <!-- <div class="footer-social-links">
                         <a href="#">
                             <i class="fa fa-facebook"></i>
                         </a>
@@ -572,7 +546,7 @@
                         <a href="#">
                             <i class="fa fa-skype"></i>
                         </a>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

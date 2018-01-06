@@ -91,3 +91,13 @@ class Document(models.Model):
     description = models.CharField(max_length=255, blank=True)
     document = models.FileField(upload_to='documents/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class SupportTicket(models.Model):
+	user = models.ForeignKey(User, related_name='+', null=True)
+	description = models.TextField()
+	status_choices = (
+		('P', 'Pending'),
+		('C', 'Confirmed'),
+	)
+	status = models.CharField(max_length=50, choices=status_choices)
+	created_at = models.DateTimeField(auto_now_add=True)

@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block body %} {% block main %} {% load static %}
+{% extends "base.html" %} {% block body %} {% block main %} {% load staticfiles %}
 <main>
     <nav class="navbar navbar-custom navbar-fixed-top one-page" role="navigation">
         <div class="container">
@@ -64,7 +64,7 @@
         {% block contents %} {% endblock %}
     </div>
 </main>
-<!-- {% load static %}
+<!-- {% load staticfiles %}
         <script src="{% static "lib/treant/Treant.js" %}"></script>
         <script src="{% static "lib/treant/raphael.js" %}"></script> -->
 {% endblock %} {% endblock %}

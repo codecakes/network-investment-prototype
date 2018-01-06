@@ -13,7 +13,7 @@ from django.db.models.query_utils import Q
 from django.views.generic import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from addons.accounts.models import Profile, Members
+from addons.accounts.models import Profile, Members, SupportTicket
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
 from addons.packages.models import Packages, User_packages
@@ -33,7 +33,7 @@ from avicrypto import services
 # Create your views here.
 
 import json
-from lib.tree import load_users, find_min_max
+from lib.tree import load_users, find_min_max, is_member_of
 
 
 def index(request):
@@ -50,6 +50,11 @@ def index(request):
         ]
     }
     template = loader.get_template('website.html')
+    return HttpResponse(template.render(context, request))
+
+def bank_website(request):
+    context = {}
+    template = loader.get_template('avicrypto_bank.html')
     return HttpResponse(template.render(context, request))
 
 
@@ -102,53 +107,103 @@ class Registration(FormView):  # code for template is given below the view's cod
 
         return self.form_invalid(form)
 
-
 def login_fn(request):
+    if not request.user.is_authenticated:
+        if request.method == 'GET':
+            template = loader.get_template('login.html')
+            if 'ref' not in request.GET:
+                context = {
+                    'referal': "",
+                    'sponser_id': "",
+                    'placement_user_left_id': "",
+                    'placement_user_right_id': ""
+                }
+            else:
+                referal = request.GET['ref']
+                sponser = Profile.objects.get(my_referal_code=referal)
+                sponser_id = sponser.user_auto_id
+                placement_users = find_min_max(sponser.user)
 
-    if request.method == 'GET':
-        template = loader.get_template('login.html')
-        if 'ref' not in request.GET:
-            context = {
-                'referal': "",
-                'sponser_id': "",
-                'placement_user_left_id': "",
-                'placement_user_right_id': ""
-            }
-        else:
-            referal = request.GET['ref']
-            sponser = Profile.objects.get(my_referal_code=referal)
-            sponser_id = sponser.user_auto_id
-            placement_users = find_min_max(sponser.user)
+                context = {
+                    'referal': referal,
+                    'sponser_id': sponser_id,
+                    'placement_user_left_id': placement_users[0].profile.user_auto_id,
+                    'placement_user_right_id': placement_users[1].profile.user_auto_id
+                }
+            return HttpResponse(template.render(context, request))
 
-            context = {
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponse(json.dumps({"status": "ok"}))
+                else:
+                    return HttpResponse(json.dumps({
+                        "status": "error",
+                        "message": "Id id not active."            
+                    }))
+            else:
+                return HttpResponse(json.dumps({
+                    "status": "error",
+                    "message": "Email or password is incorrect."            
+                }))
+    else:
+        return HttpResponseRedirect('/home')
+
+def check_referal(request):
+    referal = request.GET['referal']
+    if Profile.objects.filter(my_referal_code=referal).exists():
+        sponser = Profile.objects.get(my_referal_code=referal)
+        sponser_id = sponser.user_auto_id
+        placement_users = find_min_max(sponser.user)
+
+        response = {
+            'status': 'ok',
+            'data': {
                 'referal': referal,
                 'sponser_id': sponser_id,
                 'placement_user_left_id': placement_users[0].profile.user_auto_id,
                 'placement_user_right_id': placement_users[1].profile.user_auto_id
             }
-        return HttpResponse(template.render(context, request))
+        }
 
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(username=username, password=password)
+        return HttpResponse(json.dumps(response))
+    else:
+        return HttpResponse(json.dumps({
+            'status': 'error',
+            'message': 'Referal address invalid'
+        }))
 
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                if user.is_staff:
-                    if user.is_superuser:
-                        return HttpResponseRedirect('/admin')
-                    return HttpResponseRedirect("/home")
-                else:
-                    return HttpResponseRedirect('/home')
-                return HttpResponseRedirect('/home')
-            else:
-                return HttpResponseRedirect('/error')
-        else:
-            return HttpResponseRedirect('/error')
-        return HttpResponseRedirect('/error')
+def check_placement(request):
+    referal = request.GET['referal']
+    sponcer_id = request.GET['sponcer_id']
+    position = request.GET['position']
 
+    if Profile.objects.filter(my_referal_code=referal).exists():
+        sponser = Profile.objects.get(my_referal_code=referal)
+        sponser_id = sponser.user_auto_id
+        placement_users = find_min_max(sponser.user)
+
+        response = {
+            'status': 'ok',
+            'data': {
+                'referal': referal,
+                'sponser_id': sponser_id,
+                'placement_user_left_id': placement_users[0].profile.user_auto_id,
+                'placement_user_right_id': placement_users[1].profile.user_auto_id
+            }
+        }
+
+        return HttpResponse(json.dumps(response))
+    else:
+        return HttpResponse(json.dumps({
+            'status': 'error',
+            'message': 'Referal address invalid'
+        }))
 
 def thanks(request):
     template = loader.get_template('thanks.html')
@@ -178,11 +233,13 @@ def home(request):
     if request.method == 'GET':
         user = request.user
         packages = User_packages.objects.filter(user=user)
-        # print packages[1].expiry_date
+        support_tickets = SupportTicket.objects.filter(user=user)
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
-            'packages': packages
+            'packages': packages,
+            'support_tickets': support_tickets,
+            'support_tickets_choices': SupportTicket.status_choices
         }
 
         template = loader.get_template('dashboard.html')
@@ -243,8 +300,14 @@ def support(request):
         }
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
-        services.support_mail('Support Ticket', request.POST.get("description", ""), 'harshulkaushik9@gmail.com', from_email="postmaster")
-        return HttpResponse('Mail sent to adminstrator', content_type="application/json")
+        description = request.POST.get("description", "")
+        SupportTicket.objects.create(user=request.user, description=description, status="P")
+        return HttpResponse(json.dumps({
+            'status': 'ok',
+            'message': 'Our support team will get back to you.'
+        }))
+        # services.support_mail('Support Ticket', request.POST.get("description", ""), 'harshulkaushik9@gmail.com', from_email="postmaster")
+        # return HttpResponse('Mail sent to adminstrator', content_type="application/json")
 
 @login_required(login_url="/login")
 @csrf_exempt

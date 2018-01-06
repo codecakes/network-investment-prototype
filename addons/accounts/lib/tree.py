@@ -1,8 +1,7 @@
-from django.contrib.auth.models import User
 from addons.accounts.models import Profile, Members
 from django.conf import settings
 from urllib2 import urlparse
-
+from functools import wraps
 
 def lower_encode(member, leg_list):
     val = str.lower(member.child_id.profile.placement_position.encode("utf-8"))
@@ -81,7 +80,51 @@ def right_child(members, ref_code):
         "pos=right", get_placement_id(parent)))
 
 
+def load_next_subtree(level=4):
+    """Decorator for Stateless expandable subtree given a user"""
+    def decorate_wrap(func):
+        func.level = level
+
+        @wraps(func)
+        def func_wrapper(user, ref_code):
+            """
+            continues load_users if level not reached else stops with invite users
+
+            :type ref_code: str
+            :type user: object
+            """
+            print func.level
+            print user, ref_code
+            icon = urlparse.urljoin(getattr(settings, "STATIC_URL", "/static"), "images/node2.png")
+            profile = Profile.objects.get(user=user)
+            # import pdb; pdb.set_trace()
+            user_details = {
+                "name": user.first_name,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "sponsor_id": None if profile.sponser_id is None else profile.sponser_id.id,
+                "placement_id": None if profile.placement_id is None else profile.placement_id.id,
+                "mobile": profile.mobile,
+                "placement_position": profile.placement_position
+            }
+            if func.level > 0:
+                func.level -= 1
+                return func(user, ref_code)
+            return {
+                "text": user_details,
+                "image": icon,
+                "link": {
+                    "href": urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"  # profile.href
+                },
+                "children": []
+            }
+        return func_wrapper
+    return decorate_wrap
+
+
+@load_next_subtree(level=4)
 def load_users(user, ref_code):
+    """Generates json tree of users"""
     icon = urlparse.urljoin(getattr(settings, "STATIC_URL", "/static"), "images/node2.png")
     ref_code = ref_code or ""
     profile = Profile.objects.get(user=user)
@@ -163,10 +206,45 @@ def find_min(user):
     min_user = get_left(user)
     return min_user if min_user else user
 
+
 def find_max(user):
     """Gets rightmost user of tree"""
     max_user = get_right(user)
     return max_user if max_user else user
 
+
 def find_min_max(user):
     return (find_min(user), find_max(user))
+
+
+def get_parent(child_user):
+    return child_user.profile.placement_id
+
+
+def is_parent_of(parent, child_user):
+    if parent == child_user:
+        return child_user
+    found_node = get_parent(child_user)  # child_user.profile.placement_id
+    return None if found_node is None else True if found_node == parent else get_parent(found_node)
+
+
+def is_member_of(parent_user, child_user, leg='l'):
+    """Checks if child_user is in the selected leg of the parent subtree"""
+    node = get_left(parent_user) if leg in ('l', 'left') else get_right(parent_user) \
+        if leg in ('r', 'right') else None
+    if node:
+        found_node = is_parent_of(node, child_user)
+        if found_node is None:
+            message = "No such node placed under this sponsor. Would you like to add yourself down their line?"
+            placement_id = node.profile.user_auto_id
+        elif get_left(found_node):
+            message = "This placement is full. Would you like to add yourself down their line?"
+            node = find_min(found_node)
+            placement_id = node.profile.user_auto_id
+        elif get_left(found_node) is None:
+            message = "success"
+            placement_id = found_node.profile.user_auto_id
+    else:
+        message = "Empty Leg. No such child node. Would you like to add yourself there?"
+        placement_id = parent_user.profile.user_auto_id
+    return {'node': node, 'message': message, placement_id: placement_id}
