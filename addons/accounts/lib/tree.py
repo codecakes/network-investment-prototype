@@ -228,7 +228,7 @@ def is_parent_of(parent, child_user):
     return None if found_node is None else True if found_node == parent else get_parent(found_node)
 
 
-def is_member_of(parent_user, child_user, leg=['l', 'left']):
+def is_member_of(parent_user, child_user, leg='l'):
     """Checks if child_user is in the selected leg of the parent subtree"""
     node = get_left(parent_user) if leg in ('l', 'left') else get_right(parent_user) \
         if leg in ('r', 'right') else None
