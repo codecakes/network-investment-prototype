@@ -151,6 +151,8 @@ def login_fn(request):
                     "status": "error",
                     "message": "Email or password is incorrect."            
                 }))
+    else:
+        return HttpResponseRedirect('/home')
 
 def check_referal(request):
     referal = request.GET['referal']
