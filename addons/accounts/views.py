@@ -52,6 +52,11 @@ def index(request):
     template = loader.get_template('website.html')
     return HttpResponse(template.render(context, request))
 
+def bank_website(request):
+    context = {}
+    template = loader.get_template('avicrypto_bank.html')
+    return HttpResponse(template.render(context, request))
+
 
 class Registration(FormView):  # code for template is given below the view's code
     template_name = "login.html"
