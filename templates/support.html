@@ -10,7 +10,7 @@
         <div class="col-md-6 offset-md-3">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title" id="basic-layout-colored-form-control">REQUEST A CALL BACK</h4>
+                    <h4 class="card-title" id="basic-layout-colored-form-control">NEW SUPPORT TICKET</h4>
                 </div>
                 <div class="card-body collapse in">
                     <div class="card-block">
@@ -63,10 +63,12 @@
             dataType: "json",
             type: "POST",
             error: function (res) {
-                toastr.error("Error", "Error in Mail Sent. Please try after some time.")
+                toastr.error("Error in Mail Sent. Please try after some time.", "Error")
             },
-            success: function (res) {
-                toastr.success("Success", "We will contact you in a while.")
+            success: function (data) {
+                if (data.status == 'ok') {
+                    toastr.success(data.message, "Success")
+                }
             }
         });
     });

@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-	<div class="content-header row"></div>
+	<div class="content-header"></div>
 	<div class="content-body">
 		<section class="flexbox-container">
 			<div class="col-md-4 offset-md-1 col-xs-10 offset-xs-1 box-shadow-2 p-0">
@@ -51,7 +51,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-5 offset-md-1 col-xs-10 offset-xs-1 box-shadow-2 p-0">
+			<div class="col-md-5 offset-md-1 col-xs-10 offset-xs-1 box-shadow-2 p-0 mb-2">
 				<div cla ss="card border-grey border-lighten-3 m-0">
 					<div class="card-header no-border">
 						<div class="card-title text-xs-center"></div>
@@ -63,16 +63,16 @@
 						<div class="card-block">
 							<form id="registerForm" class="form-horizontal form-simple" novalidate>
 								{% csrf_token %}
-								{% if request.GET.ref %}
+
 									<fieldset class="form-group position-relative has-icon-left">
-										<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" readonly value="{{referal}}"/>
+										<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" value="{{referal}}"/>
 										<div class="form-control-position">
 											<i class="icon-head"></i>
 										</div>
 										<div class="help-block font-small-3"></div>
 									</fieldset>
 									<fieldset class="form-group position-relative has-icon-left">
-										<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" readonly value="{{sponser_id}}"/>
+										<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" value="{{sponser_id}}"/>
 										<div class="form-control-position">
 											<i class="icon-head"></i>
 										</div>
@@ -86,15 +86,15 @@
 										</select>
 									</fieldset>
 									<fieldset class="form-group position-relative has-icon-left">
-										<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" readonly value="{{ placement_user_left_id }}"/>
-										<input type="text" style="display:none;" name="placement_id_left" id="placement_id_right" class="form-control input-lg" placeholder="Placement ID" readonly value="{{ placement_user_right_id }}" />
+										<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_left_id }}"/>
+										<input type="text" style="display:none;" name="placement_id_right" id="placement_id_right" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_right_id }}" />
 										<div class="form-control-position">
 											<i class="icon-head"></i>
 										</div>
 										<div class="help-block font-small-3"></div>
 									</fieldset>
-								{% endif %}
-								<div class="row">
+
+									<div class="row">
 									<div class="col-xs-12 col-sm-6 col-md-6">
 										<fieldset class="form-group position-relative has-icon-left">
 											<input type="text" name="first_name" id="first_name" class="form-control input-lg" placeholder="First Name" required data-validation-required-message="Please enter First Name.">

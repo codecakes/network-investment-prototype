@@ -22,6 +22,10 @@ urlpatterns = [
 	url(r'^$', views.index, name='index'),
     url(r'^login$', views.login_fn, name='login'),
     url(r'^signup', views.Registration.as_view(), name='signup'),
+
+    url(r'^check-referal$', views.check_referal, name='check_referal'),
+    url(r'^check-placement$', views.check_placement, name='check_placement'),
+
     url(r'^profile', views.profile, name='profile'),
     url(r'^home', views.home, name='dashboard'),
     url(r'^thanks$', views.thanks, name='thanks'),
