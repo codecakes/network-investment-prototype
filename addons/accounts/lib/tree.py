@@ -206,10 +206,45 @@ def find_min(user):
     min_user = get_left(user)
     return min_user if min_user else user
 
+
 def find_max(user):
     """Gets rightmost user of tree"""
     max_user = get_right(user)
     return max_user if max_user else user
 
+
 def find_min_max(user):
     return (find_min(user), find_max(user))
+
+
+def get_parent(child_user):
+    return child_user.profile.placement_id
+
+
+def is_parent_of(parent, child_user):
+    if parent == child_user:
+        return child_user
+    found_node = get_parent(child_user)  # child_user.profile.placement_id
+    return None if found_node is None else True if found_node == parent else get_parent(found_node)
+
+
+def is_member_of(parent_user, child_user, leg=['l', 'left']):
+    """Checks if child_user is in the selected leg of the parent subtree"""
+    node = get_left(parent_user) if leg in ('l', 'left') else get_right(parent_user) \
+        if leg in ('r', 'right') else None
+    if node:
+        found_node = is_parent_of(node, child_user)
+        if found_node is None:
+            message = "No such node placed under this sponsor. Would you like to add yourself down their line?"
+            placement_id = node.profile.user_auto_id
+        elif get_left(found_node):
+            message = "This placement is full. Would you like to add yourself down their line?"
+            node = find_min(found_node)
+            placement_id = node.profile.user_auto_id
+        elif get_left(found_node) is None:
+            message = "success"
+            placement_id = found_node.profile.user_auto_id
+    else:
+        message = "Empty Leg. No such child node. Would you like to add yourself there?"
+        placement_id = parent_user.profile.user_auto_id
+    return {'node': node, 'message': message, placement_id: placement_id}
