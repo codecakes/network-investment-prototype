@@ -108,7 +108,7 @@ DATABASES = {
         'USER': os.environ["avicrypto_user"],
         'PASSWORD': os.environ["avicrypto_pwd"],
         'HOST': os.environ["avicrypto_host"],
-        'PORT': '5432'
+        'PORT': '5433'
     }
 }
 

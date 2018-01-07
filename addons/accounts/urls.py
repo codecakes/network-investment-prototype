@@ -34,6 +34,12 @@ urlpatterns = [
     url(r'^error$', views.error, name='Error'),
     url(r'^logout$', views.logout_fn, name='Secure logout'),
     url(r'^network$', views.network, name='network'),
+
+    url(r'^network/init/$', views.network_init, name='network_init'),
+    url(r'^network/parent/$', views.network_parent, name='network_parent'),
+    url(r'^network/children/(?P<user_id>.+)$', views.network_children, name='network_children'),
+
+
     url(r'^support$', views.support, name='support'),
     url(r'^uploads/simple/$', views.simple_upload, name='simple_upload'),
     url(r'^uploads/form/$', views.model_form_upload, name='model_form_upload'),
