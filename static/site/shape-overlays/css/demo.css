@@ -566,8 +566,8 @@ a.demo--current {
 	position: relative;
 	cursor: pointer;
 	position: absolute;
-	top: 3em;
-	right: 3em;
+	top: 40px;
+	right: 80px;
 	z-index: 110;
 	border-radius: 50%;
 	background-color: #fff;
