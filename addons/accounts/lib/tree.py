@@ -243,8 +243,6 @@ def load_next_subtree(func):
     return wrapped_f
 
 
-
-
 @load_next_subtree
 def load_users(user, ref_code, level=4):
     """Generates json tree of users"""
@@ -270,6 +268,3 @@ def load_users(user, ref_code, level=4):
             ])
         )
     return user_json
-
-
-

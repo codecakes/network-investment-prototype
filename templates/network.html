@@ -3,7 +3,6 @@
 {% load staticfiles %}
 
 {% block page_stylesheet %}
-    {{ block.super }}
     <!--<link rel="stylesheet" type="text/css" href="{% static 'js/treant/Treant.css' %}">-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://rawgit.com/dabeng/OrgChart/master/demo/css/jquery.orgchart.css">
@@ -51,10 +50,9 @@
 {% endblock %}
 
 {% block page_javascript %}
-    {{ block.super }}
-<!--<script src="{% static 'js/treant/raphael.js' %}"></script>-->
-<!--<script src="{% static 'js/treant/Treant.js' %}"></script>-->
-<!--<script src="{% static 'js/pages/network.js' %}"></script>-->
+    <!--<script src="{% static 'js/treant/raphael.js' %}"></script>-->
+    <!--<script src="{% static 'js/treant/Treant.js' %}"></script>-->
+    <!--<script src="{% static 'js/pages/network.js' %}"></script>-->
     <script type="text/javascript" src="https://rawgit.com/dabeng/OrgChart/master/demo/js/jquery.orgchart.js"></script>
     <script src="{% static 'js/network/render.js' %}"></script>
 {% endblock %}

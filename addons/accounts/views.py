@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
-# from models import Profile
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -13,28 +11,27 @@ from django.db.models.query_utils import Q
 from django.views.generic import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from addons.accounts.models import Profile, Members, SupportTicket
-from addons.transactions.models import Transactions
-from addons.wallet.models import Wallet
-from addons.packages.models import Packages, User_packages
-from forms import signup_form
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
+from forms import signup_form
+
+from addons.accounts.models import Profile, Members, SupportTicket
+from addons.transactions.models import Transactions
+from addons.wallet.models import Wallet
+from addons.packages.models import Packages, User_packages
+
 import sys
 import hashlib
 import random
+import json
 
 sys.path.append(settings.BASE_DIR)
 from avicrypto import services
-# Create your views here.
-
-import json
 from lib.tree import load_users, find_min_max, is_member_of
-
 
 def index(request):
     context = {
@@ -56,7 +53,6 @@ def bank_website(request):
     context = {}
     template = loader.get_template('avicrypto_bank.html')
     return HttpResponse(template.render(context, request))
-
 
 class Registration(FormView):  # code for template is given below the view's code
     template_name = "login.html"
@@ -213,7 +209,6 @@ def thanks(request):
     # return HttpResponse(template.render(context, request))
     return HttpResponse("Thank you for registration.Soon you will receive a conformation mail.")
 
-
 def error(request):
     template = loader.get_template('error.html')
     context = {
@@ -221,12 +216,10 @@ def error(request):
     }
     return HttpResponse(template.render(context, request))
 
-
 def logout_fn(request):
     logout(request)
     response = HttpResponseRedirect('/')
     return response
-
 
 @login_required(login_url="/login")
 def home(request):
@@ -249,7 +242,6 @@ def home(request):
             return HttpResponse(template.render(context, request))
     else:
         return HttpResponseRedirect('/error')
-
 
 @login_required(login_url="/login")
 @csrf_exempt
@@ -320,6 +312,34 @@ def network(request):
         data = traverse_tree(request.user)
         return HttpResponse(data)
 
+@login_required(login_url="/login")
+def network_init(request):
+    user = request.user
+    data = traverse_tree(request.user)
+    data = json.loads(data)
+    # data['collapsed'] = True
+    data['className'] = 'top-level'
+    return HttpResponse(json.dumps(data))
+
+@login_required(login_url="/login")
+def network_parent(request):
+    user = request.user
+    data = traverse_tree(request.user)
+    return HttpResponse(data)
+
+@login_required(login_url="/login")
+def network_children(request, user_id):
+    print user_id
+    user = User.objects.get(id=user_id)
+    print user
+    data = traverse_tree(user)
+    data = json.loads(data)
+    print data
+    data = {
+        'children': data['children']
+    }
+    return HttpResponse(json.dumps(data))
+
 
 # def simple_upload(request):
 #     if request.method == 'POST' and request.FILES['myfile']:
@@ -348,7 +368,6 @@ def simple_upload(request):
         })
     return render(request, 'simple_upload.html')
 
-
 def model_form_upload(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
@@ -360,7 +379,6 @@ def model_form_upload(request):
     return render(request, 'model_upload.html', {
         'form': form
     })
-
 
 def update_profile(user, data):
     profile = Profile.objects.get(user=user)
@@ -389,12 +407,10 @@ def update_profile(user, data):
 
     profile.save()
 
-
 def traverse_tree(user, level=4):
     ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
     data = load_users(user, ref_code, level=level)
     return json.dumps(data)
-
 
 @csrf_exempt
 def add_user(request):
@@ -456,7 +472,6 @@ def add_user(request):
 			message = "Email address already registered."
 
         return HttpResponse(message)
-
 
 def get_token(data):
     salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
