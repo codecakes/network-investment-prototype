@@ -108,7 +108,7 @@ DATABASES = {
         'USER': os.environ["avicrypto_user"],
         'PASSWORD': os.environ["avicrypto_pwd"],
         'HOST': os.environ["avicrypto_host"],
-        'PORT': '5432'
+        'PORT': os.environ['PORT']
     }
 }
 
@@ -180,7 +180,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # STATIC_URL = '/static/'
-STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
+STATIC_URL = os.environ["STATICFILE_URL"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Extra places for collectstatic to find static files.
