@@ -83,6 +83,7 @@ class Registration(FormView):  # code for template is given below the view's cod
                     else:
                         user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['first_name'], last_name=data_dict['last_name'])
                         user.set_password(str(data_dict['password']))
+                        user.username = user.profile.user_auto_id
                         user.save()
                         update_profile(user, request.POST)
                         body = "Welcome to Avicrypto! "
