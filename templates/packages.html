@@ -32,56 +32,179 @@
                         <a class="list-group-item">
                             <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.roi}} ROI IN USD</a>
                     </div>
+                    <div class="text-xs-center">
+                        <div class="card-block">
+                            <div class="col-md-6">
+                                <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button id="subscribeCash" class="btn btn-primary">Cash</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endfor %}
+            <div id="subscribeModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 id="subscribeTitle"class="modal-title">Welcome 2018!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div id="packCode"></div>
+                            <div id="packName"></div>
 
+                            <div id="cryptoContainer">
+                                <div class="row mt-12">
+                                    <div class="col-xl-4">
+                                        <div class="card">
+                                            <div class="text-xs-center">
+                                                <div class="card-block">
+                                                    <h4 class="card-title">Bitcoin</h4>
+                                                </div>
+                                            </div>
+                                            <div class="list-group list-group-flush" id="btcEquivalent">  
+                                            </div>
+                                            <div class="text-xs-center">
+                                                <div class="card-block">
+                                                    <button id="btcBuy" class="cryptoTrade btn btn-primary">Buy</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="text-xs-center">
+                                                <div class="card-block">
+                                                    <h4 class="card-title">Ripple</h4>
+                                                </div>
+                                            </div>
+                                            <div class="list-group list-group-flush" id="xrpEquivalent">
+                                            </div>
+                                            <div class="text-xs-center">
+                                                <div class="card-block">
+                                                    <button id="xrpBuy" class="cryptoTrade btn btn-primary">Buy</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="text-xs-center">
+                                                <div class="card-block">
+                                                    <h4 class="card-title">Ethereum</h4>
+                                                </div>
+                                            </div>
+                                            <div class="list-group list-group-flush" id="ethEquivalent">
+                                            </div>
+                                            <div class="text-xs-center">
+                                                <div class="card-block">
+                                                    <button id="ethBuy" class="cryptoTrade btn btn-primary">Buy</button>
+                                                </div>
+                                            </div>
+                                        </div>  
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="cryptoDetails">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title" id="basic-layout-colored-form-control">Required Crypto Details</h4>
+                                    </div>
+                                    <div class="card-body collapse in">
+                                        <div class="card-block">
+                                            <form>
+                                                <div class="form-body">
+                                                    <div class="form-group">
+                                                        <label>Crypto Type</label>
+                                                        <input id="cryptoPackage" name="type" class="form-control border-primary" type="text" readonly>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Package Code</label>
+                                                        <input id="cryptoPackageCode" name="code" class="form-control border-primary" type="text" readonly>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Wallet Address*</label>
+                                                        <input class="form-control border-primary" name="wallet" type="text" placeholder="Wallet Address" required/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Destination Tag*</label>
+                                                        <input class="form-control border-primary" name="tag" type="text" placeholder="Destination Tag" required>
+                                                    </div>
+                                                </div>
+                                                <div class="form-actions">
+                                                    <button id="cryptoSubmit" type="submit" class="subscribe-package btn btn-primary">Purchase</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>  
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </section>
 </div>
+{% endblock %}
 
 
+{% block page_javascript %}
+<script type="text/javascript">
+    $("#subscribeModal").modal("hide");
+    $("#cryptoDetails").toggle();
+    $("#cashContainer").toggle();
+    $("#packCode").toggle();
+    $("#packName").toggle();
 
-<!-- <div class="col-md-12">
-    <form class="registration-form" method="post">
-        {% csrf_token %}
-        <div class="form-box">
-            <div class="form-top">
-                <div class="form-top-left">
-                    <h3>Add Package</h3>
-                </div>
-            </div>
-            <div class="form-bottom">
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <label>Package Duration: </label>
-                        </div>
-                        <div class="col-sm-8">
-                            <input type="number" name="duration" id="duration" class="form-control" value="1" min="1" />
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <label>Package Type: </label>
-                        </div>
-                        <div class="col-sm-8">
-                            <select name="package" id="package">
-                                {% for p in packages %}
-                                <option value="{{p.id}}">{{p.package_name}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <div class="form-group">
-                    <button class="btn btn-round btn-b" type="submit">Save</button>
-                </div>
-            </div>
-        </div>
-    </form>
-</div> -->
+    $('#subscribeModal').on('hidden', function() {
+        clear();
+    });
+
+    var subscribePackage = function(package, code){
+        var exchSettings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=BTC%2CXRP%2CINR%2CETH",
+            "method": "GET",
+            "headers": {}
+        };
+
+        $.ajax(exchSettings).done(function (response) {
+            let
+                btc = response.BTC,
+                eth = response.ETH,
+                xrp = response.XRP;
+            var price = parseInt(code.split("usd")[1]);
+            var btcHtmlSrting = '<a class="list-group-item"><i class="icon-briefcase4"></i>&nbsp;&nbsp;Cost equivalent to '+(response.BTC*price).toFixed(5)+' Bitcoin</a>'
+            var xrpHtmlSrting = '<a class="list-group-item"><i class="icon-briefcase4"></i>&nbsp;&nbsp;Cost equivalent to '+(response.XRP*price).toFixed(5)+' Ripple</a>'
+            var ethHtmlSrting = '<a class="list-group-item"><i class="icon-briefcase4"></i>&nbsp;&nbsp;Cost equivalent to '+(response.ETH*price).toFixed(5)+' Ethereum</a>'
+            $("#btcEquivalent").html(btcHtmlSrting);
+            $("#xrpEquivalent").html(xrpHtmlSrting);
+            $("#ethEquivalent").html(ethHtmlSrting);
+            $("#packCode").html(price)
+            $("#packName").html(package);
+            $("#subscribeModal").find('.modal-title').text(package)
+            $("#subscribeModal").modal("show");
+        });
+    }
+    
+    $("#btcBuy,#xrpBuy,#ethBuy").click(function(event){
+        $("#cryptoContainer").toggle();
+        $("#cryptoDetails").toggle();
+        var cryptoType=""
+        if(event.target.id==='btcBuy'){
+            cryptoType="BTC";
+        } else if(event.target.id==='xrpBuy'){
+            cryptoType="XRP";
+        } else {
+            cryptoType="ETH";
+        }
+        $("#cryptoPackage").val(cryptoType);
+        $("#cryptoPackageCode").val("usd"+$("#packCode").html())
+
+    })
+</script>
 
 {% endblock %}
