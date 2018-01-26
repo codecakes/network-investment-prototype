@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from django.shortcuts import render
-from django.template import loader
+from django.template import loader, RequestContext, Context
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
@@ -16,6 +16,7 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.template.loader import get_template, render_to_string
 
 from forms import signup_form
 
@@ -28,10 +29,14 @@ import sys
 import hashlib
 import random
 import json
+import re
 
 sys.path.append(settings.BASE_DIR)
 from avicrypto import services
 from lib.tree import load_users, find_min_max, is_member_of
+
+def app_404(request):
+    return render(request, '404.html')
 
 def index(request):
     context = {
@@ -54,57 +59,13 @@ def bank_website(request):
     template = loader.get_template('avicrypto_bank.html')
     return HttpResponse(template.render(context, request))
 
-class Registration(FormView):  # code for template is given below the view's code
-    template_name = "login.html"
-    success_url = '/thanks'
-    form_class = signup_form
+def get_token(data):
+    salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
+    if isinstance(data, unicode):
+        data = data.encode('utf8')
+    return hashlib.sha1(salt + data).hexdigest()
 
-    @staticmethod
-    def validate_email_address(email):
-        try:
-            validate_email(email)
-            return True
-        except ValidationError:
-            return False
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        try:
-            if form.is_valid():
-                data_dict = form.cleaned_data
-                data = form.cleaned_data['email']
-
-                if self.validate_email_address(data) is True:
-                    associated_users = User.objects.filter(Q(email=data) | Q(username=data))
-                    if associated_users.exists():
-                        result = self.form_valid(form)
-                        messages.success(request, 'User already exists')
-                        return result
-                    else:
-                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['first_name'], last_name=data_dict['last_name'])
-                        user.set_password(str(data_dict['password']))
-                        user.username = user.profile.user_auto_id
-                        user.save()
-                        update_profile(user, request.POST)
-                        body = "Welcome to Avicrypto! "
-                        services.send_email_mailgun('Welcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
-                        result = self.form_valid(form)
-                        messages.success(request, 'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
-                        return result
-                else:
-                    result = self.form_valid(form)
-                    messages.success(request, 'Not an email address.')
-                    return result
-            else:
-                result = self.form_valid(form)
-                messages.success(request, 'Data invalid.')
-                return result
-        except Exception as e:
-            raise
-
-        return self.form_invalid(form)
-
-def login_fn(request):
+def app_login(request):
     if not request.user.is_authenticated:
         if request.method == 'GET':
             template = loader.get_template('login.html')
@@ -130,26 +91,158 @@ def login_fn(request):
             return HttpResponse(template.render(context, request))
 
         if request.method == 'POST':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            user = authenticate(username=username, password=password)
+            username = str(request.POST.get('username'))
+            password = str(request.POST.get('password'))
 
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return HttpResponse(json.dumps({"status": "ok"}))
+            if username and password:
+                if User.objects.filter(username=username).exists():
+                    if User.objects.filter(username=username, is_active=True).exists():
+                        user = authenticate(username=username, password=password)
+                        if user is not None:
+                            login(request, user)
+                            return HttpResponse(json.dumps({
+                                "status": "ok"
+                            }))
+                        else:
+                            return HttpResponse(json.dumps({
+                                "status": "error",
+                                "message": "Username or password is incorrect."
+                            }))
+                    else:
+                        return HttpResponse(json.dumps({
+                            "status": "error",
+                            "message": "Email address is not active."
+                        }))
                 else:
                     return HttpResponse(json.dumps({
                         "status": "error",
-                        "message": "Id id not active."            
+                        "message": "Invalid username."
                     }))
             else:
                 return HttpResponse(json.dumps({
                     "status": "error",
-                    "message": "Email or password is incorrect."            
+                    "message": "Provide username or password."
                 }))
     else:
         return HttpResponseRedirect('/home')
+
+def app_signup(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        if email and validate_email(email) == None:
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            mobile = request.POST.get('mobile')
+            password = request.POST.get('password')
+
+            if re.match(r'^\+?1?\d{9,15}$', mobile):
+                if not User.objects.filter(email=email).exists():
+                    user = User.objects.create(username=email, email=email, first_name=first_name, last_name=last_name, is_active=False)
+                    user.username = user.profile.user_auto_id
+                    user.set_password(str(password))
+                    user.save()
+
+                    token = update_user_profile(user, request.POST)
+
+                    email_data = {
+                        "user": user,
+                        "token": token
+                    }
+                    body = render_to_string('mail/welcome.html', email_data)
+                    services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
+
+                    content = {
+                        "status": "ok",
+                        "message": "Thank you for registration. Soon you will receive a conformation mail."
+                    }
+                    return HttpResponse(json.dumps(content))
+                else:
+                    content = {
+                        "status": "error",
+                        "message": "Email address already exist."
+                    }
+                    return HttpResponse(json.dumps(content))
+            else:
+                content = {
+                    "status": "error",
+                    "message": "Invalid mobile number."
+                }
+                return HttpResponse(json.dumps(content))
+        else:
+            content = {
+                "status": "error",
+                "message": "Not and email address."
+            }
+            return HttpResponse(json.dumps(content))
+
+@login_required(login_url="/login")
+def app_logout(request):
+    logout(request)
+    response = HttpResponseRedirect('/')
+    return response
+
+def app_activate_account(request, token):
+    profile = get_object_or_404(Profile, token=token, user__is_active=False)
+    profile.user.is_active = True
+    profile.user.save()
+
+    if profile.user.has_usable_password():
+        profile.token = ""
+        profile.save()
+        return HttpResponseRedirect("/login")
+    else:
+        return HttpResponseRedirect("/reset-password/" + profile.token)
+
+def app_forgot_password(request):
+    content = {}
+    if request.method == 'POST':
+        email = request.POST.get("email", "")
+
+        try:
+            user = User.objects.get(email=email)
+            token = get_token(user.username)
+            email_data = {
+                "token": token,
+                "user": user
+            }
+            body = render_to_string('mail/reset-password.html', email_data)
+            services.send_email_mailgun('Reset Password Avicrypto', body, email, from_email="postmaster")
+            content = {
+                "status": "ok",
+                "message": "Email has send to your address."
+            }
+
+            user.profile.token = token
+            user.profile.save()
+
+            return HttpResponse(json.dumps(content))
+        except User.DoesNotExist:
+            content = {
+                "status": "error",
+                "message": "Can't find that email, sorry."
+            }
+            return HttpResponse(json.dumps(content))
+
+    return render(request, 'forgot-password.html', content)
+
+def app_reset_password(request, token):
+	if request.method == "POST":
+		password = request.POST.get('password', '')
+		profile = get_object_or_404(Profile, token=token, user__is_active=True)
+
+		profile.user.set_password(password)
+		profile.token = ""
+
+		profile.save()
+		profile.user.save()
+		content = {
+            "status": "ok",
+			"message": "Password has been successfully changed."
+		}
+		return render(request, 'reset-password.html', content)
+	else:
+		profile = get_object_or_404(Profile, token=token, user__is_active=True)
+		return render(request, 'reset-password.html')
 
 def check_referal(request):
     referal = request.GET['referal']
@@ -202,25 +295,12 @@ def check_placement(request):
             'message': 'Referal address invalid'
         }))
 
-def thanks(request):
-    template = loader.get_template('thanks.html')
-    context = {
-        'user': 'None'
-    }
-    # return HttpResponse(template.render(context, request))
-    return HttpResponse("Thank you for registration.Soon you will receive a conformation mail.")
-
 def error(request):
     template = loader.get_template('error.html')
     context = {
         'user': 'None'
     }
     return HttpResponse(template.render(context, request))
-
-def logout_fn(request):
-    logout(request)
-    response = HttpResponseRedirect('/')
-    return response
 
 @login_required(login_url="/login")
 def home(request):
@@ -330,32 +410,16 @@ def network_parent(request):
 
 @login_required(login_url="/login")
 def network_children(request, user_id):
-    print user_id
     user = User.objects.get(id=user_id)
-    print user
     data = traverse_tree(user)
     data = json.loads(data)
-    print data
     data = {
         'children': data['children']
     }
     return HttpResponse(json.dumps(data))
 
-
-# def simple_upload(request):
-#     if request.method == 'POST' and request.FILES['myfile']:
-#         myfile = request.FILES['myfile']
-#         fs = FileSystemStorage()
-#         filename = fs.save(myfile.name, myfile)
-#         uploaded_file_url = fs.url(filename)
-#         return render(request, 'core/simple_upload.html', {
-#             'uploaded_file_url': uploaded_file_url
-#         })
-#     return render(request, 'core/simple_upload.html')
-
 def simple_upload(request):
-    if request.method == 'POST' and request.FILES['passfront'] and request.FILES['passback'] and request.FILES[
-        'passphoto']:
+    if request.method == 'POST' and request.FILES['passfront'] and request.FILES['passback'] and request.FILES['passphoto']:
         passfront = request.FILES['passfront']
         passback = request.FILES['passback']
         passphoto = request.FILES['passphoto']
@@ -381,7 +445,7 @@ def model_form_upload(request):
         'form': form
     })
 
-def update_profile(user, data):
+def update_user_profile(user, data):
     profile = Profile.objects.get(user=user)
     profile.country = data.get('country', "US")
     profile.mobile = data.get('mobile', None)
@@ -390,6 +454,9 @@ def update_profile(user, data):
     sponcer_id = data.get('sponcer_id', None)
     placement_id = data.get('placement_id', None)
     placement_position = data.get('placement_position', "L")
+    token = get_token(user.username)
+
+    profile.token = token
 
     if referal_code:
         sponser_user = Profile.objects.get(my_referal_code=referal_code)
@@ -407,6 +474,8 @@ def update_profile(user, data):
             Members.objects.create(parent_id=profile.placement_id, child_id=user)
 
     profile.save()
+
+    return token
 
 def traverse_tree(user, level=4):
     ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
@@ -445,6 +514,8 @@ def add_user(request):
             user = User.objects.create(email=email, username=email)
             user.first_name = data['first_name']
             user.last_name = data['last_name']
+            user.username = user.profile.user_auto_id
+            user.is_active = False
             user.save()
 
             profile = Profile.objects.get(user=user)
@@ -454,7 +525,7 @@ def add_user(request):
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
             profile.country = data['country']
-            token = get_token(email)
+            token = get_token(user.username)
             profile.token = token
 
             if data['placement'] == 'left':
@@ -464,36 +535,25 @@ def add_user(request):
 
             profile.save()
 
-            body = "Create password for your account: http://www.avicrypto.us/reset-password/" + profile.token
+            # body = "Create password for your account: http://www.avicrypto.us/reset-password/" + profile.token
+            # services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
+
+            email_data = {
+                "user": user,
+                "token": token
+            }
+            body = render_to_string('mail/welcome.html', email_data)
             services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
 
             Members.objects.create(parent_id=placement_id.user, child_id=user)
-            message = "Success"
+            content = {
+                "status": "ok",
+                "message": "Registration complete.",
+            }
         else:
-			message = "Email address already registered."
+            content = {
+                "status": "ok",
+                "message": "Email address already registered.",
+            }
 
-        return HttpResponse(message)
-
-def get_token(data):
-    salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
-    if isinstance(data, unicode):
-        data = data.encode('utf8')
-    return hashlib.sha1(salt + data).hexdigest()
-
-def reset_password(request, token):
-	if request.method == "POST":
-		password = request.POST.get('password', '')
-		profile = get_object_or_404(Profile, token=token)
-
-		profile.user.set_password(password)
-		profile.token = ""
-
-		profile.save()
-		profile.user.save()
-		content = {
-			"message": "Password has been successfully changed."
-		}
-		return render(request, 'reset-password.html', content)
-	else:
-		profile = get_object_or_404(Profile, token=token)
-		return render(request, 'reset-password.html')
+        return HttpResponse(json.dumps(content))

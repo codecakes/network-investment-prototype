@@ -17,3 +17,4 @@ avicrypto/*.pyc
 pyc
 media/
 staticfiles/
+.vscode/
