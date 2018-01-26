@@ -1,0 +1,69 @@
+{% extends "home_root.html" %} {% block contents %} {% load staticfiles %}
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+<div class="tab-pane" id="support">
+    <div class="row" id="request-support">
+        <section class="module bg-dark-60 request-cta" data-background="{% static " images /Layer.png " %}">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h2 class="font-alt">Request a call back</h2>
+                        <p>Would you like to speak to one of our financial advisers over the phone? Just submit your details and we’ll be in touch shortly. You can also email us if you would prefer.</p>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="row">
+                            <form class="form rqst-form" id="requestACall" role="form" method="post" action="">
+                                <div class="form-group col-sm-6 col-xs-12">
+                                    <input class="form-control input-lg" type="text" value="{{user.first_name}}" readonly/>
+                                </div>
+                                <div class="form-group col-sm-6 col-xs-12">
+                                    <input class="form-control input-lg" type="text" value="{{user.last_name}}" readonly/>
+                                </div>
+                                <div class="form-group col-sm-6 col-xs-12">
+                                    <input class="form-control input-lg" type="text" value="{{user.profile.mobile}}" readonly/>
+                                </div>
+                                <div class="form-group col-sm-6 col-xs-12">
+                                    <input class="form-control input-lg" type="text" value="{{user.email}}" readonly/>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <textarea id="description" name="description" placeholder="Description" style="width: 100%; height: 150px; color: black;"></textarea>
+                                </div>
+                            </form>
+                            <div class="form-group col-sm-6 col-xs-12">
+                                <button class="btn btn-border-w btn-circle btn-block" id="racSubmit" type="submit">
+                                    <i class="fa fa-paper-plane-o"></i> Submit
+                                </button>
+                            </div>
+                            <div id="requestFormResponse"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<script src="{% static "lib/jquery/dist/jquery.js" %}"></script>
+<script type="text/javascript">
+    $('#racSubmit').click(function () {
+
+        var data = {
+            'description': $("#description").val()
+        }
+        $.ajax({
+            url: "/support",
+            data: data,
+            dataType: "json",
+            type: "POST",
+            error: function (res) {
+                alert("Error in Mail Sent. Please try after some time.")
+            },
+            success: function (res) {
+                alert("Mail Sent.")
+            }
+        });
+    });
+</script> {% endblock %}

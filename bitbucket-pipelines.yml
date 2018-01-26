@@ -22,9 +22,8 @@ pipelines:
           - cd avi.github.io && cp -R $pwd_dir/staticfiles ./
           - git config --global user.email $AKUL_GITHUB_EMAIL
           - git config --global user.name $AKUL_GITHUB_USER
+          - rm staticfiles/site/lib/owl.carousel/docs_src/templates/pages/docs/dev-buildin-plugins.hbs
           - echo $(git status)
-          - rm staticfiles/lib/owl.carousel/docs_src/templates/pages/docs/dev-buildin-plugins.hbs
-          - rm staticfiles/lib/owl.carousel/docs_src/templates/pages/docs/dev-buildin-plugins.dc8accba73a0.hbs
           - git add * && git commit -am "updated staticfiles"
           - echo $(git status)
           - git push

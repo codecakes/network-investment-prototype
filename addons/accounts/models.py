@@ -10,20 +10,21 @@ from django.core.validators import RegexValidator
 from addons.packages.models import Packages
 import base64, uuid
 from django.contrib.postgres.fields import ArrayField
+
 # Create your models here.
-User._meta.local_fields[4].__dict__['_unique'] = True
+# User._meta.local_fields[4].__dict__['_unique'] = True
 
 def increment_user_id():
     last_user_id = Profile.objects.all().order_by('user_auto_id').last()
     if last_user_id is  None:
-    	return 'AVI000001'
+    	return 'AVI000000001'
     # if not last_user_id.user_auto_id:
-    #      return 'AVI000001'
+    #      return 'AVI000000001'
     else:
 	    user_id_no = last_user_id.user_auto_id
 	    user_id_int = int(user_id_no.split('AVI')[-1])
 	    new_user_id_int = user_id_int + 1
-	    new_user_id_no = 'AVI' + str(new_user_id_int)
+	    new_user_id_no = 'AVI' + str(new_user_id_int).zfill(9)
 	    return new_user_id_no
 
 class Profile(models.Model):
@@ -37,19 +38,15 @@ class Profile(models.Model):
 		('NA', 'Non-Active'),
 		('C', 'Confirmed'),
 		('NC', 'Non-Confirmed')
-		)
+	)
 	user_auto_id = models.CharField(max_length=500, default=increment_user_id, null=True, blank=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	referal_code = models.CharField(max_length=20, blank=True)
-	# sponser_id =models.OneToOneField(User, null=True, related_name='+')
 	sponser_id = models.ForeignKey(User,on_delete=models.CASCADE, related_name='+', null=True)
-	# package = models.OneToOneField(Packages,null=True)
+	country = models.CharField(max_length=5, default=None, null=True, blank=True)
 	mobile = models.CharField(max_length=15,validators=[phone_regex], blank=True)
 	placement_id = models.ForeignKey(User,on_delete=models.CASCADE, related_name='+', null=True)
-	# placement_id = models.OneToOneField(User, null=True, related_name='+')
 	placement_position = models.CharField(max_length=100,choices=placement_type, null=True)
-	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)
 	bank_name = models.CharField(max_length=20, null=True)
 	account_number = models.CharField(max_length=20, null=True)
 	account_type = models.CharField(max_length=20, null=True)
@@ -58,7 +55,9 @@ class Profile(models.Model):
 	status = models.CharField(max_length=50, choices=status_type)
 	model_pic = models.ImageField(upload_to = 'media/pic_folder', default = 'media/pic_folder/None/no-img.jpg')
 	href = models.CharField(max_length=20, null=True)
-	# members = ArrayField(ArrayField(models.CharField(max_length=10, blank=True),size=8,),size=8,)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	token = models.CharField(max_length=100, default=None, null=True, blank=True)
 
 	def __unicode__(self):
 		return "%s" %(self.user)
@@ -92,3 +91,13 @@ class Document(models.Model):
     description = models.CharField(max_length=255, blank=True)
     document = models.FileField(upload_to='documents/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class SupportTicket(models.Model):
+	user = models.ForeignKey(User, related_name='+', null=True)
+	description = models.TextField()
+	status_choices = (
+		('P', 'Pending'),
+		('C', 'Confirmed'),
+	)
+	status = models.CharField(max_length=50, choices=status_choices)
+	created_at = models.DateTimeField(auto_now_add=True)

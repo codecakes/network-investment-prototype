@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from urllib2 import urlparse
 # import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -103,11 +104,24 @@ WSGI_APPLICATION = 'avicrypto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['avicrypto_db'],
-        'USER': os.environ['avicrypto_user'],
-        'PASSWORD': os.environ['avicrypto_pwd'],
-        'HOST': os.environ['avicrypto_host'],
-        'PORT': '5432'
+        'NAME': os.environ["avicrypto_db"],
+        'USER': os.environ["avicrypto_user"],
+        'PASSWORD': os.environ["avicrypto_pwd"],
+        'HOST': os.environ["avicrypto_host"],
+        'PORT': 5432
+    }
+}
+
+# using redis for caches
+REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL'))
+CACHES = {
+    "default": {
+         "BACKEND": "redis_cache.RedisCache",
+         "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
+         "OPTIONS": {
+             "PASSWORD": REDIS_URL.password,
+             "DB": 0,
+         }
     }
 }
 
@@ -166,7 +180,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # STATIC_URL = '/static/'
-STATIC_URL = "https://codecakes.github.io/avi.github.io/staticfiles/"
+STATIC_URL = os.environ["STATICFILE_URL"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Extra places for collectstatic to find static files.
