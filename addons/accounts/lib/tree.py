@@ -147,13 +147,13 @@ def get_right(user):
 def find_min(user):
     """Gets leftmost user of tree"""
     min_user = get_left(user)
-    return min_user if min_user else user
+    return find_min(min_user) if get_left(min_user) else user
 
 
 def find_max(user):
     """Gets rightmost user of tree"""
     max_user = get_right(user)
-    return max_user if max_user else user
+    return find_max(max_user) if get_right(max_user) else user
 
 
 def find_min_max(user):
