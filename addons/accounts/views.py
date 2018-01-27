@@ -18,8 +18,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.template.loader import get_template, render_to_string
 
-from forms import signup_form
-
 from addons.accounts.models import Profile, Members, SupportTicket
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
@@ -37,6 +35,17 @@ from lib.tree import load_users, find_min_max, is_member_of, is_parent_of
 
 def app_404(request):
     return render(request, '404.html')
+
+def traverse_tree(user, level=4):
+    ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
+    data = load_users(user, ref_code, level=level)
+    return json.dumps(data)
+
+def get_token(data):
+    salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
+    if isinstance(data, unicode):
+        data = data.encode('utf8')
+    return hashlib.sha1(salt + data).hexdigest()
 
 def index(request):
     context = {
@@ -58,12 +67,6 @@ def bank_website(request):
     context = {}
     template = loader.get_template('avicrypto_bank.html')
     return HttpResponse(template.render(context, request))
-
-def get_token(data):
-    salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
-    if isinstance(data, unicode):
-        data = data.encode('utf8')
-    return hashlib.sha1(salt + data).hexdigest()
 
 def app_login(request):
     if not request.user.is_authenticated:
@@ -396,7 +399,8 @@ def network(request):
 @login_required(login_url="/login")
 def network_init(request):
     user = request.user
-    data = traverse_tree(request.user)
+    print user
+    data = traverse_tree(user)
     data = json.loads(data)
     # data['collapsed'] = True
     data['className'] = 'top-level'
@@ -445,6 +449,7 @@ def model_form_upload(request):
         'form': form
     })
 
+@login_required(login_url="/login")
 def update_user_profile(user, data):
     profile = Profile.objects.get(user=user)
     profile.country = data.get('country', "US")
@@ -477,11 +482,7 @@ def update_user_profile(user, data):
 
     return token
 
-def traverse_tree(user, level=4):
-    ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
-    data = load_users(user, ref_code, level=level)
-    return json.dumps(data)
-
+@login_required(login_url="/login")
 @csrf_exempt
 def add_user(request):
 
