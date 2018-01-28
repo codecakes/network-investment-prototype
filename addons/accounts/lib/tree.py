@@ -115,7 +115,7 @@ def right_child(members, ref_code, level):
 
 
 def get_left(user):
-    """Helper Function: Gets leftmost user of tree"""
+    """Helper Function: Gets left node of user node"""
     members = Members.objects.filter(parent_id=user.id)
     assert len(members) <= 2
 
@@ -132,7 +132,7 @@ def get_left(user):
 
 
 def get_right(user):
-    """Helper Function: Gets rightmost user of tree"""
+    """Helper Function: Gets right node of user node"""
     members = Members.objects.filter(parent_id=user.id)
     assert len(members) <= 2
 
@@ -231,7 +231,17 @@ def is_member_of(parent_user, child_user):
     # return {'node': node, 'message': message, placement_id: placement_id}
 
 
+def has_child(parent_node, leg):
+    """Checks if parent_node has any child nodes in its right or left leg"""
+    members = Members.objects.filter(parent_id=parent_node.id)
+    assert len(members) <= 2
+    check_leg = LEG[leg]
+    if not members:
+        return False
+    return any(map(check_leg, members))
+
 def get_relationship(user):
+    """sets out logical 1 or 0 iff has a parent/sibling/child"""
     if type(user) == Profile:
         user = Profile.objects.get(user_id=user)
     parent_user = get_parent(user)
