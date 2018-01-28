@@ -31,7 +31,8 @@ import json
 
 sys.path.append(settings.BASE_DIR)
 from avicrypto import services
-from lib.tree import load_users, find_min_max, is_member_of, is_parent_of
+from lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg
+
 
 def index(request):
     context = {
@@ -49,10 +50,12 @@ def index(request):
     template = loader.get_template('website.html')
     return HttpResponse(template.render(context, request))
 
+
 def bank_website(request):
     context = {}
     template = loader.get_template('avicrypto_bank.html')
     return HttpResponse(template.render(context, request))
+
 
 class Registration(FormView):  # code for template is given below the view's code
     template_name = "login.html"
@@ -75,21 +78,25 @@ class Registration(FormView):  # code for template is given below the view's cod
                 data = form.cleaned_data['email']
 
                 if self.validate_email_address(data) is True:
-                    associated_users = User.objects.filter(Q(email=data) | Q(username=data))
+                    associated_users = User.objects.filter(
+                        Q(email=data) | Q(username=data))
                     if associated_users.exists():
                         result = self.form_valid(form)
                         messages.success(request, 'User already exists')
                         return result
                     else:
-                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['first_name'], last_name=data_dict['last_name'])
+                        user = User.objects.create(
+                            username=data_dict['email'], email=data_dict['email'], first_name=data_dict['first_name'], last_name=data_dict['last_name'])
                         user.set_password(str(data_dict['password']))
                         user.username = user.profile.user_auto_id
                         user.save()
                         update_profile(user, request.POST)
                         body = "Welcome to Avicrypto! "
-                        services.send_email_mailgun('Welcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
+                        services.send_email_mailgun(
+                            'Welcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
                         result = self.form_valid(form)
-                        messages.success(request, 'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
+                        messages.success(
+                            request, 'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
                         return result
                 else:
                     result = self.form_valid(form)
@@ -103,6 +110,7 @@ class Registration(FormView):  # code for template is given below the view's cod
             raise
 
         return self.form_invalid(form)
+
 
 def login_fn(request):
     if not request.user.is_authenticated:
@@ -141,15 +149,16 @@ def login_fn(request):
                 else:
                     return HttpResponse(json.dumps({
                         "status": "error",
-                        "message": "Id id not active."            
+                        "message": "Id id not active."
                     }))
             else:
                 return HttpResponse(json.dumps({
                     "status": "error",
-                    "message": "Email or password is incorrect."            
+                    "message": "Email or password is incorrect."
                 }))
     else:
         return HttpResponseRedirect('/home')
+
 
 def check_referal(request):
     referal = request.GET['referal']
@@ -174,6 +183,7 @@ def check_referal(request):
             'status': 'error',
             'message': 'Referal address invalid'
         }))
+
 
 def check_placement(request):
     referal = request.GET['referal']
@@ -202,6 +212,7 @@ def check_placement(request):
             'message': 'Referal address invalid'
         }))
 
+
 def thanks(request):
     template = loader.get_template('thanks.html')
     context = {
@@ -210,6 +221,7 @@ def thanks(request):
     # return HttpResponse(template.render(context, request))
     return HttpResponse("Thank you for registration.Soon you will receive a conformation mail.")
 
+
 def error(request):
     template = loader.get_template('error.html')
     context = {
@@ -217,10 +229,12 @@ def error(request):
     }
     return HttpResponse(template.render(context, request))
 
+
 def logout_fn(request):
     logout(request)
     response = HttpResponseRedirect('/')
     return response
+
 
 @login_required(login_url="/login")
 def home(request):
@@ -244,6 +258,7 @@ def home(request):
     else:
         return HttpResponseRedirect('/error')
 
+
 @login_required(login_url="/login")
 @csrf_exempt
 def profile(request):
@@ -252,7 +267,8 @@ def profile(request):
         country_json = json.load(open('country.json'))
         country = ""
         if user.profile.country:
-            country = (item for item in country_json if item["country_code"] == user.profile.country).next()
+            country = (
+                item for item in country_json if item["country_code"] == user.profile.country).next()
 
         context = {
             'user_country': country,
@@ -283,6 +299,7 @@ def profile(request):
     else:
         return HttpResponseRedirect('/error')
 
+
 @login_required(login_url="/login")
 @csrf_exempt
 def support(request):
@@ -294,13 +311,15 @@ def support(request):
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
         description = request.POST.get("description", "")
-        SupportTicket.objects.create(user=request.user, description=description, status="P")
+        SupportTicket.objects.create(
+            user=request.user, description=description, status="P")
         return HttpResponse(json.dumps({
             'status': 'ok',
             'message': 'Our support team will get back to you.'
         }))
         # services.support_mail('Support Ticket', request.POST.get("description", ""), 'harshulkaushik9@gmail.com', from_email="postmaster")
         # return HttpResponse('Mail sent to adminstrator', content_type="application/json")
+
 
 @login_required(login_url="/login")
 @csrf_exempt
@@ -313,6 +332,7 @@ def network(request):
         data = traverse_tree(request.user)
         return HttpResponse(data)
 
+
 @login_required(login_url="/login")
 def network_init(request):
     user = request.user
@@ -322,11 +342,13 @@ def network_init(request):
     data['className'] = 'top-level'
     return HttpResponse(json.dumps(data))
 
+
 @login_required(login_url="/login")
 def network_parent(request):
     user = request.user
     data = traverse_tree(request.user)
     return HttpResponse(data)
+
 
 @login_required(login_url="/login")
 def network_children(request, user_id):
@@ -355,7 +377,7 @@ def network_children(request, user_id):
 
 def simple_upload(request):
     if request.method == 'POST' and request.FILES['passfront'] and request.FILES['passback'] and request.FILES[
-        'passphoto']:
+            'passphoto']:
         passfront = request.FILES['passfront']
         passback = request.FILES['passback']
         passphoto = request.FILES['passphoto']
@@ -363,11 +385,13 @@ def simple_upload(request):
         filename_passfront = fs.save(passfront.name, passfront)
         filename_passback = fs.save(passback.name, passback)
         filename_passphoto = fs.save(passphoto.name, passphoto)
-        uploaded_file_url = fs.url(filename_passfront) or fs.url(filename_passback) or fs.url(filename_passphoto)
+        uploaded_file_url = fs.url(filename_passfront) or fs.url(
+            filename_passback) or fs.url(filename_passphoto)
         return render(request, 'simple_upload.html', {
             'uploaded_file_url': uploaded_file_url
         })
     return render(request, 'simple_upload.html')
+
 
 def model_form_upload(request):
     if request.method == 'POST':
@@ -380,6 +404,7 @@ def model_form_upload(request):
     return render(request, 'model_upload.html', {
         'form': form
     })
+
 
 def update_profile(user, data):
     profile = Profile.objects.get(user=user)
@@ -404,14 +429,18 @@ def update_profile(user, data):
             profile.placement_position = placement_position
             profile.referal_code = referal_code
             profile.sponcer_id = sponser_user.user
-            Members.objects.create(parent_id=profile.placement_id, child_id=user)
+            Members.objects.create(
+                parent_id=profile.placement_id, child_id=user)
 
     profile.save()
 
+
 def traverse_tree(user, level=4):
-    ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
+    ref_code = "/add/user?ref={}&place={}".format(
+        user.profile.my_referal_code, user.profile.user_auto_id)
     data = load_users(user, ref_code, level=level)
     return json.dumps(data)
+
 
 @csrf_exempt
 def add_user(request):
@@ -449,7 +478,8 @@ def add_user(request):
 
             profile = Profile.objects.get(user=user)
             sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
-            placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
+            placement_id = Profile.objects.get(
+                user_auto_id=data['placement_id'])
             profile.sponser_id = sponser_id.user
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
@@ -465,14 +495,16 @@ def add_user(request):
             profile.save()
 
             body = "Create password for your account: http://www.avicrypto.us/reset-password/" + profile.token
-            services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
+            services.send_email_mailgun(
+                'Welcome to Avicrypto', body, email, from_email="postmaster")
 
             Members.objects.create(parent_id=placement_id.user, child_id=user)
             message = "Success"
         else:
-			message = "Email address already registered."
+            message = "Email address already registered."
 
         return HttpResponse(message)
+
 
 def get_token(data):
     salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
@@ -480,20 +512,21 @@ def get_token(data):
         data = data.encode('utf8')
     return hashlib.sha1(salt + data).hexdigest()
 
+
 def reset_password(request, token):
-	if request.method == "POST":
-		password = request.POST.get('password', '')
-		profile = get_object_or_404(Profile, token=token)
+    if request.method == "POST":
+        password = request.POST.get('password', '')
+        profile = get_object_or_404(Profile, token=token)
 
-		profile.user.set_password(password)
-		profile.token = ""
+        profile.user.set_password(password)
+        profile.token = ""
 
-		profile.save()
-		profile.user.save()
-		content = {
-			"message": "Password has been successfully changed."
-		}
-		return render(request, 'reset-password.html', content)
-	else:
-		profile = get_object_or_404(Profile, token=token)
-		return render(request, 'reset-password.html')
+        profile.save()
+        profile.user.save()
+        content = {
+            "message": "Password has been successfully changed."
+        }
+        return render(request, 'reset-password.html', content)
+    else:
+        profile = get_object_or_404(Profile, token=token)
+        return render(request, 'reset-password.html')
