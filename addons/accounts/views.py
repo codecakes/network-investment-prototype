@@ -273,25 +273,41 @@ def check_referal(request):
 
 def check_placement(request):
     referal = request.GET['referal']
-    sponcer_id = request.GET['sponcer_id']
+    placement_id = request.GET['placement_id']
     position = request.GET['position']
 
+
+
     if Profile.objects.filter(my_referal_code=referal).exists():
-        sponser = Profile.objects.get(my_referal_code=referal)
-        sponser_id = sponser.user_auto_id
-        placement_users = find_min_max(sponser.user)
+        if Profile.objects.filter(user_auto_id=placement_id).exists():
+            
+            referal_user = Profile.objects.get(my_referal_code=referal).user
+            placement_user = Profile.objects.get(user_auto_id=placement_id).user
 
-        response = {
-            'status': 'ok',
-            'data': {
-                'referal': referal,
-                'sponser_id': sponser_id,
-                'placement_user_left_id': placement_users[0].profile.user_auto_id,
-                'placement_user_right_id': placement_users[1].profile.user_auto_id
-            }
-        }
 
-        return HttpResponse(json.dumps(response))
+            print is_parent_of(referal_user, placement_user)
+            # sponser = Profile.objects.get(my_referal_code=referal)
+            # sponser_id = sponser.user_auto_id
+            # placement_users = find_min_max(sponser.user)
+
+            # response = {
+            #     'status': 'ok',
+            #     'data': {
+            #         'referal': referal,
+            #         'sponser_id': sponser_id,
+            #         'placement_user_left_id': placement_users[0].profile.user_auto_id,
+            #         'placement_user_right_id': placement_users[1].profile.user_auto_id
+            #     }
+            # }
+
+            return HttpResponse(json.dumps({
+                "status": "ok"
+            }))
+        else:
+            return HttpResponse(json.dumps({
+                'status': 'error',
+                'message': 'Invalid placement id'
+            }))
     else:
         return HttpResponse(json.dumps({
             'status': 'error',
@@ -399,7 +415,6 @@ def network(request):
 @login_required(login_url="/login")
 def network_init(request):
     user = request.user
-    print user
     data = traverse_tree(user)
     data = json.loads(data)
     # data['collapsed'] = True
