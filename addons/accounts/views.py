@@ -31,7 +31,8 @@ import re
 
 sys.path.append(settings.BASE_DIR)
 from avicrypto import services
-from lib.tree import load_users, find_min_max, is_member_of, is_parent_of
+from lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg
+
 
 def app_404(request):
     return render(request, '404.html')
@@ -63,10 +64,12 @@ def index(request):
     template = loader.get_template('website.html')
     return HttpResponse(template.render(context, request))
 
+
 def bank_website(request):
     context = {}
     template = loader.get_template('avicrypto_bank.html')
     return HttpResponse(template.render(context, request))
+
 
 def app_login(request):
     if not request.user.is_authenticated:
@@ -271,6 +274,7 @@ def check_referal(request):
             'message': 'Referal address invalid'
         }))
 
+
 def check_placement(request):
     referal = request.GET['referal']
     placement_id = request.GET['placement_id']
@@ -343,6 +347,7 @@ def home(request):
     else:
         return HttpResponseRedirect('/error')
 
+
 @login_required(login_url="/login")
 @csrf_exempt
 def profile(request):
@@ -351,7 +356,8 @@ def profile(request):
         country_json = json.load(open('country.json'))
         country = ""
         if user.profile.country:
-            country = (item for item in country_json if item["country_code"] == user.profile.country).next()
+            country = (
+                item for item in country_json if item["country_code"] == user.profile.country).next()
 
         context = {
             'user_country': country,
@@ -382,6 +388,7 @@ def profile(request):
     else:
         return HttpResponseRedirect('/error')
 
+
 @login_required(login_url="/login")
 @csrf_exempt
 def support(request):
@@ -393,13 +400,15 @@ def support(request):
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
         description = request.POST.get("description", "")
-        SupportTicket.objects.create(user=request.user, description=description, status="P")
+        SupportTicket.objects.create(
+            user=request.user, description=description, status="P")
         return HttpResponse(json.dumps({
             'status': 'ok',
             'message': 'Our support team will get back to you.'
         }))
         # services.support_mail('Support Ticket', request.POST.get("description", ""), 'harshulkaushik9@gmail.com', from_email="postmaster")
         # return HttpResponse('Mail sent to adminstrator', content_type="application/json")
+
 
 @login_required(login_url="/login")
 @csrf_exempt
@@ -412,6 +421,7 @@ def network(request):
         data = traverse_tree(request.user)
         return HttpResponse(data)
 
+
 @login_required(login_url="/login")
 def network_init(request):
     user = request.user
@@ -421,11 +431,13 @@ def network_init(request):
     data['className'] = 'top-level'
     return HttpResponse(json.dumps(data))
 
+
 @login_required(login_url="/login")
 def network_parent(request):
     user = request.user
     data = traverse_tree(request.user)
     return HttpResponse(data)
+
 
 @login_required(login_url="/login")
 def network_children(request, user_id):
@@ -446,11 +458,13 @@ def simple_upload(request):
         filename_passfront = fs.save(passfront.name, passfront)
         filename_passback = fs.save(passback.name, passback)
         filename_passphoto = fs.save(passphoto.name, passphoto)
-        uploaded_file_url = fs.url(filename_passfront) or fs.url(filename_passback) or fs.url(filename_passphoto)
+        uploaded_file_url = fs.url(filename_passfront) or fs.url(
+            filename_passback) or fs.url(filename_passphoto)
         return render(request, 'simple_upload.html', {
             'uploaded_file_url': uploaded_file_url
         })
     return render(request, 'simple_upload.html')
+
 
 def model_form_upload(request):
     if request.method == 'POST':
@@ -491,7 +505,8 @@ def update_user_profile(user, data):
             profile.placement_position = placement_position
             profile.referal_code = referal_code
             profile.sponcer_id = sponser_user.user
-            Members.objects.create(parent_id=profile.placement_id, child_id=user)
+            Members.objects.create(
+                parent_id=profile.placement_id, child_id=user)
 
     profile.save()
 
@@ -536,7 +551,8 @@ def add_user(request):
 
             profile = Profile.objects.get(user=user)
             sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
-            placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
+            placement_id = Profile.objects.get(
+                user_auto_id=data['placement_id'])
             profile.sponser_id = sponser_id.user
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
