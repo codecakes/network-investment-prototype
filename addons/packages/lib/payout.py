@@ -1,5 +1,5 @@
 from addons.packages.models import Packages, User_packages
-from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer
+from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer, get_left, get_right
 from django.conf import settings
 import pytz
 import calendar
@@ -13,14 +13,16 @@ START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
 # ################# direct sum calculation #######################
 # TODO: Lotsa caching decorators
 
+
 def calc_direct(user, last_date, next_date):
     """calculate the direct on each leg"""
     packages = User_packages.objects.filter(user=u)
     pkg = filter(lambda p: p.status == 'A', packages)
     assert len(pkg) == 1
-    pkg = [pkg]
+    pkg = pkg[0]
     direct_payout = pkg.package.directout
-    return min(calc_direct_leg(user, last_date, next_date, leg='l'), calc_direct_leg(user, last_date, next_date, leg='r')) * direct_payout
+    leg = find_min_leg(user)
+    return calc_direct_leg(user, last_date, next_date, leg=leg) * direct_payout
 
 
 def calc_direct_leg(user, last_date, next_date, leg='l'):
@@ -72,6 +74,40 @@ def calc(user, last_date, investment_type):
     return INVESTMENT_TYPE[investment_type](user, last_date, next_date)
 
 
+def find_min_leg(user):
+    """Finds minimum of the two legs of `user` by aggregating their total package prices"""
+    return 'l' if calc_aggregate_left(user) < calc_aggregate_right(user) else 'r' 
+
+def calc_aggregate_left(user):
+    """Find the aggregate sum of all packages in left leg"""
+    if user:
+        left_user = get_left(user)
+        packages = filter_by_active_package(user)
+        if packages:    
+            assert len(packages) == 1
+            pkg = packages[0]
+            return pkg.package.price + calc_aggregate_left(left_user) + calc_aggregate_right(left_user)
+        return 0.0
+    else:
+        return 0.0
+
+def calc_aggregate_right(user):
+    """Find the aggregate sum of all packages in right leg"""
+    if user:
+        right_user = get_right(user)
+        packages = filter_by_active_package(user)
+        if packages:    
+            assert len(packages) == 1
+            pkg = packages[0]
+            return pkg.package.price + calc_aggregate_left(right_user) + calc_aggregate_right(right_user)
+        return 0.0
+    else:
+        return 0.0
+
+
+
+
+
 # ############### HELPER FUNCTIONS ###############
 def get_user_from_member(member):
     return Members.objects.filter(parent_id=member.child_id)
@@ -95,8 +131,12 @@ def valid_payout_user(member, last_date, next_date):
 
 
 def filter_by_active_package(member):
-    filter(lambda p: p.status == 'A',
-           User_packages.objects.filter(user=member.child_id))
+    if type(member) == Members:
+        child_id = member.child_id
+    elif type(member) == User:
+        child_id = member.id
+    return filter(lambda p: p.status == 'A',
+           User_packages.objects.filter(user=child_id))
 
 
 def find_next_monday():
