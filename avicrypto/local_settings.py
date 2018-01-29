@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from datetime import datetime
+import pytz
+
+utc = pytz.UTC
+EPOCH_BEGIN = utc.normalize(utc.localize(datetime(2017, 12, 1, 00, 00, 00)))
+
 # import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
