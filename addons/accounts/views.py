@@ -31,7 +31,7 @@ import re
 
 sys.path.append(settings.BASE_DIR)
 from avicrypto import services
-from lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg
+from lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child
 
 
 def app_404(request):
