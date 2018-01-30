@@ -39,3 +39,4 @@ class User_packages(models.Model):
 	user = models.ForeignKey(User, null=True, related_name='+')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	# TODO: Add last_payout_date DateTimeField with default set to settings.EPOCH_BEGIN

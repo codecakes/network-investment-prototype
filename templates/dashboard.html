@@ -139,6 +139,9 @@
                                     <th>Description</th>
                                     <th>Price</th>
                                     <th>Status</th>
+                                    <th>Direct Out</th>
+                                    <th>Binary Payout</th>
+                                    <th>Your Payout</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -148,6 +151,10 @@
                                     <td>{{ package.package.description }}</td>
                                     <td>{{ package.package.price }}</td>
                                     <td>{{ package.status }}</td>
+                                    <td>{{ package.directout }}</td>
+                                    <td>{{ package.binary_payout }}</td>
+                                    <td>{{ package.payout }}</td>
+                                    <td>{{ package.no_payout }}</td>
                                 </tr>
                                 {% empty %}
                                     <tr>
