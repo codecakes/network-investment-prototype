@@ -135,6 +135,11 @@ def app_login(request):
 def app_signup(request):
 	if request.method == "POST":
 		email = request.POST.get('email')
+		referal_code = data.get('referal', None)
+		sponcer_id = data.get('sponcer_id', None)
+		placement_id = data.get('placement_id', None)
+		placement_position = data.get('placement_position', "L")
+
 		if email and validate_email(email) == None:
 			first_name = request.POST.get('first_name')
 			last_name = request.POST.get('last_name')
@@ -143,6 +148,35 @@ def app_signup(request):
 
 			if re.match(r'^\+?1?\d{9,15}$', mobile):
 				if not User.objects.filter(email=email).exists():
+
+					if referal_code:
+						try:
+							referal_user = Profile.objects.get(my_referal_code=referal_code)
+							if placement_id:
+								placement_user_profile = Profile.objects.get(user_auto_id=placement_id)
+								placement_user = placement_user_profile.user
+
+								position = 'l' if 'L' == position else 'r'
+
+								if is_member_of(referal_user, placement_user):
+									if has_child(placement_user, position):
+										return HttpResponse(json.dumps({
+											"status": "error",
+											"message": "Placement user selected position is not empty."
+										}))
+								else:
+									return HttpResponse(json.dumps({
+										"status": "error",
+										"message": "Placement id user does not belong to the referal user."
+									}))
+
+						except Profile.DoesNotExist:
+							content = {
+								"status": "error",
+								"message": "Referal code does not exist."
+							}
+							return HttpResponse(json.dumps(content))
+
 					user = User.objects.create(username=email, email=email, first_name=first_name, last_name=last_name, is_active=False)
 					user.username = user.profile.user_auto_id
 					user.set_password(str(password))
@@ -280,17 +314,14 @@ def check_placement(request):
 	position = request.GET['position']
 
 	position = 'l' if 'left' == position else 'r'
-	print position
 
 	if Profile.objects.filter(my_referal_code=referal).exists():
 		if Profile.objects.filter(user_auto_id=placement_id).exists():			
 			referal_user = Profile.objects.get(my_referal_code=referal).user
 			placement_user = Profile.objects.get(user_auto_id=placement_id).user
 
-			print is_valid_leg(referal_user, placement_user, position)
-
 			if is_member_of(referal_user, placement_user):
-				if is_valid_leg(referal_user, placement_user, position):
+				if not has_child(placement_user, position):
 					return HttpResponse(json.dumps({
 						"status": "ok"
 					}))
@@ -344,7 +375,6 @@ def home(request):
 	else:
 		return HttpResponseRedirect('/error')
 
-
 @login_required(login_url="/login")
 @csrf_exempt
 def profile(request):
@@ -385,7 +415,6 @@ def profile(request):
 	else:
 		return HttpResponseRedirect('/error')
 
-
 @login_required(login_url="/login")
 @csrf_exempt
 def support(request):
@@ -406,7 +435,6 @@ def support(request):
 		# services.support_mail('Support Ticket', request.POST.get("description", ""), 'harshulkaushik9@gmail.com', from_email="postmaster")
 		# return HttpResponse('Mail sent to adminstrator', content_type="application/json")
 
-
 @login_required(login_url="/login")
 @csrf_exempt
 def network(request):
@@ -418,7 +446,6 @@ def network(request):
 		data = traverse_tree(request.user)
 		return HttpResponse(data)
 
-
 @login_required(login_url="/login")
 def network_init(request):
 	user = request.user
@@ -428,13 +455,11 @@ def network_init(request):
 	data['className'] = 'top-level'
 	return HttpResponse(json.dumps(data))
 
-
 @login_required(login_url="/login")
 def network_parent(request):
 	user = request.user
 	data = traverse_tree(request.user)
 	return HttpResponse(data)
-
 
 @login_required(login_url="/login")
 def network_children(request, user_id):
@@ -461,7 +486,6 @@ def simple_upload(request):
 			'uploaded_file_url': uploaded_file_url
 		})
 	return render(request, 'simple_upload.html')
-
 
 def model_form_upload(request):
 	if request.method == 'POST':
@@ -502,8 +526,7 @@ def update_user_profile(user, data):
 			profile.placement_position = placement_position
 			profile.referal_code = referal_code
 			profile.sponcer_id = sponser_user.user
-			Members.objects.create(
-				parent_id=profile.placement_id, child_id=user)
+			Members.objects.create(parent_id=profile.placement_id, child_id=user)
 
 	profile.save()
 
