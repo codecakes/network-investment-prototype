@@ -81,14 +81,14 @@
 								</fieldset>
 								<fieldset class="form-group position-relative has-icon-left">
 									<label for="placement_position">Position</label>
-									<select name="placement_position" id="placement_position" class="form-control input-lg">
+									<select name="placement_position" id="placement_position" class="form-control input-lg" data-validation-callback-callback="checkPlacement">
 										<option value="L">LEFT</option>
 										<option value="R">RIGHT</option>
 									</select>
 								</fieldset>
 								<fieldset class="form-group position-relative has-icon-left">
-									<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_left_id }}"/>
-									<input type="text" style="display:none;" name="placement_id_right" id="placement_id_right" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_right_id }}" />
+									<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_left_id }}" data-validation-callback-callback="checkPlacement"/>
+									<input type="text" style="display:none;" name="placement_id_right" id="placement_id_right" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_right_id }}" data-validation-callback-callback="checkPlacement"/>
 									<div class="form-control-position">
 										<i class="icon-head"></i>
 									</div>

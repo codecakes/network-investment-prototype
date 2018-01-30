@@ -426,8 +426,7 @@ def support(request):
 		return HttpResponse(template.render(context, request))
 	if request.method == 'POST':
 		description = request.POST.get("description", "")
-		SupportTicket.objects.create(
-			user=request.user, description=description, status="P")
+		SupportTicket.objects.create(user=request.user, description=description, status="P")
 		return HttpResponse(json.dumps({
 			'status': 'ok',
 			'message': 'Our support team will get back to you.'
@@ -515,18 +514,21 @@ def update_user_profile(user, data):
 
 	if referal_code:
 		sponser_user = Profile.objects.get(my_referal_code=referal_code)
-		if sponser_user:
+
+		if placement_id:
+			profile.placement_id = Profile.objects.get(user_auto_id=placement_id).user
+		else:
 			placement_users = find_min_max(sponser_user.user)
 
-			if placement_position == "L":
-				profile.placement_id = placement_users[0]
-			else:
+			if placement_position == "R":
 				profile.placement_id = placement_users[1]
+			else:
+				profile.placement_id = placement_users[0]
 
-			profile.placement_position = placement_position
-			profile.referal_code = referal_code
-			profile.sponcer_id = sponser_user.user
-			Members.objects.create(parent_id=profile.placement_id, child_id=user)
+		profile.placement_position = placement_position
+		profile.referal_code = referal_code
+		profile.sponcer_id = sponser_user.user
+		Members.objects.create(parent_id=profile.placement_id, child_id=user)
 
 	profile.save()
 
