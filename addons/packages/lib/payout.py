@@ -15,13 +15,8 @@ START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
 # TODO: Lotsa caching decorators
 
 def get_package(user):
-    packages = User_packages.objects.filter(user=user)
-    if packages:    
-        pkg = filter(lambda p: p.status == 'A', packages)
-        pkg = pkg[0]
-        assert len(pkg) == 1
-        return pkg
-    return None
+    packages = User_packages.objects.get(user=user, status='A')
+    return packages if packages else None
 
 
 def filter_by_leg_user(member, leg):
@@ -99,8 +94,8 @@ def calc_binary(user, last_date, next_date):
 # ################# Weekly sum calculation #######################
 
 
-def calc_weekly():
-    pass
+def calc_weekly(user, last_date, next_date):
+    return 
 
 
 def calc_leg(user, last_date, next_date, leg='l'):
