@@ -174,6 +174,10 @@ def calculate_investment(user):
             pkg.save()
 
 
+def run_scheduler():
+    users = User.objects.all
+    divide_conquer(users, 0, len(users)-1, calculate_investment)
+    
 def get_left_right_agg(user):
     """Returns True if left leg has lower aggregate package else False"""
     return (calc_aggregate_left(user), calc_aggregate_right(user))

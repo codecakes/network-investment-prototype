@@ -7,8 +7,7 @@ import time
 import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from addons.packages.models import Packages, User_packages
-from addons.packages.lib.payout import calc, calculate_investment
+from addons.packages.lib.payout import run_scheduler
 from addons.accounts.lib.tree import divide_conquer
 from addons.accounts.models import User, Members
 
@@ -18,8 +17,7 @@ sched = BlockingScheduler()
 @sched.scheduled_job('cron', day_of_week='sun', hour=23)
 def tick():
     print('Tick Running. The time is: %s' % datetime.now())
-    users = User.objects.all
-    divide_conquer(users, 0, len(users), calculate_investment)
+    run_scheduler()
 
 if __name__ == '__main__':
     # scheduler = BackgroundScheduler()
