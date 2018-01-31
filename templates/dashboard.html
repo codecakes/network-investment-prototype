@@ -3,6 +3,8 @@
 {% block content %}
 
 {% load staticfiles %}
+
+{% load add %}
 <div class="content-header"></div>
 <div class="content-body">
     <div class="row">
@@ -162,10 +164,11 @@
                                     <td>{{ package.package.description }}</td>
                                     <td>{{ package.package.price }}</td>
                                     <td>{{ package.status }}</td>
+                                    <td>{{ package.payout }}</td>
                                     <td>{{ package.direct }}</td>
                                     <td>{{ package.binary }}</td>
                                     <td>{{ package.weekly }}</td>
-                                    <td>{{ package.weekly }} + {{ package.binary }} + {{ package.direct }}</td>
+                                    <td>{% sumit package.weekly package.binary package.direct %}</td>
                                 </tr>
                                 {% empty %}
                                     <tr>
