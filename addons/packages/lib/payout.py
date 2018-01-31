@@ -16,9 +16,11 @@ START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
 
 
 def get_package(user):
-    packages = User_packages.objects.get(user=user, status='A')
-    return packages if packages else None
-
+    packages = User_packages.objects.filter(user=user, status='A')
+    if packages:    
+        packages = User_packages.objects.get(user=user, status='A')
+        return packages if packages else None
+    return None
 
 def filter_by_leg_user(member, leg):
     """return only members of `leg`"""
@@ -151,17 +153,19 @@ def calc(user, last_date, investment_type):
 
 
 def calculate_investment(user):
-    pkg = User_packages.objects.get(user=user, status='A')
-    last_date = pkg.last_payout_date
-    today = UTC.normalize(UTC.localize(datetime.utcnow()))
-    next_payout = find_next_monday()
-    if last_date <= today < next_payout:    
-        pkg.binary = calc(user, last_date, 'binary')
-        pkg.direct = calc(user, last_date, 'direct')
-        pkg.weekly = calc(user, last_date, 'weekly')
-        pkg.total_payout = pkg.binary + pkg.direct + pkg.weekly
-        pkg.last_payout_date = next_payout
-        pkg.save()
+    packages = User_packages.objects.filter(user=user, status='A')
+    if packages:    
+        pkg = User_packages.objects.get(user=user, status='A')
+        last_date = pkg.last_payout_date
+        today = UTC.normalize(UTC.localize(datetime.utcnow()))
+        next_payout = find_next_monday()
+        if last_date <= today < next_payout:    
+            pkg.binary = calc(user, last_date, 'binary')
+            pkg.direct = calc(user, last_date, 'direct')
+            pkg.weekly = calc(user, last_date, 'weekly')
+            pkg.total_payout = pkg.binary + pkg.direct + pkg.weekly
+            pkg.last_payout_date = next_payout
+            pkg.save()
 
 
 def get_left_right_agg(user):
