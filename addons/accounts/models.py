@@ -15,23 +15,23 @@ from django.contrib.postgres.fields import ArrayField
 # User._meta.local_fields[4].__dict__['_unique'] = True
 
 def increment_user_id():
-    last_user_id = Profile.objects.all().order_by('user_auto_id').last()
-    if last_user_id is  None:
-    	return 'AVI000000001'
-    # if not last_user_id.user_auto_id:
-    #      return 'AVI000000001'
-    else:
-	    user_id_no = last_user_id.user_auto_id
-	    user_id_int = int(user_id_no.split('AVI')[-1])
-	    new_user_id_int = user_id_int + 1
-	    new_user_id_no = 'AVI' + str(new_user_id_int).zfill(9)
-	    return new_user_id_no
+	last_user_id = Profile.objects.all().order_by('user_auto_id').last()
+	if last_user_id is  None:
+		return 'AVI000000001'
+	# if not last_user_id.user_auto_id:
+	#      return 'AVI000000001'
+	else:
+		user_id_no = last_user_id.user_auto_id
+		user_id_int = int(user_id_no.split('AVI')[-1])
+		new_user_id_int = user_id_int + 1
+		new_user_id_no = 'AVI' + str(new_user_id_int).zfill(9)
+		return new_user_id_no
 
 class Profile(models.Model):
 	phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
 	placement_type = (
-	    ('L', 'Left'),
-	    ('R', 'Right')
+		('L', 'Left'),
+		('R', 'Right')
 	)
 	status_type = (
 		('A', 'Active'),
@@ -70,27 +70,33 @@ class Profile(models.Model):
 			self.my_referal_code = self.generate_referal_code()
 		elif not self.my_referal_code:
 			self.my_referal_code = self.generate_referal_code()
+
+		# self.user.username = self.user_auto_id
+		# self.user.save()
+
 		return super(Profile, self).save(*args, **kwargs)
 
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
+	if created:
+		profile = Profile.objects.create(user=instance)
+		instance.username = profile.user_auto_id
+		instance.save()
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+	instance.profile.save()
 
 
 class Members(models.Model):
-    parent_id = models.ForeignKey(User, related_name='+', null=True)
-    child_id = models.ForeignKey(User, related_name='+', null=True)
+	parent_id = models.ForeignKey(User, related_name='+', null=True)
+	child_id = models.ForeignKey(User, related_name='+', null=True)
 
 class Document(models.Model):
-    description = models.CharField(max_length=255, blank=True)
-    document = models.FileField(upload_to='documents/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+	description = models.CharField(max_length=255, blank=True)
+	document = models.FileField(upload_to='documents/')
+	uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class SupportTicket(models.Model):
 	user = models.ForeignKey(User, related_name='+', null=True)
