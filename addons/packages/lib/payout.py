@@ -98,11 +98,16 @@ def calc_binary(user, last_date, next_date):
 def calc_weekly(user, last_date, next_date):
     pkg = get_package(user)
     if pkg:
+        print last_date
         # calculate number of weeks passed since last_date before next_date
         old_date = date(last_date.year, last_date.month, last_date.day)
         new_date = date.today()
+        print "new date is %s | old date is %s" %(new_date, old_date)
         delta = new_date - old_date
-        pkg.package.roi * pkg.package.price * (delta.days/7)
+        print "diff is", delta
+        num_weeks = delta.days/7
+        print num_weeks
+        return (pkg.package.payout/100.) * pkg.package.price * num_weeks
     return 0.0
 
 
@@ -148,14 +153,15 @@ def calc(user, last_date, investment_type):
 def calculate_investment(user):
     pkg = User_packages.objects.get(user=user, status='A')
     last_date = pkg.last_payout_date
-    binary = calc(user, last_date, 'binary')
-    direct = calc(user, last_date, 'direct')
-    weekly = calc(user, last_date, 'weekly')
-    pkg.binary += binary
-    pkg.direct += direct
-    pkg.weekly += weekly
-    pkg.last_payout_date = find_next_monday()
-    pkg.save()
+    today = UTC.normalize(UTC.localize(datetime.utcnow()))
+    next_payout = find_next_monday()
+    if last_date <= today < next_payout:    
+        pkg.binary = calc(user, last_date, 'binary')
+        pkg.direct = calc(user, last_date, 'direct')
+        pkg.weekly = calc(user, last_date, 'weekly')
+        pkg.total_payout = pkg.binary + pkg.direct + pkg.weekly
+        pkg.last_payout_date = next_payout
+        pkg.save()
 
 
 def get_left_right_agg(user):
@@ -167,10 +173,8 @@ def calc_aggregate_left(user):
     """Find the aggregate sum of all packages in left leg"""
     if user:
         left_user = get_left(user)
-        packages = filter_by_active_package(user)
-        if packages:
-            assert len(packages) == 1
-            pkg = packages[0]
+        pkg = get_package(user)
+        if pkg:
             return pkg.package.price + calc_aggregate_left(left_user) + calc_aggregate_right(left_user)
         return 0.0
     else:
@@ -181,10 +185,8 @@ def calc_aggregate_right(user):
     """Find the aggregate sum of all packages in right leg"""
     if user:
         right_user = get_right(user)
-        packages = filter_by_active_package(user)
-        if packages:
-            assert len(packages) == 1
-            pkg = packages[0]
+        pkg = get_package(user)
+        if pkg:
             return pkg.package.price + calc_aggregate_left(right_user) + calc_aggregate_right(right_user)
         return 0.0
     else:
@@ -219,6 +221,7 @@ def valid_payout_user(member, last_date, next_date):
 
 
 def filter_by_active_package(member):
+    print member, type(member)
     if type(member) == Members:
         child_id = member.child_id
     elif type(member) == User:
