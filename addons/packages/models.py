@@ -46,3 +46,4 @@ class User_packages(models.Model):
 	binary = models.FloatField(null=True, blank=True, default=0.0)
 	weekly = models.FloatField(null=True, blank=True, default=0.0)
 	direct = models.FloatField(null=True, blank=True, default=0.0)
+	total_payout = models.FloatField(null=True, blank=True, default=0.0)

@@ -140,6 +140,7 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">My Fixed Deposits</h4>
+                    <p>Next payout: {{ next_payout }}</p>
                 </div>
                 <div class="card-body collapse in">
                     <div class="table-responsive">
@@ -147,10 +148,10 @@
                             <thead>
                                 <tr>
                                     <th>Fixed Deposit Name</th>
-                                    <th>Description</th>
                                     <th>Price</th>
                                     <th>Status</th>
-                                    <th> Payouts </th>
+                                    <th> Total Payouts </th>
+                                    <th>Remaining Payouts </th>
                                     <th>Direct Out</th>
                                     <th>Binary Payout</th>
                                     <th>Weekly Payout</th>
@@ -161,14 +162,14 @@
                                 {% for package in packages %}
                                 <tr>
                                     <td>{{ package.package.package_name }}</td>
-                                    <td>{{ package.package.description }}</td>
                                     <td>{{ package.package.price }}</td>
                                     <td>{{ package.status }}</td>
-                                    <td>{{ package.payout }}</td>
+                                    <td>{{ package.package.no_payout }}</td>
+                                    <td>{{ payout_remain }} </td>
                                     <td>{{ package.direct }}</td>
                                     <td>{{ package.binary }}</td>
                                     <td>{{ package.weekly }}</td>
-                                    <td>{% sumit package.weekly package.binary package.direct %}</td>
+                                    <td>{{ package.total_payout }}</td>
                                 </tr>
                                 {% empty %}
                                     <tr>
