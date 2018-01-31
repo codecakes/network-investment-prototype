@@ -396,15 +396,16 @@ def home(request):
         }
         user_active_package = [
             package for package in packages if package.status == 'A']
-
-        pkg = user_active_package[0]
+        if user_active_package:
+            pkg = user_active_package[0]
             # today = UTC.normalize(UTC.localize(datetime.datetime.now()))
-        dt = UTC.normalize(UTC.localize(datetime.datetime.now())) - pkg.created_at
-        context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
+            dt = UTC.normalize(UTC.localize(
+                datetime.datetime.now())) - pkg.created_at
+            context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
+            next_payout = find_next_monday()
+            context["next_payout"] = "%s-%s-%s" % (
+                next_payout.year, next_payout.month, next_payout.day)
 
-        next_payout = find_next_monday()
-        context["next_payout"] = "%s-%s-%s" % (
-            next_payout.year, next_payout.month, next_payout.day)
         if len(user_active_package) == 0:
             context["weekly_payout"] = 0
             context["direct_payout"] = 0
