@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.conf import settings
+
 import uuid
 
 # Create your models here.
@@ -21,7 +23,7 @@ class Packages(models.Model):
 	uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	
+
 	def __unicode__(self):
 		return "%s" %(self.package_name)
 
@@ -39,4 +41,5 @@ class User_packages(models.Model):
 	user = models.ForeignKey(User, null=True, related_name='+')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	last_payout_date = models.DateTimeField(default=settings.EPOCH_BEGIN)
 	# TODO: Add last_payout_date DateTimeField with default set to settings.EPOCH_BEGIN
