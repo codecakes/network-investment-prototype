@@ -1,8 +1,6 @@
 *.pyc
-**/**/migrations/*
 venv/
 .idea/*
-addons/*/migrations/
 .pyc
 **/*/*.pyc
 **/**/*.pyc
