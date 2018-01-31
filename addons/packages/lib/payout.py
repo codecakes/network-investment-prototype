@@ -4,7 +4,7 @@ from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_
 from django.conf import settings
 import pytz
 import calendar
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 UTC = pytz.UTC
 
@@ -13,6 +13,7 @@ START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
 
 # ################# direct sum calculation #######################
 # TODO: Lotsa caching decorators
+
 
 def get_package(user):
     packages = User_packages.objects.get(user=user, status='A')
@@ -70,7 +71,7 @@ def get_direct_pair(user, last_date, next_date):
 def calc_direct(user, last_date, next_date):
     """calculate the direct on each leg"""
     pkg = get_package(user)
-    if pkg:    
+    if pkg:
         direct_payout = pkg.package.directout
         # finds leg with minimium total package prices
         leg = find_min_leg(user)
@@ -97,8 +98,13 @@ def calc_binary(user, last_date, next_date):
 def calc_weekly(user, last_date, next_date):
     pkg = get_package(user)
     if pkg:
-        pkg.package.roi * pkg.package.price
+        # calculate number of weeks passed since last_date before next_date
+        old_date = date(last_date.year, last_date.month, last_date.day)
+        new_date = date.today()
+        delta = new_date - old_date
+        pkg.package.roi * pkg.package.price * (delta.days/7)
     return 0.0
+
 
 def calc_leg(user, last_date, next_date, leg='l'):
     check_leg = LEG[leg]
@@ -145,9 +151,9 @@ def calculate_investment(user):
     binary = calc(user, last_date, 'binary')
     direct = calc(user, last_date, 'direct')
     weekly = calc(user, last_date, 'weekly')
-    pkg.binary = binary
-    pkg.direct = direct
-    pkg.weekly = weekly
+    pkg.binary += binary
+    pkg.direct += direct
+    pkg.weekly += weekly
     pkg.last_payout_date = find_next_monday()
     pkg.save()
 
