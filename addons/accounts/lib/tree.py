@@ -176,6 +176,7 @@ def is_parent_of(parent, child_user):
     return False if found_node is None else True if found_node == parent else is_parent_of(parent, found_node)
 
 
+
 def divide_conquer(arr, lo, hi, member_fn):
     mid = (hi - lo)/2 + lo
     if mid > lo:

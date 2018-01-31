@@ -123,15 +123,21 @@ def calc_leg(user, last_date, next_date, leg='l'):
     return calc_sum(sponsor_id, last_date, next_date, filter_members)
 
 
-def calc_sum(sponsor_id, last_date, next_date, members):
+def filter_active_mem(member):
+    res = filter_by_active_package(member)
+    if res:
+        return getattr(getattr(res[0], 'package'), 'price', 0)
+    else:
+        return 0
+
+def calc_sum(sponsor_id, last_date, next_date, members):    
     users_sum = 0.0
     while members:
         # find active members' total package price sum in current cycle by sponsor id
-        users_sum += sum(map(lambda m: getattr(getattr(filter_by_active_package(
-            m), 'package'), 'price'), filter_by_sponsor(sponsor_id, last_date, next_date, members)))
+        users_sum += sum(map(lambda m: filter_active_mem(m), filter_by_sponsor(sponsor_id, last_date, next_date, members)))
         # tree level traversal - get more members per child level
         members = reduce(lambda x, y: x+y, divide_conquer(members,
-                                                          0, len(members), get_user_from_member))
+                                                          0, len(members)-1, get_user_from_member))
     return users_sum
 
 
@@ -225,7 +231,7 @@ def valid_payout_user(member, last_date, next_date):
 
 
 def filter_by_active_package(member):
-    print member, type(member)
+    # print member, type(member)
     if type(member) == Members:
         child_id = member.child_id
     elif type(member) == User:
