@@ -362,7 +362,7 @@ def home(request):
 		support_tickets = SupportTicket.objects.filter(user=user)
 
 		user_active_package = [package for package in packages if package.status == 'A']
-		print user_active_package[0].last_payout_date
+		# print user_active_package[0].last_payout_date
 		context = {
 			'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
 			'packages': packages,
