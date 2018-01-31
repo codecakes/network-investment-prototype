@@ -375,9 +375,9 @@ def home(request):
 			context["direct_payout"] = 0
 			context["binary_payout"] = 0
 		else:
-			# context["weekly_payout"] = calc(user, user_active_package[0].last_payout_date, 'weekly')
-			context["direct_payout"] = calc(user, user_active_package[0].last_payout_date, 'direct')
-			context["binary_payout"] = calc(user, user_active_package[0].last_payout_date, 'binary')
+			context["weekly_payout"] = user_active_package[0].weekly
+			context["direct_payout"] = user_active_package[0].direct
+			context["binary_payout"] = user_active_package[0].binary
 
 
 		template = loader.get_template('dashboard.html')

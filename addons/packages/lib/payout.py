@@ -149,6 +149,7 @@ def calculate_investment(user):
     pkg.direct = direct
     pkg.weekly = weekly
     pkg.last_payout_date = find_next_monday()
+    pkg.save()
 
 
 def get_left_right_agg(user):
