@@ -6,16 +6,16 @@ from datetime import datetime
 import time
 import os
 
-from apscheduler.schedulers.background import BackgroundScheduler
-from addons.packages.lib.payout import run_scheduler
-from addons.accounts.lib.tree import divide_conquer
-from addons.accounts.models import User, Members
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'avicrypto.settings')
 
-sched = BlockingScheduler()
+from apscheduler.schedulers.background import BackgroundScheduler
+
+sched = BackgroundScheduler()
 
 
 @sched.scheduled_job('cron', day_of_week='sun', hour=23)
 def tick():
+    from addons.packages.lib.payout import run_scheduler
     print('Tick Running. The time is: %s' % datetime.now())
     run_scheduler()
 
@@ -31,4 +31,4 @@ if __name__ == '__main__':
             time.sleep(0.5)
     except (KeyboardInterrupt, SystemExit):
         # Not strictly necessary if daemonic mode is enabled but should be done if possible
-        scheduler.shutdown()
+        sched.shutdown()
