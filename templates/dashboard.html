@@ -8,6 +8,12 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Payouts</h4>
+                    <div class="heading-elements" style="top: 9px;">
+                        <button type="button" class="btn btn-primary btn-min-width">Withdraw</button>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="card-block">
                         <div class="row">
@@ -17,13 +23,14 @@
                                         <i class="icon-box font-large-1 blue-grey"></i>
                                     </div>
                                     <div class="media-body text-xs-right">
-                                        <span class="font-large-2 text-bold-300 info">ROI</span>
+                                        <span class="font-large-2 text-bold-300 info">Weekly</span>
                                     </div>
                                     <div class="row mt-1">
-                                        <div id="xrp-roi" class="col-xs-3"></div>
-                                        <div id="eth-roi" class="col-xs-3"></div>
-                                        <div id="btc-roi" class="col-xs-3"></div>
-                                        <div id="inr-roi" class="col-xs-3"></div>
+                                        <input type="hidden" id="roi-payout" value="{{weekly_payout}}">
+                                        <div id="xrp-roi" class="col-xs-6"></div>
+                                        <div id="eth-roi" class="col-xs-6"></div>
+                                        <div id="btc-roi" class="col-xs-6"></div>
+                                        <div id="inr-roi" class="col-xs-6"></div>
                                     </div>
                                 </div>
                             </div>
@@ -33,13 +40,14 @@
                                         <i class="icon-tag3 font-large-1 blue-grey"></i>
                                     </div>
                                     <div class="media-body text-xs-right">
-                                        <span class="font-large-2 text-bold-300 deep-orange">Direct Payout</span>
+                                        <span class="font-large-2 text-bold-300 deep-orange">Direct</span>
                                     </div>
                                     <div class="row mt-1">
-                                        <div id="xrp-direct" class="col-xs-3"></div>
-                                        <div id="eth-direct" class="col-xs-3"></div>
-                                        <div id="btc-direct" class="col-xs-3"></div>
-                                        <div id="inr-direct" class="col-xs-3"></div>
+                                            <input type="hidden" id="direct-payout" value="{{direct_payout}}">
+                                        <div id="xrp-direct" class="col-xs-6"></div>
+                                        <div id="eth-direct" class="col-xs-6"></div>
+                                        <div id="btc-direct" class="col-xs-6"></div>
+                                        <div id="inr-direct" class="col-xs-6"></div>
                                     </div>
                                 </div>
                             </div>
@@ -49,13 +57,14 @@
                                         <i class="icon-shuffle3 font-large-1 blue-grey"></i>
                                     </div>
                                     <div class="media-body text-xs-right">
-                                        <span class="font-large-2 text-bold-300 danger">Binary Payout</span>
+                                        <span class="font-large-2 text-bold-300 danger">Binary</span>
                                     </div>
                                     <div class="row mt-1">
-                                        <div id="xrp-binary" class="col-xs-3"></div>
-                                        <div id="eth-binary" class="col-xs-3"></div>
-                                        <div id="btc-binary" class="col-xs-3"></div>
-                                        <div id="inr-binary" class="col-xs-3"></div>
+                                        <input type="hidden" id="binary-payout" value="{{binary_payout}}">
+                                        <div id="xrp-binary" class="col-xs-6"></div>
+                                        <div id="eth-binary" class="col-xs-6"></div>
+                                        <div id="btc-binary" class="col-xs-6"></div>
+                                        <div id="inr-binary" class="col-xs-6"></div>
                                     </div>
                                 </div>
                             </div>
@@ -242,9 +251,9 @@
                 eth = response.ETH,
                 xrp = response.XRP,
                 inr = response.XRP,
-                roiVal = parseInt($("#roi-payout").text()),
-                binaryVal = parseInt($("#binary-payout").text()),
-                directVal = parseInt($("#direct-payout").text()),
+                roiVal = parseInt($("#roi-payout").val()),
+                binaryVal = parseInt($("#binary-payout").val()),
+                directVal = parseInt($("#direct-payout").val()),
                 btcRoi = roiVal * btc,
                 ethRoi = roiVal * eth,
                 xrpRoi = roiVal * xrp,
@@ -283,12 +292,8 @@
 
     intId = setInterval(fetchRates, 5000);
 
-
     window.onbeforeunload = function (evt) {
         stopOnUnload(intId);
     };
-
 </script>
-
-
 {% endblock %}
