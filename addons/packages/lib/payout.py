@@ -169,7 +169,7 @@ def calculate_investment(user):
             pkg.binary = calc(user, last_date, 'binary')
             pkg.direct = calc(user, last_date, 'direct')
             pkg.weekly = calc(user, last_date, 'weekly')
-            pkg.total_payout = pkg.binary + pkg.direct + pkg.weekly
+            pkg.total_payout += pkg.binary + pkg.direct + pkg.weekly
             pkg.last_payout_date = next_payout
             pkg.save()
 
