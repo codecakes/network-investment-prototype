@@ -140,7 +140,9 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">My Fixed Deposits</h4>
-                    <p>Next payout: {{ next_payout }}</p>
+                    {% if next_payout %}
+                        <p>Next payout: {{ next_payout }}</p>
+                    {% endif %}
                 </div>
                 <div class="card-body collapse in">
                     <div class="table-responsive">
