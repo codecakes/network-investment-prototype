@@ -15,4 +15,6 @@ avicrypto/*.pyc
 pyc
 media/
 staticfiles/
+.vscode/bitbucket-pipelines.yml
+vscode/
 .vscode/
