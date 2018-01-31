@@ -95,8 +95,10 @@ def calc_binary(user, last_date, next_date):
 
 
 def calc_weekly(user, last_date, next_date):
-    return 
-
+    pkg = get_package(user)
+    if pkg:
+        pkg.package.roi * pkg.package.price
+    return 0.0
 
 def calc_leg(user, last_date, next_date, leg='l'):
     check_leg = LEG[leg]
@@ -135,6 +137,18 @@ def calc(user, last_date, investment_type):
     """
     next_date = find_next_monday()
     return INVESTMENT_TYPE[investment_type](user, last_date, next_date)
+
+
+def calculate_investment(user):
+    pkg = User_packages.objects.get(user=user, status='A')
+    last_date = pkg.last_payout_date
+    binary = calc(user, last_date, 'binary')
+    direct = calc(user, last_date, 'direct')
+    weekly = calc(user, last_date, 'weekly')
+    pkg.binary = binary
+    pkg.direct = direct
+    pkg.weekly = weekly
+    pkg.last_payout_date = find_next_monday()
 
 
 def get_left_right_agg(user):
