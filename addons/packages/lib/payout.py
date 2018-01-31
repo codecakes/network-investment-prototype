@@ -1,9 +1,10 @@
+from addons.accounts.models import User, Members
 from addons.packages.models import Packages, User_packages
 from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer, get_left, get_right
 from django.conf import settings
 import pytz
 import calendar
-from datetime import datetime
+from datetime import datetime, timedelta
 
 UTC = pytz.UTC
 
@@ -12,6 +13,16 @@ START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
 
 # ################# direct sum calculation #######################
 # TODO: Lotsa caching decorators
+
+def get_package(user):
+    packages = User_packages.objects.filter(user=user)
+    if packages:    
+        pkg = filter(lambda p: p.status == 'A', packages)
+        pkg = pkg[0]
+        assert len(pkg) == 1
+        return pkg
+    return None
+
 
 def filter_by_leg_user(member, leg):
     """return only members of `leg`"""
@@ -63,31 +74,31 @@ def get_direct_pair(user, last_date, next_date):
 
 def calc_direct(user, last_date, next_date):
     """calculate the direct on each leg"""
-    packages = User_packages.objects.filter(user=user)
-    pkg = filter(lambda p: p.status == 'A', packages)
-    assert len(pkg) == 1
-    pkg = pkg[0]
-    direct_payout = pkg.package.directout
-    # finds leg with minimium total package prices
-    leg = find_min_leg(user)
-    return calc_leg(user, last_date, next_date, leg=leg) * direct_payout
-
+    pkg = get_package(user)
+    if pkg:    
+        direct_payout = pkg.package.directout
+        # finds leg with minimium total package prices
+        leg = find_min_leg(user)
+        return calc_leg(user, last_date, next_date, leg=leg) * direct_payout
+    return 0.0
 # ################# Binary sum calculation #######################
+
+
 def calc_binary(user, last_date, next_date):
     """calculate the direct on each leg"""
     pairs = get_direct_pair(user, last_date, next_date)
     if pairs:
-        packages = User_packages.objects.filter(user=user)
-        pkg = filter(lambda p: p.status == 'A', packages)
-        assert len(pkg) == 1
-        pkg = pkg[0]
-        binary_payout = pkg.package.binary_payout
-        # finds leg with minimium total package prices
-        leg = find_min_leg(user)
-        return calc_leg(user, last_date, next_date, leg=leg) * binary_payout    
+        pkg = get_package(user)
+        if pkg:
+            binary_payout = pkg.package.binary_payout
+            # finds leg with minimium total package prices
+            leg = find_min_leg(user)
+            return calc_leg(user, last_date, next_date, leg=leg) * binary_payout
     return 0.0
 
 # ################# Weekly sum calculation #######################
+
+
 def calc_weekly():
     pass
 
@@ -163,6 +174,7 @@ def calc_aggregate_right(user):
     else:
         return 0.0
 
+
 def find_min_leg(user):
     """Finds minimum of the two legs of `user` by aggregating their total package prices"""
     left, right = get_left_right_agg(user)
@@ -204,4 +216,7 @@ def find_next_monday():
     cur_dt = UTC.normalize(UTC.localize(datetime.utcnow()))
     day = calendar.weekday(cur_dt.year, cur_dt.month, cur_dt.day)
     remaining_days = (7 - day) % 7
-    return UTC.normalize(UTC.localize(datetime(cur_dt.year, cur_dt.month, cur_dt.day+remaining_days, cur_dt.hour, cur_dt.minute, cur_dt.second, cur_dt.microsecond)))
+    dt = datetime(cur_dt.year, cur_dt.month, cur_dt.day, cur_dt.hour,
+                  cur_dt.minute, cur_dt.second, cur_dt.microsecond)
+    rem_dt = timedelta(days=remaining_days)
+    return UTC.normalize(UTC.localize(dt + rem_dt))
