@@ -17,6 +17,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.template.loader import get_template, render_to_string
+from django.utils import timezone
 
 from addons.accounts.models import Profile, Members, SupportTicket
 from addons.transactions.models import Transactions
@@ -32,7 +33,7 @@ import re
 sys.path.append(settings.BASE_DIR)
 from avicrypto import services
 from lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child
-
+from addons.packages.lib.payout import calc, find_next_monday
 
 def app_404(request):
 	return render(request, '404.html')
@@ -360,12 +361,24 @@ def home(request):
 		packages = User_packages.objects.filter(user=user)
 		support_tickets = SupportTicket.objects.filter(user=user)
 
+		user_active_package = [package for package in packages if package.status == 'A']
+
 		context = {
 			'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
 			'packages': packages,
 			'support_tickets': support_tickets,
-			'support_tickets_choices': SupportTicket.status_choices
+			'support_tickets_choices': SupportTicket.status_choices,
 		}
+
+		if len(user_active_package) == 0:
+			context["weekly_payout"] = 0
+			context["direct_payout"] = 0
+			context["binary_payout"] = 0
+		else:
+			context["weekly_payout"] = calc(user, user_active_package[0].last_payout_date, 'weekly')
+			context["direct_payout"] = calc(user, user_active_package[0].last_payout_date, 'direct')
+			context["binary_payout"] = calc(user, user_active_package[0].last_payout_date, 'binary')
+
 
 		template = loader.get_template('dashboard.html')
 		if not request.user.is_authenticated():

@@ -66,7 +66,7 @@
 							<form id="registerForm" method="post" action="" class="form-horizontal form-simple" novalidate>
 								{% csrf_token %}
 								<fieldset class="form-group position-relative has-icon-left">
-									<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" value="{{referal}}"/>
+									<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" value="{{referal}}" data-validation-callback-callback="checkReferal"/>
 									<div class="form-control-position">
 										<i class="icon-head"></i>
 									</div>
