@@ -8,7 +8,7 @@ pyc
 .pyc
 /*.pyc
 **/*.pyc
-migrations/
+# migrations/
 pyc
 addons/**/*.pyc
 avicrypto/*.pyc
