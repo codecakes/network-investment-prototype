@@ -41,9 +41,11 @@ class User_packages(models.Model):
 	user = models.ForeignKey(User, null=True, related_name='+')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
-	# TODO: Add last_payout_date DateTimeField with default set to settings.EPOCH_BEGIN
 	last_payout_date = models.DateTimeField(default=settings.EPOCH_BEGIN)
 	binary = models.FloatField(null=True, blank=True, default=0.0)
 	weekly = models.FloatField(null=True, blank=True, default=0.0)
 	direct = models.FloatField(null=True, blank=True, default=0.0)
 	total_payout = models.FloatField(null=True, blank=True, default=0.0)
+	left_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
+	right_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
+
