@@ -18,3 +18,5 @@ staticfiles/
 .vscode/bitbucket-pipelines.yml
 .vscode/
 addons/*/migrations/
+addons/*/migrations
+addons/packages/migrations/
