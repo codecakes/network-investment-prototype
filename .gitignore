@@ -25,3 +25,4 @@ addons/accounts/migrations/
 addons/wallet/migrations/
 addons/transactions/migrations/
 addons/packages/migrations/*
+migrations/
