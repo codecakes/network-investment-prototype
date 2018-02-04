@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 from urllib2 import urlparse
+from datetime import datetime
+import pytz
+
+utc = pytz.UTC
+EPOCH_BEGIN = utc.normalize(utc.localize(datetime(2017, 12, 1, 00, 00, 00)))
 # import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -50,13 +55,13 @@ INSTALLED_APPS = [
 ]
 
 # MIDDLEWARE_CLASSES = (
-    # Simplified static file serving.
-    # https://warehouse.python.org/project/whitenoise/
-    # 'whitenoise.middleware.WhiteNoiseMiddleware')
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+# 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -116,12 +121,12 @@ DATABASES = {
 REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL'))
 CACHES = {
     "default": {
-         "BACKEND": "redis_cache.RedisCache",
-         "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
-         "OPTIONS": {
-             "PASSWORD": REDIS_URL.password,
-             "DB": 0,
-         }
+        "BACKEND": "redis_cache.RedisCache",
+        "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
+        "OPTIONS": {
+            "PASSWORD": REDIS_URL.password,
+            "DB": 0,
+        }
     }
 }
 
@@ -192,7 +197,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
     'compressor.finders.CompressorFinder'
 )
 
@@ -202,6 +207,3 @@ mailgun_conf = {
     'api': 'https://api.mailgun.net/v3/avicrypto.us/messages'
 }
 # django_heroku.settings(locals())
-
-
-

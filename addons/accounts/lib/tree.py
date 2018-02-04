@@ -6,12 +6,14 @@ from django.conf import settings
 from urllib2 import urlparse
 from functools import wraps
 
-icon = urlparse.urljoin(getattr(settings, "STATIC_URL", "/static"), "images/node2.png")
+ICON = urlparse.urljoin(getattr(settings, "STATIC_URL",
+                                "/static"), "images/node2.png")
 
 
 def lower_encode(member, leg_list):
     if type(member) == Members:
-        val = str.lower(member.child_id.profile.placement_position.encode("utf-8"))
+        val = str.lower(
+            member.child_id.profile.placement_position.encode("utf-8"))
     elif type(member) == User and member.profile.placement_position:
         val = str.lower(member.profile.placement_position.encode("utf-8"))
     else:
@@ -39,8 +41,8 @@ def is_right(member):
 def tot_txn_vol(user):
     """Helper function to calculate total aggregated amount"""
     # TODO: integrate a redis cache decorator
-    return sum(map(lambda w: Transactions.objects.filter(sender_wallet=w.uuid, \
-                                                         reciever_wallet=w.uuid).aggregate(Sum('amount')), \
+    return sum(map(lambda w: Transactions.objects.filter(sender_wallet=w.uuid,
+                                                         reciever_wallet=w.uuid).aggregate(Sum('amount')),
                    Wallet.objects.filter(owner=user)))
 
 
@@ -65,10 +67,12 @@ def new_user_text(ref_code, *ref_kw):
     href = "{}&{}".format(ref_code, '&'.join(*ref_kw))
     parent = '1'
     children = '0'
-    user_auto_id = urlparse.urlparse('&pos=right&parent_placement_id=AVI000000020').path.split('=')[-1]
+    user_auto_id = urlparse.urlparse(
+        '&pos=right&parent_placement_id=AVI000000020').path.split('=')[-1]
     profile = Profile.objects.get(user_auto_id=user_auto_id)
     parent_user = profile.user
-    sibling = '1'  #''1' if get_left(parent_user) else '1' if get_right(parent_user) else '0'
+    # ''1' if get_left(parent_user) else '1' if get_right(parent_user) else '0'
+    sibling = '1'
     relationship = parent+sibling+children
     return dict(
         name="<a href= {}>Add New User</a>".format(href),
@@ -90,7 +94,7 @@ def left_child(members, ref_code, level):
         child_member = None
         parent = members[0].parent_id
     return load_users(child_member, ref_code, level=level) if child_member else new_user_text(ref_code,
-                                                                                 ("pos=left", get_placement_id(parent)))
+                                                                                              ("pos=left", get_placement_id(parent)))
 
 
 def right_child(members, ref_code, level):
@@ -111,7 +115,7 @@ def right_child(members, ref_code, level):
 
 
 def get_left(user):
-    """Helper Function: Gets leftmost user of tree"""
+    """Helper Function: Gets left node of user node"""
     members = Members.objects.filter(parent_id=user.id)
     assert len(members) <= 2
 
@@ -128,7 +132,7 @@ def get_left(user):
 
 
 def get_right(user):
-    """Helper Function: Gets rightmost user of tree"""
+    """Helper Function: Gets right node of user node"""
     members = Members.objects.filter(parent_id=user.id)
     assert len(members) <= 2
 
@@ -147,13 +151,21 @@ def get_right(user):
 def find_min(user):
     """Gets leftmost user of tree"""
     min_user = get_left(user)
-    return min_user if min_user else user
-
+    if min_user:
+        if get_left(min_user):
+            return find_min(min_user)
+        return min_user
+    return user
+    
 
 def find_max(user):
     """Gets rightmost user of tree"""
     max_user = get_right(user)
-    return max_user if max_user else user
+    if max_user:
+        if get_right(max_user):
+            return find_max(max_user)
+        return max_user
+    return user
 
 
 def find_min_max(user):
@@ -166,35 +178,79 @@ def get_parent(child_user):
 
 def is_parent_of(parent, child_user):
     """Checks if a child node `child_user` has a parent node user `parent`"""
-    if parent == child_user:
-        return child_user
+    # if parent == child_user:
+    #     return False
     found_node = get_parent(child_user)  # child_user.profile.placement_id
-    return None if found_node is None else True if found_node == parent else get_parent(found_node)
+    return False if found_node is None else True if found_node == parent else is_parent_of(parent, found_node)
 
 
-def is_member_of(parent_user, child_user, leg='l'):
-    """Checks if child_user is in the selected leg of the parent subtree"""
-    node = get_left(parent_user) if leg in ('l', 'left') else get_right(parent_user) \
-        if leg in ('r', 'right') else None
-    if node:
-        found_node = is_parent_of(node, child_user)
-        if found_node is None:
-            message = "No such node placed under this sponsor. Would you like to add yourself down their line?"
-            placement_id = node.profile.user_auto_id
-        elif get_left(found_node):
-            message = "This placement is full. Would you like to add yourself down their line?"
-            node = find_min(found_node)
-            placement_id = node.profile.user_auto_id
-        elif get_left(found_node) is None:
-            message = "success"
-            placement_id = found_node.profile.user_auto_id
+
+def divide_conquer(arr, lo, hi, member_fn):
+    mid = (hi - lo)/2 + lo
+    if mid > lo:
+        return divide_conquer(arr, lo, mid, member_fn) + divide_conquer(arr, mid+1, hi, member_fn)
     else:
-        message = "Empty Leg. No such child node. Would you like to add yourself there?"
-        placement_id = parent_user.profile.user_auto_id
-    return {'node': node, 'message': message, placement_id: placement_id}
+        return [member_fn(arr[lo])]
 
+
+LEG = {'l': is_left, 'r': is_right}
+
+
+def is_valid_leg(parent_user, child_user, leg):
+    """Checks if the child user is in the leg `leg` of parent_user
+    leg is either 'l' or 'r'
+    """
+    check_leg = LEG[leg]
+    child_node = child_user
+    while parent_user != child_node:
+        if not child_node:
+            return False
+        if check_leg(child_node):
+            return True
+        child_node = get_parent(child_node)
+    return False
+
+
+def is_member_of(parent_user, child_user):
+    """Checks if child_user is in the selected leg of the parent subtree"""
+    if parent_user == child_user:
+        return True
+
+    child_node = child_user
+    while parent_user != child_node:
+        if not child_node:
+            return False
+        child_node = get_parent(child_node)
+    return True
+    # if node:
+    #     found_node = is_parent_of(node, child_user)
+    #     if found_node is None:
+    #         message = "No such node placed under this sponsor. Would you like to add yourself down their line?"
+    #         placement_id = node.profile.user_auto_id
+    #     elif get_left(found_node):
+    #         message = "This placement is full. Would you like to add yourself down their line?"
+    #         node = find_min(found_node)
+    #         placement_id = node.profile.user_auto_id
+    #     elif get_left(found_node) is None:
+    #         message = "success"
+    #         placement_id = found_node.profile.user_auto_id
+    # else:
+    #     message = "Empty Leg. No such child node. Would you like to add yourself there?"
+    #     placement_id = parent_user.profile.user_auto_id
+    # return {'node': node, 'message': message, placement_id: placement_id}
+
+
+def has_child(parent_node, leg):
+    """Checks if parent_node has any child nodes in its right or left leg"""
+    members = Members.objects.filter(parent_id=parent_node.id)
+    assert len(members) <= 2
+    check_leg = LEG[leg]
+    if not members:
+        return False
+    return any(map(check_leg, members))
 
 def get_relationship(user):
+    """sets out logical 1 or 0 iff has a parent/sibling/child"""
     if type(user) == Profile:
         user = Profile.objects.get(user_id=user)
     parent_user = get_parent(user)
@@ -217,7 +273,7 @@ def get_user_json(user, profile):
                 content="Total Transactional Volume: %s" % (tot_txn_vol(user)),
                 sponsor_id=None if profile.sponser_id is None else profile.sponser_id.id,
                 placement_id=None if profile.placement_id is None else profile.placement_id.id,
-                placement_position=profile.placement_position, image=icon,
+                placement_position=profile.placement_position, image=ICON,
                 link=dict(
                     href=urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"))
 
@@ -263,8 +319,10 @@ def load_users(user, ref_code, level=4):
     else:
         user_json.update(
             dict(children=[
-                new_user_text(ref_code, ("pos=left", "parent_placement_id=%s" % (profile.user_auto_id))),
-                new_user_text(ref_code, ("pos=right", "parent_placement_id=%s" % (profile.user_auto_id)))
+                new_user_text(
+                    ref_code, ("pos=left", "parent_placement_id=%s" % (profile.user_auto_id))),
+                new_user_text(
+                    ref_code, ("pos=right", "parent_placement_id=%s" % (profile.user_auto_id)))
             ])
         )
     return user_json

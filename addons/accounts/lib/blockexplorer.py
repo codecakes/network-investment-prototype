@@ -4,39 +4,42 @@ from functools import wraps
 
 ether_key = "6F98VB1ZJ6MY46JHZ9AVR6YJQJPU3RCH95"
 
-coins = {
-    "btc": {
-        "host": "https://blockexplorer.com/",
-        "txn_api": "api/tx/",
-        "addr_api": "api/addr/"
-    },
-    "eth": {
-        "host": "https://api.etherscan.io",
-        "txn_api": "api?module=transaction&action=gettxreceiptstatus&apikey=6F98VB1ZJ6MY46JHZ9AVR6YJQJPU3RCH95" # txhash=0x513c1ba0bebf66436b5fed86ab668452b7805593c05073eb2d51d3a52f480a76&
-        # "addr_api":
-    },
-    "xrp": "https://data.ripple.com"
-}
+BTC_HOST = "https://blockexplorer.com/"
+ETH_HOST = "https://api.etherscan.io"
+XRP_HOST = "https://data.ripple.com"
 
-
-def get_endpoints(addr, txn_id, coin):
-    api_host = coins.get(coin)
-    if coin == "btc":
-        txn_endpoint = "api/tx/%s" % (txn_id)
-        coin_endpoint = "api/addr/%s" % (addr)
-    elif coin == "eth":
-        txn_endpoint = "api?module=transaction&action=gettxreceiptstatus&txhash=%s&apikey=6F98VB1ZJ6MY46JHZ9AVR6YJQJPU3RCH95" %(txn_id) #
-        coin_endpoint = "api?module=account&action=txlist&address=%s&startblock=0&endblock=99999999&sort=asc&apikey=6F98VB1ZJ6MY46JHZ9AVR6YJQJPU3RCH95" %(addr) % (addr)
-    # elif coin == "xrp":
-    #     txn_endpoint = "api/tx/%s" % (txn_id)
-    #     coin_endpoint = "api/addr/%s" % (addr)
+def get_endpoints(api_host, txn_endpoint, coin_endpoint):
     txn_api = urlparse.urljoin(api_host, txn_endpoint)
     addr_api = urlparse.urljoin(api_host, coin_endpoint)
     return [txn_api, addr_api]
 
+def get_btc(addr, txn_id):
+    txn_endpoint = "api/tx/%s" % (txn_id)
+    coin_endpoint = "api/addr/%s" % (addr)
+    return get_endpoints(BTC_HOST, txn_endpoint, coin_endpoint)
+
+def get_eth(addr, txn_id):
+    txn_endpoint = "api?module=transaction&action=gettxreceiptstatus&txhash=%s&apikey=%s" %(txn_id, ether_key)
+    coin_endpoint = "api?module=account&action=balance&address=%s&tag=latest&apikey=%s" %(addr, ether_key)
+    return get_endpoints(ETH_HOST, txn_endpoint, coin_endpoint)
+
+
+def get_xrp(addr, txn_id):
+    txn_endpoint = "v2/transactions/%s" % (txn_id)
+    coin_endpoint = "v2/accounts/%s/transactions" % (addr)
+    return get_endpoints(XRP_HOST, txn_endpoint, coin_endpoint)
+
+
+COIN = {
+    "btc": get_btc,
+    "eth": get_eth,
+    "xrp": get_xrp
+}
+
+
 def validate_transaction(addr, txn_id, coin="btc"):
-    api_host = coins.get(coin)
-    txn_api, addr_api = get_endpoints(addr, txn_id, coin)
+    
+    txn_api, addr_api = COIN[coin](addr, txn_id)
 
     txn_res = requests.get(txn_api)
     addr_res = requests.get(addr_api)

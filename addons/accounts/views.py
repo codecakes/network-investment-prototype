@@ -1,37 +1,60 @@
 from __future__ import unicode_literals
-from django.shortcuts import render
-from django.template import loader
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
-from django.db.models.query_utils import Q
-from django.views.generic import *
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from django.core.files.storage import FileSystemStorage
+
+import hashlib
+import json
+import random
+import re
+import sys
+
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.files.storage import FileSystemStorage
+from django.core.validators import validate_email
+from django.db.models.query_utils import Q
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.template import Context, RequestContext, loader
+from django.template.loader import get_template, render_to_string
+from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.views.generic import *
 
-from forms import signup_form
-
-from addons.accounts.models import Profile, Members, SupportTicket
+from addons.accounts.models import Members, Profile, SupportTicket
+from addons.packages.lib.payout import (UTC, calc, calculate_investment,
+                                        find_next_monday)
+from addons.packages.models import Packages, User_packages
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
-from addons.packages.models import Packages, User_packages
-
-import sys
-import hashlib
-import random
-import json
+from avicrypto import services
+from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of,
+                      is_valid_leg, load_users)
 
 sys.path.append(settings.BASE_DIR)
-from avicrypto import services
-from lib.tree import load_users, find_min_max, is_member_of, is_parent_of
+
+
+def app_404(request):
+    return render(request, '404.html')
+
+
+def traverse_tree(user, level=4):
+    ref_code = "/add/user?ref={}&place={}".format(
+        user.profile.my_referal_code, user.profile.user_auto_id)
+    data = load_users(user, ref_code, level=level)
+    return json.dumps(data)
+
+
+def get_token(data):
+    salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
+    if isinstance(data, unicode):
+        data = data.encode('utf8')
+    return hashlib.sha1(salt + data).hexdigest()
+
 
 def index(request):
     context = {
@@ -49,62 +72,14 @@ def index(request):
     template = loader.get_template('website.html')
     return HttpResponse(template.render(context, request))
 
+
 def bank_website(request):
     context = {}
     template = loader.get_template('avicrypto_bank.html')
     return HttpResponse(template.render(context, request))
 
-class Registration(FormView):  # code for template is given below the view's code
-    template_name = "login.html"
-    success_url = '/thanks'
-    form_class = signup_form
 
-    @staticmethod
-    def validate_email_address(email):
-        try:
-            validate_email(email)
-            return True
-        except ValidationError:
-            return False
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        try:
-            if form.is_valid():
-                data_dict = form.cleaned_data
-                data = form.cleaned_data['email']
-
-                if self.validate_email_address(data) is True:
-                    associated_users = User.objects.filter(Q(email=data) | Q(username=data))
-                    if associated_users.exists():
-                        result = self.form_valid(form)
-                        messages.success(request, 'User already exists')
-                        return result
-                    else:
-                        user = User.objects.create(username=data_dict['email'], email=data_dict['email'], first_name=data_dict['first_name'], last_name=data_dict['last_name'])
-                        user.set_password(str(data_dict['password']))
-                        user.username = user.profile.user_auto_id
-                        user.save()
-                        update_profile(user, request.POST)
-                        body = "Welcome to Avicrypto! "
-                        services.send_email_mailgun('Welcome to Avicrypto', body, data_dict['email'], from_email="postmaster")
-                        result = self.form_valid(form)
-                        messages.success(request, 'An email has been sent to {0}. Please check its inbox to continue reseting password.'.format(data))
-                        return result
-                else:
-                    result = self.form_valid(form)
-                    messages.success(request, 'Not an email address.')
-                    return result
-            else:
-                result = self.form_valid(form)
-                messages.success(request, 'Data invalid.')
-                return result
-        except Exception as e:
-            raise
-
-        return self.form_invalid(form)
-
-def login_fn(request):
+def app_login(request):
     if not request.user.is_authenticated:
         if request.method == 'GET':
             template = loader.get_template('login.html')
@@ -130,26 +105,204 @@ def login_fn(request):
             return HttpResponse(template.render(context, request))
 
         if request.method == 'POST':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            user = authenticate(username=username, password=password)
+            username = str(request.POST.get('username'))
+            password = str(request.POST.get('password'))
 
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return HttpResponse(json.dumps({"status": "ok"}))
+            if username and password:
+                if User.objects.filter(username=username).exists():
+                    if User.objects.filter(username=username, is_active=True).exists():
+                        user = authenticate(
+                            username=username, password=password)
+                        if user is not None:
+                            login(request, user)
+                            return HttpResponse(json.dumps({
+                                "status": "ok"
+                            }))
+                        else:
+                            return HttpResponse(json.dumps({
+                                "status": "error",
+                                "message": "Username or password is incorrect."
+                            }))
+                    else:
+                        return HttpResponse(json.dumps({
+                            "status": "error",
+                            "message": "Email address is not active."
+                        }))
                 else:
                     return HttpResponse(json.dumps({
                         "status": "error",
-                        "message": "Id id not active."            
+                        "message": "Invalid username."
                     }))
             else:
                 return HttpResponse(json.dumps({
                     "status": "error",
-                    "message": "Email or password is incorrect."            
+                    "message": "Provide username or password."
                 }))
     else:
         return HttpResponseRedirect('/home')
+
+
+def app_signup(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        referal_code = data.get('referal', None)
+        sponcer_id = data.get('sponcer_id', None)
+        placement_id = data.get('placement_id', None)
+        placement_position = data.get('placement_position', "L")
+
+        if email and validate_email(email) == None:
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            mobile = request.POST.get('mobile')
+            password = request.POST.get('password')
+
+            if re.match(r'^\+?1?\d{9,15}$', mobile):
+                if not User.objects.filter(email=email).exists():
+
+                    if referal_code:
+                        try:
+                            referal_user = Profile.objects.get(
+                                my_referal_code=referal_code)
+                            if placement_id:
+                                placement_user_profile = Profile.objects.get(
+                                    user_auto_id=placement_id)
+                                placement_user = placement_user_profile.user
+
+                                position = 'l' if 'L' == position else 'r'
+
+                                if is_member_of(referal_user, placement_user):
+                                    if has_child(placement_user, position):
+                                        return HttpResponse(json.dumps({
+                                            "status": "error",
+                                            "message": "Placement user selected position is not empty."
+                                        }))
+                                else:
+                                    return HttpResponse(json.dumps({
+                                        "status": "error",
+                                        "message": "Placement id user does not belong to the referal user."
+                                    }))
+
+                        except Profile.DoesNotExist:
+                            content = {
+                                "status": "error",
+                                "message": "Referal code does not exist."
+                            }
+                            return HttpResponse(json.dumps(content))
+
+                    user = User.objects.create(
+                        username=email, email=email, first_name=first_name, last_name=last_name, is_active=False)
+                    user.username = user.profile.user_auto_id
+                    user.set_password(str(password))
+                    user.save()
+
+                    token = update_user_profile(user, request.POST)
+
+                    email_data = {
+                        "user": user,
+                        "token": token
+                    }
+                    body = render_to_string('mail/welcome.html', email_data)
+                    services.send_email_mailgun(
+                        'Welcome to Avicrypto', body, email, from_email="postmaster")
+
+                    content = {
+                        "status": "ok",
+                        "message": "Thank you for registration. Soon you will receive a conformation mail."
+                    }
+                    return HttpResponse(json.dumps(content))
+                else:
+                    content = {
+                        "status": "error",
+                        "message": "Email address already exist."
+                    }
+                    return HttpResponse(json.dumps(content))
+            else:
+                content = {
+                    "status": "error",
+                    "message": "Invalid mobile number."
+                }
+                return HttpResponse(json.dumps(content))
+        else:
+            content = {
+                "status": "error",
+                "message": "Not and email address."
+            }
+            return HttpResponse(json.dumps(content))
+
+
+@login_required(login_url="/login")
+def app_logout(request):
+    logout(request)
+    response = HttpResponseRedirect('/')
+    return response
+
+
+def app_activate_account(request, token):
+    profile = get_object_or_404(Profile, token=token, user__is_active=False)
+    profile.user.is_active = True
+    profile.user.save()
+
+    if profile.user.has_usable_password():
+        profile.token = ""
+        profile.save()
+        return HttpResponseRedirect("/login")
+    else:
+        return HttpResponseRedirect("/reset-password/" + profile.token)
+
+
+def app_forgot_password(request):
+    content = {}
+    if request.method == 'POST':
+        email = request.POST.get("email", "")
+
+        try:
+            user = User.objects.get(email=email)
+            token = get_token(user.username)
+            email_data = {
+                "token": token,
+                "user": user
+            }
+            body = render_to_string('mail/reset-password.html', email_data)
+            services.send_email_mailgun(
+                'Reset Password Avicrypto', body, email, from_email="postmaster")
+            content = {
+                "status": "ok",
+                "message": "Email has send to your address."
+            }
+
+            user.profile.token = token
+            user.profile.save()
+
+            return HttpResponse(json.dumps(content))
+        except User.DoesNotExist:
+            content = {
+                "status": "error",
+                "message": "Can't find that email, sorry."
+            }
+            return HttpResponse(json.dumps(content))
+
+    return render(request, 'forgot-password.html', content)
+
+
+def app_reset_password(request, token):
+    if request.method == "POST":
+        password = request.POST.get('password', '')
+        profile = get_object_or_404(Profile, token=token, user__is_active=True)
+
+        profile.user.set_password(password)
+        profile.token = ""
+
+        profile.save()
+        profile.user.save()
+        content = {
+            "status": "ok",
+            "message": "Password has been successfully changed."
+        }
+        return render(request, 'reset-password.html', content)
+    else:
+        profile = get_object_or_404(Profile, token=token, user__is_active=True)
+        return render(request, 'reset-password.html')
+
 
 def check_referal(request):
     referal = request.GET['referal']
@@ -175,40 +328,46 @@ def check_referal(request):
             'message': 'Referal address invalid'
         }))
 
+
 def check_placement(request):
     referal = request.GET['referal']
-    sponcer_id = request.GET['sponcer_id']
+    placement_id = request.GET['placement_id']
     position = request.GET['position']
 
+    position = 'l' if 'left' == position else 'r'
+
     if Profile.objects.filter(my_referal_code=referal).exists():
-        sponser = Profile.objects.get(my_referal_code=referal)
-        sponser_id = sponser.user_auto_id
-        placement_users = find_min_max(sponser.user)
+        if Profile.objects.filter(user_auto_id=placement_id).exists():
+            referal_user = Profile.objects.get(my_referal_code=referal).user
+            placement_user = Profile.objects.get(
+                user_auto_id=placement_id).user
 
-        response = {
-            'status': 'ok',
-            'data': {
-                'referal': referal,
-                'sponser_id': sponser_id,
-                'placement_user_left_id': placement_users[0].profile.user_auto_id,
-                'placement_user_right_id': placement_users[1].profile.user_auto_id
-            }
-        }
-
-        return HttpResponse(json.dumps(response))
+            if is_member_of(referal_user, placement_user):
+                if not has_child(placement_user, position):
+                    return HttpResponse(json.dumps({
+                        "status": "ok"
+                    }))
+                else:
+                    return HttpResponse(json.dumps({
+                        "status": "error",
+                        "message": "Placement user selected position is not empty."
+                    }))
+            else:
+                return HttpResponse(json.dumps({
+                    "status": "error",
+                    "message": "Placement id user does not belong to the referal user."
+                }))
+        else:
+            return HttpResponse(json.dumps({
+                'status': 'error',
+                'message': 'Invalid placement id'
+            }))
     else:
         return HttpResponse(json.dumps({
             'status': 'error',
             'message': 'Referal address invalid'
         }))
 
-def thanks(request):
-    template = loader.get_template('thanks.html')
-    context = {
-        'user': 'None'
-    }
-    # return HttpResponse(template.render(context, request))
-    return HttpResponse("Thank you for registration.Soon you will receive a conformation mail.")
 
 def error(request):
     template = loader.get_template('error.html')
@@ -217,15 +376,15 @@ def error(request):
     }
     return HttpResponse(template.render(context, request))
 
-def logout_fn(request):
-    logout(request)
-    response = HttpResponseRedirect('/')
-    return response
 
 @login_required(login_url="/login")
 def home(request):
+    import datetime
     if request.method == 'GET':
         user = request.user
+        # TODO: TEMPORARY. Remove this line before next MONDAY!
+        calculate_investment(user)
+
         packages = User_packages.objects.filter(user=user)
         support_tickets = SupportTicket.objects.filter(user=user)
 
@@ -233,8 +392,28 @@ def home(request):
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
             'packages': packages,
             'support_tickets': support_tickets,
-            'support_tickets_choices': SupportTicket.status_choices
+            'support_tickets_choices': SupportTicket.status_choices,
         }
+        user_active_package = [
+            package for package in packages if package.status == 'A']
+        if user_active_package:
+            pkg = user_active_package[0]
+            # today = UTC.normalize(UTC.localize(datetime.datetime.now()))
+            dt = UTC.normalize(UTC.localize(
+                datetime.datetime.now())) - pkg.created_at
+            context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
+            next_payout = find_next_monday()
+            context["next_payout"] = "%s-%s-%s" % (
+                next_payout.year, next_payout.month, next_payout.day)
+
+        if len(user_active_package) == 0:
+            context["weekly_payout"] = 0
+            context["direct_payout"] = 0
+            context["binary_payout"] = 0
+        else:
+            context["weekly_payout"] = user_active_package[0].weekly
+            context["direct_payout"] = user_active_package[0].direct
+            context["binary_payout"] = user_active_package[0].binary
 
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
@@ -244,6 +423,7 @@ def home(request):
     else:
         return HttpResponseRedirect('/error')
 
+
 @login_required(login_url="/login")
 @csrf_exempt
 def profile(request):
@@ -252,7 +432,8 @@ def profile(request):
         country_json = json.load(open('country.json'))
         country = ""
         if user.profile.country:
-            country = (item for item in country_json if item["country_code"] == user.profile.country).next()
+            country = (
+                item for item in country_json if item["country_code"] == user.profile.country).next()
 
         context = {
             'user_country': country,
@@ -283,6 +464,7 @@ def profile(request):
     else:
         return HttpResponseRedirect('/error')
 
+
 @login_required(login_url="/login")
 @csrf_exempt
 def support(request):
@@ -294,13 +476,15 @@ def support(request):
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
         description = request.POST.get("description", "")
-        SupportTicket.objects.create(user=request.user, description=description, status="P")
+        SupportTicket.objects.create(
+            user=request.user, description=description, status="P")
         return HttpResponse(json.dumps({
             'status': 'ok',
             'message': 'Our support team will get back to you.'
         }))
         # services.support_mail('Support Ticket', request.POST.get("description", ""), 'harshulkaushik9@gmail.com', from_email="postmaster")
         # return HttpResponse('Mail sent to adminstrator', content_type="application/json")
+
 
 @login_required(login_url="/login")
 @csrf_exempt
@@ -313,14 +497,16 @@ def network(request):
         data = traverse_tree(request.user)
         return HttpResponse(data)
 
+
 @login_required(login_url="/login")
 def network_init(request):
     user = request.user
-    data = traverse_tree(request.user)
+    data = traverse_tree(user)
     data = json.loads(data)
     # data['collapsed'] = True
     data['className'] = 'top-level'
     return HttpResponse(json.dumps(data))
+
 
 @login_required(login_url="/login")
 def network_parent(request):
@@ -328,34 +514,20 @@ def network_parent(request):
     data = traverse_tree(request.user)
     return HttpResponse(data)
 
+
 @login_required(login_url="/login")
 def network_children(request, user_id):
-    print user_id
     user = User.objects.get(id=user_id)
-    print user
     data = traverse_tree(user)
     data = json.loads(data)
-    print data
     data = {
         'children': data['children']
     }
     return HttpResponse(json.dumps(data))
 
 
-# def simple_upload(request):
-#     if request.method == 'POST' and request.FILES['myfile']:
-#         myfile = request.FILES['myfile']
-#         fs = FileSystemStorage()
-#         filename = fs.save(myfile.name, myfile)
-#         uploaded_file_url = fs.url(filename)
-#         return render(request, 'core/simple_upload.html', {
-#             'uploaded_file_url': uploaded_file_url
-#         })
-#     return render(request, 'core/simple_upload.html')
-
 def simple_upload(request):
-    if request.method == 'POST' and request.FILES['passfront'] and request.FILES['passback'] and request.FILES[
-        'passphoto']:
+    if request.method == 'POST' and request.FILES['passfront'] and request.FILES['passback'] and request.FILES['passphoto']:
         passfront = request.FILES['passfront']
         passback = request.FILES['passback']
         passphoto = request.FILES['passphoto']
@@ -363,11 +535,13 @@ def simple_upload(request):
         filename_passfront = fs.save(passfront.name, passfront)
         filename_passback = fs.save(passback.name, passback)
         filename_passphoto = fs.save(passphoto.name, passphoto)
-        uploaded_file_url = fs.url(filename_passfront) or fs.url(filename_passback) or fs.url(filename_passphoto)
+        uploaded_file_url = fs.url(filename_passfront) or fs.url(
+            filename_passback) or fs.url(filename_passphoto)
         return render(request, 'simple_upload.html', {
             'uploaded_file_url': uploaded_file_url
         })
     return render(request, 'simple_upload.html')
+
 
 def model_form_upload(request):
     if request.method == 'POST':
@@ -381,7 +555,9 @@ def model_form_upload(request):
         'form': form
     })
 
-def update_profile(user, data):
+
+@login_required(login_url="/login")
+def update_user_profile(user, data):
     profile = Profile.objects.get(user=user)
     profile.country = data.get('country', "US")
     profile.mobile = data.get('mobile', None)
@@ -390,29 +566,35 @@ def update_profile(user, data):
     sponcer_id = data.get('sponcer_id', None)
     placement_id = data.get('placement_id', None)
     placement_position = data.get('placement_position', "L")
+    token = get_token(user.username)
+
+    profile.token = token
 
     if referal_code:
         sponser_user = Profile.objects.get(my_referal_code=referal_code)
-        if sponser_user:
+
+        if placement_id:
+            profile.placement_id = Profile.objects.get(
+                user_auto_id=placement_id).user
+        else:
             placement_users = find_min_max(sponser_user.user)
 
-            if placement_position == "L":
-                profile.placement_id = placement_users[0]
-            else:
+            if placement_position == "R":
                 profile.placement_id = placement_users[1]
+            else:
+                profile.placement_id = placement_users[0]
 
-            profile.placement_position = placement_position
-            profile.referal_code = referal_code
-            profile.sponcer_id = sponser_user.user
-            Members.objects.create(parent_id=profile.placement_id, child_id=user)
+        profile.placement_position = placement_position
+        profile.referal_code = referal_code
+        profile.sponcer_id = sponser_user.user
+        Members.objects.create(parent_id=profile.placement_id, child_id=user)
 
     profile.save()
 
-def traverse_tree(user, level=4):
-    ref_code = "/add/user?ref={}&place={}".format(user.profile.my_referal_code, user.profile.user_auto_id)
-    data = load_users(user, ref_code, level=level)
-    return json.dumps(data)
+    return token
 
+
+@login_required(login_url="/login")
 @csrf_exempt
 def add_user(request):
 
@@ -445,16 +627,19 @@ def add_user(request):
             user = User.objects.create(email=email, username=email)
             user.first_name = data['first_name']
             user.last_name = data['last_name']
+            user.username = user.profile.user_auto_id
+            user.is_active = False
             user.save()
 
             profile = Profile.objects.get(user=user)
             sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
-            placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
+            placement_id = Profile.objects.get(
+                user_auto_id=data['placement_id'])
             profile.sponser_id = sponser_id.user
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
             profile.country = data['country']
-            token = get_token(email)
+            token = get_token(user.username)
             profile.token = token
 
             if data['placement'] == 'left':
@@ -464,36 +649,26 @@ def add_user(request):
 
             profile.save()
 
-            body = "Create password for your account: http://www.avicrypto.us/reset-password/" + profile.token
-            services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
+            # body = "Create password for your account: http://www.avicrypto.us/reset-password/" + profile.token
+            # services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
+
+            email_data = {
+                "user": user,
+                "token": token
+            }
+            body = render_to_string('mail/welcome.html', email_data)
+            services.send_email_mailgun(
+                'Welcome to Avicrypto', body, email, from_email="postmaster")
 
             Members.objects.create(parent_id=placement_id.user, child_id=user)
-            message = "Success"
+            content = {
+                "status": "ok",
+                "message": "Registration complete.",
+            }
         else:
-			message = "Email address already registered."
+            content = {
+                "status": "ok",
+                "message": "Email address already registered.",
+            }
 
-        return HttpResponse(message)
-
-def get_token(data):
-    salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
-    if isinstance(data, unicode):
-        data = data.encode('utf8')
-    return hashlib.sha1(salt + data).hexdigest()
-
-def reset_password(request, token):
-	if request.method == "POST":
-		password = request.POST.get('password', '')
-		profile = get_object_or_404(Profile, token=token)
-
-		profile.user.set_password(password)
-		profile.token = ""
-
-		profile.save()
-		profile.user.save()
-		content = {
-			"message": "Password has been successfully changed."
-		}
-		return render(request, 'reset-password.html', content)
-	else:
-		profile = get_object_or_404(Profile, token=token)
-		return render(request, 'reset-password.html')
+        return HttpResponse(json.dumps(content))

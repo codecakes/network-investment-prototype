@@ -22,16 +22,18 @@
 							<form id="loginForm" method="post" action="" class="form-horizontal form-simple" novalidate>
 								{% csrf_token %}
 								<fieldset class="form-group position-relative has-icon-left">
-									<input type="text" class="form-control form-control-lg input-lg" name="username" placeholder="Your Username" required>
+									<input type="text" class="form-control form-control-lg input-lg" name="username" placeholder="Your Username" required data-validation-required-message="Please enter email address.">
 									<div class="form-control-position">
 										<i class="icon-head"></i>
 									</div>
+									<div class="help-block font-small-3"></div>
 								</fieldset>
 								<fieldset class="form-group position-relative has-icon-left">
-									<input type="password" class="form-control form-control-lg input-lg" name="password" placeholder="Enter Password" required>
+									<input type="password" class="form-control form-control-lg input-lg" name="password" placeholder="Enter Password" required data-validation-required-message="Please enter password.">
 									<div class="form-control-position">
 										<i class="icon-key3"></i>
 									</div>
+									<div class="help-block font-small-3"></div>
 								</fieldset>
 								<button type="submit" class="btn btn-primary btn-lg btn-block">
 									<i class="icon-unlock2"></i> Login
@@ -42,7 +44,7 @@
 					<div class="card-footer">
 						<div class="">
 							<p class="float-sm-left text-xs-center m-0">
-								<!-- <a href="recover-password.html" class="card-link">Recover password</a> -->
+								<a href="/forgot-password" class="card-link">Forgot password ?</a>
 							</p>
 							<p class="float-sm-right text-xs-center m-0">
 								<!-- <a href="register-simple.html" class="card-link">Sign Up</a> -->
@@ -52,7 +54,7 @@
 				</div>
 			</div>
 			<div class="col-md-5 offset-md-1 col-xs-10 offset-xs-1 box-shadow-2 p-0 mb-2">
-				<div cla ss="card border-grey border-lighten-3 m-0">
+				<div class="card border-grey border-lighten-3 m-0">
 					<div class="card-header no-border">
 						<div class="card-title text-xs-center"></div>
 						<h6 class="card-subtitle line-on-side text-muted text-xs-center font-small-3 pt-2">
@@ -61,40 +63,39 @@
 					</div>
 					<div class="card-body collapse in">
 						<div class="card-block">
-							<form id="registerForm" class="form-horizontal form-simple" novalidate>
+							<form id="registerForm" method="post" action="" class="form-horizontal form-simple" novalidate>
 								{% csrf_token %}
+								<fieldset class="form-group position-relative has-icon-left">
+									<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" value="{{referal}}" data-validation-callback-callback="checkReferal"/>
+									<div class="form-control-position">
+										<i class="icon-head"></i>
+									</div>
+									<div class="help-block font-small-3"></div>
+								</fieldset>
+								<fieldset class="form-group position-relative has-icon-left">
+									<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" value="{{sponser_id}}" disabled/>
+									<div class="form-control-position">
+										<i class="icon-head"></i>
+									</div>
+									<div class="help-block font-small-3"></div>
+								</fieldset>
+								<fieldset class="form-group position-relative has-icon-left">
+									<label for="placement_position">Position</label>
+									<select name="placement_position" id="placement_position" class="form-control input-lg" data-validation-callback-callback="checkPlacement">
+										<option value="L">LEFT</option>
+										<option value="R">RIGHT</option>
+									</select>
+								</fieldset>
+								<fieldset class="form-group position-relative has-icon-left">
+									<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_left_id }}" data-validation-callback-callback="checkPlacement"/>
+									<input type="text" style="display:none;" name="placement_id_right" id="placement_id_right" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_right_id }}" data-validation-callback-callback="checkPlacement"/>
+									<div class="form-control-position">
+										<i class="icon-head"></i>
+									</div>
+									<div class="help-block font-small-3"></div>
+								</fieldset>
 
-									<fieldset class="form-group position-relative has-icon-left">
-										<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" value="{{referal}}"/>
-										<div class="form-control-position">
-											<i class="icon-head"></i>
-										</div>
-										<div class="help-block font-small-3"></div>
-									</fieldset>
-									<fieldset class="form-group position-relative has-icon-left">
-										<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" value="{{sponser_id}}"/>
-										<div class="form-control-position">
-											<i class="icon-head"></i>
-										</div>
-										<div class="help-block font-small-3"></div>
-									</fieldset>
-									<fieldset class="form-group position-relative has-icon-left">
-										<label for="placement_position">Position</label>
-										<select name="placement_position" id="placement_position" class="form-control input-lg">
-											<option value="L">LEFT</option>
-											<option value="R">RIGHT</option>
-										</select>
-									</fieldset>
-									<fieldset class="form-group position-relative has-icon-left">
-										<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_left_id }}"/>
-										<input type="text" style="display:none;" name="placement_id_right" id="placement_id_right" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_right_id }}" />
-										<div class="form-control-position">
-											<i class="icon-head"></i>
-										</div>
-										<div class="help-block font-small-3"></div>
-									</fieldset>
-
-									<div class="row">
+								<div class="row">
 									<div class="col-xs-12 col-sm-6 col-md-6">
 										<fieldset class="form-group position-relative has-icon-left">
 											<input type="text" name="first_name" id="first_name" class="form-control input-lg" placeholder="First Name" required data-validation-required-message="Please enter First Name.">
@@ -122,7 +123,7 @@
 									<div class="help-block font-small-3"></div>
 								</fieldset>
 								<fieldset class="form-group position-relative has-icon-left">
-									<input type="text" name="mobile" id="mobile" class="form-control input-lg" placeholder="Mobile Number" pattern="^[0]?[789]\d{9}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number.">
+									<input type="text" name="mobile" id="mobile" class="form-control input-lg" placeholder="Mobile Number" pattern="^\+?1?\d{9,15}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number.">
 									<div class="form-control-position">
 										<i class="icon-mobile"></i>
 									</div>
@@ -387,7 +388,7 @@
 									<div class="help-block font-small-3"></div>
 								</fieldset>
 
-								<button type="submit" class="btn btn-primary btn-lg btn-block">
+								<button id="register_form_submit" type="submit" class="btn btn-primary btn-lg btn-block">
 									<i class="icon-head"></i> Register
 								</button>
 							</form>

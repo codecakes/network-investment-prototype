@@ -1,8 +1,6 @@
 *.pyc
-**/**/migrations/*
 venv/
 .idea/*
-addons/*/migrations/
 .pyc
 **/*/*.pyc
 **/**/*.pyc
@@ -17,3 +15,14 @@ avicrypto/*.pyc
 pyc
 media/
 staticfiles/
+.vscode/bitbucket-pipelines.yml
+.vscode/
+addons/*/migrations/
+addons/*/migrations
+addons/packages/migrations/
+addons/packages/migrations/
+addons/accounts/migrations/
+addons/wallet/migrations/
+addons/transactions/migrations/
+addons/packages/migrations/*
+migrations/
