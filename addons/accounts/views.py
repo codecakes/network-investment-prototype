@@ -294,11 +294,7 @@ def app_reset_password(request, token):
 
         profile.save()
         profile.user.save()
-        content = {
-            "status": "ok",
-            "message": "Password has been successfully changed."
-        }
-        return render(request, 'reset-password.html', content)
+        return HttpResponseRedirect('/login')
     else:
         profile = get_object_or_404(Profile, token=token, user__is_active=True)
         return render(request, 'reset-password.html')
