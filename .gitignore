@@ -16,5 +16,13 @@ pyc
 media/
 staticfiles/
 .vscode/bitbucket-pipelines.yml
-vscode/
 .vscode/
+addons/*/migrations/
+addons/*/migrations
+addons/packages/migrations/
+addons/packages/migrations/
+addons/accounts/migrations/
+addons/wallet/migrations/
+addons/transactions/migrations/
+addons/packages/migrations/*
+migrations/
