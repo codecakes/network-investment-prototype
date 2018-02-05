@@ -59,6 +59,12 @@ class Profile(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	token = models.CharField(max_length=100, default=None, null=True, blank=True)
 
+	destination_tag = models.CharField(max_length=100, default=None, null=True, blank=True)
+	btc_address = models.CharField(max_length=100, default=None, null=True, blank=True)
+	eth_address = models.CharField(max_length=100, default=None, null=True, blank=True)
+	xrp_address = models.CharField(max_length=100, default=None, null=True, blank=True)
+
+
 	def __unicode__(self):
 		return "%s" %(self.user)
 
