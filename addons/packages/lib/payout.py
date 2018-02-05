@@ -132,7 +132,7 @@ def calc_weekly(user, last_date, next_date):
     delta = new_date - old_date
     num_weeks = delta.days/7
     pkg = get_package(user)
-    return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct')
+    return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct') 
 
 
 def calc_leg(user, last_date, next_date, leg='l'):
