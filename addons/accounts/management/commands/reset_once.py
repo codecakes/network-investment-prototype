@@ -3,6 +3,7 @@ import datetime
 from pytz import UTC
 from addons.accounts.models import User
 from addons.packages.models import User_packages
+from addons.packages.lib.payout import run_scheduler
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -33,10 +34,17 @@ def reset_these():
         pkg = User_packages.objects.filter(user = u, status='A')
         if pkg:
             pkg = pkg[0]
+            pkg.last_payout_date = u.date_joined
+            pkg.binary = 0.0
+            pkg.weekly = 0.0
+            pkg.direct = 0.0
             pkg.total_payout = 0.0
+            pkg.left_binary_cf = 0.0
+            pkg.right_binary_cf = 0.0
             pkg.save()
-        
-
+    print "running"
+    print run_scheduler()
+    print "run_scheduler() done"
 
 
 class Command(BaseCommand):
