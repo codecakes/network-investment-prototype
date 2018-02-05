@@ -11,9 +11,13 @@
         <div class="col-xs-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Payouts</h4>
+                    <h4 class="card-title">Payouts for package: ${{user_active_package_value}}</h4>
                     <div class="heading-elements" style="top: 9px;">
-                        <button type="button" class="btn btn-primary btn-min-width">Withdraw</button>
+                        {% if enable_withdraw %}
+                            <button type="button" class="btn btn-primary btn-min-width">Withdraw</button>
+                        {% else %}
+                            <button type="button" class="btn btn-danger btn-min-width" disabled>Withdraw</button>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="card-body">
@@ -168,10 +172,10 @@
                                     <td>{{ package.status }}</td>
                                     <td>{{ package.package.no_payout }}</td>
                                     <td>{{ payout_remain }} </td>
-                                    <td>{{ package.direct }}</td>
-                                    <td>{{ package.binary }}</td>
-                                    <td>{{ package.weekly }}</td>
-                                    <td>{{ package.total_payout }}</td>
+                                    <td>${{ package.direct }}</td>
+                                    <td>${{ package.binary }}</td>
+                                    <td>${{ package.weekly }}</td>
+                                    <td>${{ package.total_payout }}</td>
                                 </tr>
                                 {% empty %}
                                     <tr>

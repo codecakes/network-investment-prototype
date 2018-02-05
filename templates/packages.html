@@ -36,7 +36,7 @@
                         {% if package_access_disable %}
                             <div class="card-block">
                                 <div class="col-md-6">
-                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" disabled="">Crypto</button>
+                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" disabled>Crypto</button>
                                 </div>
                                 <div class="col-md-6">
                                     <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
@@ -48,11 +48,10 @@
                                     <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
                                 </div>
                                 <div class="col-md-6">
-                                    <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
+                                    <button id="subscribeCash" class="btn btn-primary">Cash</button>
                                 </div>
                             </div>
                         {% endif%}
-
                     </div>
                 </div>
             </div>
