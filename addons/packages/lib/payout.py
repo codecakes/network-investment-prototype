@@ -194,7 +194,7 @@ def calculate_investment(user):
         
         if last_date <= today < next_payout:
             # print "INSIDE calculate_investments"
-            # print "calculating for ", user
+            print "calculating for ", user
             state_m = StateMachine(user)
             
             state_m.add_state('weekly', INVESTMENT_TYPE, end_state='direct')
