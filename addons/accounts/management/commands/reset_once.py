@@ -5,7 +5,6 @@ from addons.accounts.models import User
 from addons.packages.models import User_packages
 
 from django.core.management.base import BaseCommand, CommandError
-from polls.models import Question as Poll
 
 def reset_these():    
     for email in ["robertjohnlie@gmail.com", "erwinyap.btc@gmail.com", "lilibest.btc@gmail.com",
@@ -13,7 +12,7 @@ def reset_these():
         "amirryand8@gmail.com", "suherman6224@gmail.com", "cryptomujur@gmail.com",
         "billioner.kaya@gmail.com", "wildareflita1972@gmail.com"]:
         u = User.objects.get(email = email)
-        u.date_joined = UTC.normialize(UTC.localize(datetime.datetime(2018, 2, 1, 00, 00, 00)))
+        u.date_joined = UTC.normalize(UTC.localize(datetime.datetime(2018, 2, 1, 00, 00, 00)))
         u.set_password("avi123456")
         u.save()
         pkg = User_packages.objects.get(user = u)
