@@ -386,7 +386,7 @@ def home(request):
         today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
         is_day = calendar.weekday(today.year, today.month, today.day)
         if today.hour == 23 and today.minute == 59 and is_day == 0:
-            calculate_investmente(user)
+            calculate_investment(user)
 
         packages = User_packages.objects.filter(user=user)
         support_tickets = SupportTicket.objects.filter(user=user)
