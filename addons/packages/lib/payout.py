@@ -191,7 +191,8 @@ def calculate_investment(user):
         last_date = START_TIME
         today = UTC.normalize(UTC.localize(datetime.utcnow()))
         next_payout = find_next_monday()
-        if last_date <= today < next_payout:
+
+        if last_date <= today < next_payout and today:
             # print "INSIDE calculate_investments"
             state_m = StateMachine(user)
             
