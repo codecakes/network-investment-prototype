@@ -661,7 +661,9 @@ def add_user(request):
         email = data['email']
 
         if not User.objects.filter(email=email).exists():
+            password = User.objects.make_random_password()
             user = User.objects.create(email=email, username=email)
+            user.set_password(password)
             user.first_name = data['first_name']
             user.last_name = data['last_name']
             user.username = user.profile.user_auto_id
@@ -670,8 +672,7 @@ def add_user(request):
 
             profile = Profile.objects.get(user=user)
             sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
-            placement_id = Profile.objects.get(
-                user_auto_id=data['placement_id'])
+            placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
             profile.sponser_id = sponser_id.user
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
@@ -691,11 +692,11 @@ def add_user(request):
 
             email_data = {
                 "user": user,
-                "token": token
+                "token": token,
+                "password": password
             }
             body = render_to_string('mail/welcome.html', email_data)
-            services.send_email_mailgun(
-                'Welcome to Avicrypto', body, email, from_email="postmaster")
+            services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
 
             Members.objects.create(parent_id=placement_id.user, child_id=user)
             content = {

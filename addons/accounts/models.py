@@ -107,3 +107,11 @@ class SupportTicket(models.Model):
 	)
 	status = models.CharField(max_length=50, choices=status_choices)
 	created_at = models.DateTimeField(auto_now_add=True)
+
+class UserAccount(models.Model):
+	user = models.ForeignKey(User, related_name='+')
+	btc_address = models.CharField(max_length=100, default=None, null=True, blank=True)
+	xrp_address = models.CharField(max_length=100, default=None, null=True, blank=True)
+	etr_address = models.CharField(max_length=100, default=None, null=True, blank=True)
+	etr_destination_tag = models.CharField(max_length=100, default=None, null=True, blank=True)
+	created_at = models.DateTimeField(auto_now_add=True)
