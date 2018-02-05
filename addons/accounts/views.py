@@ -34,6 +34,7 @@ from addons.wallet.models import Wallet
 from avicrypto import services
 from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of,
                       is_valid_leg, load_users)
+from lib.blockexplorer import validate_transaction
 
 sys.path.append(settings.BASE_DIR)
 
@@ -144,7 +145,8 @@ def app_login(request):
 
 def app_signup(request):
     if request.method == "POST":
-        email = request.POST.get('email')
+        data = request.POST
+        email = data.get('email')
         referal_code = data.get('referal', None)
         sponcer_id = data.get('sponcer_id', None)
         placement_id = data.get('placement_id', None)
