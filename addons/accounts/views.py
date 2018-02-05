@@ -378,10 +378,15 @@ def error(request):
 @login_required(login_url="/login")
 def home(request):
     import datetime
+    from pytz import UTC
+    import calendar
     if request.method == 'GET':
         user = request.user
         # TODO: TEMPORARY. Remove this line before next MONDAY!
-        calculate_investment(user)
+        today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+        is_day = calendar.weekday(today.year, today.month, today.day)
+        if today.hour == 23 and today.minute == 59 and is_day == 0:
+            calculate_investmente(user)
 
         packages = User_packages.objects.filter(user=user)
         support_tickets = SupportTicket.objects.filter(user=user)
