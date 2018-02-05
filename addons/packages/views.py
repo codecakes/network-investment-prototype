@@ -34,9 +34,12 @@ def add_years(d, years):
 def PackagesCreate(request):
 
     context = {
-        "packages": Packages.objects.all()
+        "packages": Packages.objects.all(),
+        "package_access_disable":True
     }
-
+    user = UserAccount.object.get(user=request.user);
+    if user.btc_address and user.eth_address and user.xrp_address and user.destination_tag :
+        contest["package_access_disable"] = False 
     if request.method == "POST":
         user = request.user
         package_id = request.POST.get("package", "1")
