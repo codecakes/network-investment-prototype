@@ -7,24 +7,27 @@ from addons.packages.models import User_packages
 from django.core.management.base import BaseCommand, CommandError
 
 def reset_these():    
-    for email in ["robertjohnlie@gmail.com", "erwinyap.btc@gmail.com", "lilibest.btc@gmail.com",
-        "zoulbizz@gmail.com", "andrisaputra148@gmail.com", "masta2803@gmail.com", 
-        "amirryand8@gmail.com", "suherman6224@gmail.com", "cryptomujur@gmail.com",
-        "billioner.kaya@gmail.com", "wildareflita1972@gmail.com"]:
+    # for email in ["robertjohnlie@gmail.com", "erwinyap.btc@gmail.com", "lilibest.btc@gmail.com",
+    #     "zoulbizz@gmail.com", "andrisaputra148@gmail.com", "masta2803@gmail.com", 
+    #     "amirryand8@gmail.com", "suherman6224@gmail.com", "cryptomujur@gmail.com",
+    #     "billioner.kaya@gmail.com", "wildareflita1972@gmail.com"]:
+    for email in ["akur.nya@gmail.com"]:
         u = User.objects.get(email = email)
         u.date_joined = UTC.normalize(UTC.localize(datetime.datetime(2018, 2, 1, 00, 00, 00)))
         u.set_password("avi123456")
         u.save()
-        pkg = User_packages.objects.get(user = u)
-        pkg.updated_at = u.date_joined
-        pkg.last_payout_date = u.date_joined
-        pkg.binary = 0.0
-        pkg.weekly = 0.0
-        pkg.direct = 0.0
-        pkg.total_payout = 0.0
-        pkg.left_binary_cf = 0.0
-        pkg.right_binary_cf = 0.0
-        pkg.save()
+        pkg = User_packages.objects.filter(user = u, status='A')
+        if pkg:
+            pkg = pkg[0]    
+            pkg.updated_at = u.date_joined
+            pkg.last_payout_date = u.date_joined
+            pkg.binary = 0.0
+            pkg.weekly = 0.0
+            pkg.direct = 0.0
+            pkg.total_payout = 0.0
+            pkg.left_binary_cf = 0.0
+            pkg.right_binary_cf = 0.0
+            pkg.save()
 
 
 
