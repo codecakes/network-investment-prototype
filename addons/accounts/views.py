@@ -197,7 +197,7 @@ def app_signup(request):
                     user.set_password(str(password))
                     user.save()
 
-                    token = update_user_profile(user, request.POST)
+                    token = update_signup_user_profile(user, request.POST)
 
                     email_data = {
                         "user": user,
@@ -558,6 +558,44 @@ def model_form_upload(request):
     })
 
 
+# TODO: This is for signup purposes only. Refactor
+def update_signup_user_profile(user, data):
+    profile = Profile.objects.get(user=user)
+    profile.country = data.get('country', "US")
+    profile.mobile = data.get('mobile', None)
+
+    referal_code = data.get('referal', None)
+    sponcer_id = data.get('sponcer_id', None)
+    placement_id = data.get('placement_id', None)
+    placement_position = data.get('placement_position', "L")
+    token = get_token(user.username)
+
+    profile.token = token
+
+    if referal_code:
+        sponser_user = Profile.objects.get(my_referal_code=referal_code)
+
+        if placement_id:
+            p_user = Profile.objects.get(
+                user_auto_id=placement_id)
+            profile.placement_id = p_user.user 
+        else:
+            placement_users = find_min_max(sponser_user.user)
+
+            if placement_position == "R":
+                profile.placement_id = placement_users[1]
+            else:
+                profile.placement_id = placement_users[0]
+
+        profile.placement_position = placement_position
+        profile.referal_code = referal_code
+        profile.sponcer_id = sponser_user.user
+        Members.objects.create(parent_id=profile.placement_id, child_id=user)
+
+    profile.save()
+
+    return token
+
 @login_required(login_url="/login")
 def update_user_profile(user, data):
     profile = Profile.objects.get(user=user)
@@ -576,8 +614,9 @@ def update_user_profile(user, data):
         sponser_user = Profile.objects.get(my_referal_code=referal_code)
 
         if placement_id:
-            profile.placement_id = Profile.objects.get(
-                user_auto_id=placement_id).user
+            p_user = Profile.objects.get(
+                user_auto_id=placement_id)
+            profile.placement_id = p_user.user 
         else:
             placement_users = find_min_max(sponser_user.user)
 
