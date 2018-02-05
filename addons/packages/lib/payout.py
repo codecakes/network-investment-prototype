@@ -125,7 +125,9 @@ def calc_binary(user, last_date, next_date):
 @is_eligible
 def calc_weekly(user, last_date, next_date):
     # calculate number of weeks passed since last_date before next_date
-    old_date = date(last_date.year, last_date.month, last_date.day)
+    user_doj = user.date_joined
+    user_doj = date(user_doj.year, user_doj.month, user_doj.day)
+    old_date = greater_date(user_doj, date(last_date.year, last_date.month, last_date.day))
     new_date = date.today()
     delta = new_date - old_date
     num_weeks = delta.days/7
@@ -185,7 +187,8 @@ def calculate_investment(user):
     packages = User_packages.objects.filter(user=user, status='A')
     if packages:
         pkg = User_packages.objects.get(user=user, status='A')
-        last_date = pkg.last_payout_date
+        # last_date = pkg.last_payout_date
+        last_date = START_TIME
         today = UTC.normalize(UTC.localize(datetime.utcnow()))
         next_payout = find_next_monday()
         if last_date <= today < next_payout:
@@ -302,3 +305,6 @@ def find_next_monday():
                   cur_dt.minute, cur_dt.second, cur_dt.microsecond)
     rem_dt = timedelta(days=remaining_days)
     return UTC.normalize(UTC.localize(dt + rem_dt))
+
+def greater_date(dt1, dt2):
+    return max(dt1, dt2)
