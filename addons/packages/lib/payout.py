@@ -224,7 +224,7 @@ def calculate_investment(user):
 
 
 def run_scheduler():
-    users = User.objects.all
+    users = User.objects.all()
     divide_conquer(users, 0, len(users)-1, calculate_investment)
 
 
