@@ -281,7 +281,7 @@ def valid_payout_user(sponsor_id, member, last_date, next_date):
         next_date = UTC.normalize(UTC.localize(datetime(
             next_date.year, next_date.month, next_date.day, doj.hour, doj.minute, doj.second, doj.microsecond)))
     pkg = get_package(member.child_id)
-    return (last_date <= doj < next_date) and (member.child_id.sponsor_id == sponsor_id) and pkg
+    return (last_date <= doj < next_date) and (member.child_id.profile.sponsor_id == sponsor_id) and pkg
 
 
 def filter_by_active_package(member):
