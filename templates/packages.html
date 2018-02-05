@@ -33,14 +33,25 @@
                             <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.roi}} ROI IN USD</a>
                     </div>
                     <div class="text-xs-center">
-                        <div class="card-block">
-                            <div class="col-md-6">
-                                <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
+                        {% if package_access_disable %}
+                            <div class="card-block">
+                                <div class="col-md-6">
+                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" disabled>Crypto</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <button id="subscribeCash" class="btn btn-primary">Cash</button>
+                        {% else %}
+                            <div class="card-block">
+                                <div class="col-md-6">
+                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button id="subscribeCash" class="btn btn-primary">Cash</button>
+                                </div>
                             </div>
-                        </div>
+                        {% endif%}
                     </div>
                 </div>
             </div>
@@ -134,7 +145,7 @@
 
                                                     <div class="form-group">
                                                         <label>Destination Tag*</label>
-                                                        <input class="form-control border-primary" name="tag" type="text" placeholder="Destination Tag" required>
+                                                        <input id="destinationTag"class="form-control border-primary" name="tag" type="text" placeholder="Destination Tag">
                                                     </div>
                                                 </div>
                                                 <div class="form-actions">
@@ -202,13 +213,16 @@
     $("#btcBuy,#xrpBuy,#ethBuy").click(function(event){
         $("#cryptoContainer").toggle();
         $("#cryptoDetails").toggle();
+        $($("#destinationTag").parent().get(0)).toggle();
         var cryptoType=""
         if(event.target.id==='btcBuy'){
             cryptoType="BTC";
         } else if(event.target.id==='xrpBuy'){
             cryptoType="XRP";
         } else {
+            $($("#destinationTag").parent().get(0)).toggle();
             cryptoType="ETH";
+
         }
         $("#cryptoPackage").val(cryptoType);
         $("#cryptoPackageCode").val("usd"+$("#packCode").html())

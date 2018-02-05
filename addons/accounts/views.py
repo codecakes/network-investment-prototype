@@ -5,6 +5,8 @@ import json
 import random
 import re
 import sys
+from datetime import datetime
+import calendar
 
 from django.conf import settings
 from django.contrib import messages
@@ -377,13 +379,13 @@ def error(request):
 
 @login_required(login_url="/login")
 def home(request):
-    import datetime
+    # import datetime
     from pytz import UTC
     import calendar
     if request.method == 'GET':
         user = request.user
         # TODO: TEMPORARY. Remove this line before next MONDAY!
-        today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+        today = UTC.normalize(UTC.localize(datetime.utcnow()))
         is_day = calendar.weekday(today.year, today.month, today.day)
         if today.hour == 23 and today.minute == 59 and is_day == 0:
             calculate_investment(user)
@@ -396,14 +398,21 @@ def home(request):
             'packages': packages,
             'support_tickets': support_tickets,
             'support_tickets_choices': SupportTicket.status_choices,
+            'enable_withdraw': False
         }
+
+        today = datetime.utcnow()
+        is_day = calendar.weekday(today.year, today.month, today.day)
+        if 0<= is_day < 2:
+            context["enable_withdraw"] = True
+
         user_active_package = [
             package for package in packages if package.status == 'A']
         if user_active_package:
             pkg = user_active_package[0]
             # today = UTC.normalize(UTC.localize(datetime.datetime.now()))
             dt = UTC.normalize(UTC.localize(
-                datetime.datetime.now())) - pkg.created_at
+                datetime.now())) - pkg.created_at
             context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
             next_payout = find_next_monday()
             context["next_payout"] = "%s-%s-%s" % (
@@ -413,10 +422,12 @@ def home(request):
             context["weekly_payout"] = 0
             context["direct_payout"] = 0
             context["binary_payout"] = 0
+            context["user_active_package_value"] = 0
         else:
             context["weekly_payout"] = user_active_package[0].weekly
             context["direct_payout"] = user_active_package[0].direct
             context["binary_payout"] = user_active_package[0].binary
+            context["user_active_package_value"] = user_active_package[0].package.price
 
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
