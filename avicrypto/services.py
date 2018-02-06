@@ -7,7 +7,7 @@ def send_email_mailgun(subject, body, receipient_emails, from_email="postmaster"
         "from": "AviCrypto <mail@avicrypto.us>",
         "to": receipient_emails,
         "subject": subject,
-        "text": body
+        "html": body
     }
 
     return requests.post(uri, auth=("api", key), data=data)
@@ -17,7 +17,7 @@ def support_mail(subject, body, receipient_emails, from_email="postmaster"):
         "from": "AviCrypto <mail@avicrypto.us>",
         "to": receipient_emails,
         "subject": subject,
-        "text": body
+        "html": body
     }
 
     return requests.post(uri, auth=("api", key), data=data)

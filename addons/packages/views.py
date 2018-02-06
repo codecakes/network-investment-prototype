@@ -21,6 +21,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 # from server.accounts.models import Profile
 from models import Packages, User_packages
+from addons.accounts.models import UserAccount
 from forms import packages_form
 import datetime
 
@@ -34,8 +35,13 @@ def add_years(d, years):
 def PackagesCreate(request):
 
     context = {
-        "packages": Packages.objects.all()
+        "packages": Packages.objects.all(),
+        "package_access_disable": True
     }
+    user_account = UserAccount.objects.filter(user=request.user)
+
+    if len(user_account) and (user_account[0].btc_address or user_account[0].eth_address or (user_account[0].xrp_address and user_account[0].destination_tag)):
+        context["package_access_disable"] = False
 
     if request.method == "POST":
         user = request.user

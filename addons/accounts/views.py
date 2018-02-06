@@ -5,6 +5,8 @@ import json
 import random
 import re
 import sys
+from datetime import datetime
+import calendar
 
 from django.conf import settings
 from django.contrib import messages
@@ -34,6 +36,7 @@ from addons.wallet.models import Wallet
 from avicrypto import services
 from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of,
                       is_valid_leg, load_users)
+from lib.blockexplorer import validate_transaction
 
 sys.path.append(settings.BASE_DIR)
 
@@ -144,7 +147,8 @@ def app_login(request):
 
 def app_signup(request):
     if request.method == "POST":
-        email = request.POST.get('email')
+        data = request.POST
+        email = data.get('email')
         referal_code = data.get('referal', None)
         sponcer_id = data.get('sponcer_id', None)
         placement_id = data.get('placement_id', None)
@@ -195,7 +199,7 @@ def app_signup(request):
                     user.set_password(str(password))
                     user.save()
 
-                    token = update_user_profile(user, request.POST)
+                    token = update_signup_user_profile(user, request.POST)
 
                     email_data = {
                         "user": user,
@@ -207,7 +211,7 @@ def app_signup(request):
 
                     content = {
                         "status": "ok",
-                        "message": "Thank you for registration. Soon you will receive a conformation mail."
+                        "message": "Thank you for registration. Soon you will receive a confirmation mail."
                     }
                     return HttpResponse(json.dumps(content))
                 else:
@@ -294,11 +298,7 @@ def app_reset_password(request, token):
 
         profile.save()
         profile.user.save()
-        content = {
-            "status": "ok",
-            "message": "Password has been successfully changed."
-        }
-        return render(request, 'reset-password.html', content)
+        return HttpResponseRedirect('/login')
     else:
         profile = get_object_or_404(Profile, token=token, user__is_active=True)
         return render(request, 'reset-password.html')
@@ -379,11 +379,16 @@ def error(request):
 
 @login_required(login_url="/login")
 def home(request):
-    import datetime
+    # import datetime
+    from pytz import UTC
+    import calendar
     if request.method == 'GET':
         user = request.user
         # TODO: TEMPORARY. Remove this line before next MONDAY!
-        calculate_investment(user)
+        today = UTC.normalize(UTC.localize(datetime.utcnow()))
+        is_day = calendar.weekday(today.year, today.month, today.day)
+        if today.hour == 23 and today.minute == 59 and is_day == 0:
+            calculate_investment(user)
 
         packages = User_packages.objects.filter(user=user)
         support_tickets = SupportTicket.objects.filter(user=user)
@@ -393,14 +398,21 @@ def home(request):
             'packages': packages,
             'support_tickets': support_tickets,
             'support_tickets_choices': SupportTicket.status_choices,
+            'enable_withdraw': False
         }
+
+        today = datetime.utcnow()
+        is_day = calendar.weekday(today.year, today.month, today.day)
+        if 0<= is_day < 2:
+            context["enable_withdraw"] = True
+
         user_active_package = [
             package for package in packages if package.status == 'A']
         if user_active_package:
             pkg = user_active_package[0]
             # today = UTC.normalize(UTC.localize(datetime.datetime.now()))
             dt = UTC.normalize(UTC.localize(
-                datetime.datetime.now())) - pkg.created_at
+                datetime.now())) - pkg.created_at
             context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
             next_payout = find_next_monday()
             context["next_payout"] = "%s-%s-%s" % (
@@ -410,10 +422,12 @@ def home(request):
             context["weekly_payout"] = 0
             context["direct_payout"] = 0
             context["binary_payout"] = 0
+            context["user_active_package_value"] = 0
         else:
             context["weekly_payout"] = user_active_package[0].weekly
             context["direct_payout"] = user_active_package[0].direct
             context["binary_payout"] = user_active_package[0].binary
+            context["user_active_package_value"] = user_active_package[0].package.price
 
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
@@ -556,6 +570,44 @@ def model_form_upload(request):
     })
 
 
+# TODO: This is for signup purposes only. Refactor
+def update_signup_user_profile(user, data):
+    profile = Profile.objects.get(user=user)
+    profile.country = data.get('country', "US")
+    profile.mobile = data.get('mobile', None)
+
+    referal_code = data.get('referal', None)
+    sponcer_id = data.get('sponcer_id', None)
+    placement_id = data.get('placement_id', None)
+    placement_position = data.get('placement_position', "L")
+    token = get_token(user.username)
+
+    profile.token = token
+
+    if referal_code:
+        sponser_user = Profile.objects.get(my_referal_code=referal_code)
+
+        if placement_id:
+            p_user = Profile.objects.get(
+                user_auto_id=placement_id)
+            profile.placement_id = p_user.user 
+        else:
+            placement_users = find_min_max(sponser_user.user)
+
+            if placement_position == "R":
+                profile.placement_id = placement_users[1]
+            else:
+                profile.placement_id = placement_users[0]
+
+        profile.placement_position = placement_position
+        profile.referal_code = referal_code
+        profile.sponcer_id = sponser_user.user
+        Members.objects.create(parent_id=profile.placement_id, child_id=user)
+
+    profile.save()
+
+    return token
+
 @login_required(login_url="/login")
 def update_user_profile(user, data):
     profile = Profile.objects.get(user=user)
@@ -574,8 +626,9 @@ def update_user_profile(user, data):
         sponser_user = Profile.objects.get(my_referal_code=referal_code)
 
         if placement_id:
-            profile.placement_id = Profile.objects.get(
-                user_auto_id=placement_id).user
+            p_user = Profile.objects.get(
+                user_auto_id=placement_id)
+            profile.placement_id = p_user.user 
         else:
             placement_users = find_min_max(sponser_user.user)
 
@@ -624,7 +677,9 @@ def add_user(request):
         email = data['email']
 
         if not User.objects.filter(email=email).exists():
+            password = User.objects.make_random_password()
             user = User.objects.create(email=email, username=email)
+            user.set_password(password)
             user.first_name = data['first_name']
             user.last_name = data['last_name']
             user.username = user.profile.user_auto_id
@@ -633,8 +688,7 @@ def add_user(request):
 
             profile = Profile.objects.get(user=user)
             sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
-            placement_id = Profile.objects.get(
-                user_auto_id=data['placement_id'])
+            placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
             profile.sponser_id = sponser_id.user
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
@@ -654,11 +708,11 @@ def add_user(request):
 
             email_data = {
                 "user": user,
-                "token": token
+                "token": token,
+                "password": password
             }
             body = render_to_string('mail/welcome.html', email_data)
-            services.send_email_mailgun(
-                'Welcome to Avicrypto', body, email, from_email="postmaster")
+            services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
 
             Members.objects.create(parent_id=placement_id.user, child_id=user)
             content = {
