@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load staticfiles %}
+
+{% load add %}
+<div class="content-header"></div>
+<div class="content-body">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Payouts for package: ${{user_active_package_value}}</h4>
+                    <div class="heading-elements" style="top: 9px;">
+                        {% if enable_withdraw %}
+                            <button type="button" class="btn btn-primary btn-min-width">Withdraw</button>
+                        {% else %}
+                            <button type="button" class="btn btn-danger btn-min-width" disabled>Withdraw</button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-block">
+                        <div class="row">
+                            <div class="col-xl-4 col-sm-12 border-right-blue-grey border-right-lighten-5">
+                                <div class="media px-1">
+                                    <div class="media-left media-middle">
+                                        <i class="icon-box font-large-1 blue-grey"></i>
+                                    </div>
+                                    <div class="media-body text-xs-right">
+                                        <span class="font-large-2 text-bold-300 info">Weekly</span>
+                                    </div>
+                                    <div class="row mt-1">
+                                        <input type="hidden" id="roi-payout" value="{{weekly_payout}}">
+                                        <div id="xrp-roi" class="col-xs-6"></div>
+                                        <div id="eth-roi" class="col-xs-6"></div>
+                                        <div id="btc-roi" class="col-xs-6"></div>
+                                        <div id="inr-roi" class="col-xs-6"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-4 col-sm-12 border-right-blue-grey border-right-lighten-5">
+                                <div class="media px-1">
+                                    <div class="media-left media-middle">
+                                        <i class="icon-tag3 font-large-1 blue-grey"></i>
+                                    </div>
+                                    <div class="media-body text-xs-right">
+                                        <span class="font-large-2 text-bold-300 deep-orange">Direct</span>
+                                    </div>
+                                    <div class="row mt-1">
+                                            <input type="hidden" id="direct-payout" value="{{direct_payout}}">
+                                        <div id="xrp-direct" class="col-xs-6"></div>
+                                        <div id="eth-direct" class="col-xs-6"></div>
+                                        <div id="btc-direct" class="col-xs-6"></div>
+                                        <div id="inr-direct" class="col-xs-6"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-4 col-sm-12 border-right-blue-grey border-right-lighten-5">
+                                <div class="media px-1">
+                                    <div class="media-left media-middle">
+                                        <i class="icon-shuffle3 font-large-1 blue-grey"></i>
+                                    </div>
+                                    <div class="media-body text-xs-right">
+                                        <span class="font-large-2 text-bold-300 danger">Binary</span>
+                                    </div>
+                                    <div class="row mt-1">
+                                        <input type="hidden" id="binary-payout" value="{{binary_payout}}">
+                                        <div id="xrp-binary" class="col-xs-6"></div>
+                                        <div id="eth-binary" class="col-xs-6"></div>
+                                        <div id="btc-binary" class="col-xs-6"></div>
+                                        <div id="inr-binary" class="col-xs-6"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Profile</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Firstname</th>
+                                    <th>Lastname</th>
+                                    <th>Unique ID</th>
+                                    <th>Email</th>
+                                    <th>Mobile Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{user.first_name}}</td>
+                                    <td>{{user.last_name}}</td>
+                                    <td>{{user.profile.user_auto_id}}</td>
+                                    <td>{{user.email}}</td>
+                                    <td>{{user.profile.mobile}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Referal Link</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="card-block">
+                        <fieldset class="form-group">
+                            <div class="row">
+                                <div class="col-xs-10">
+                                    <input type="text" class="form-control" size="40" value="{{link}}" id="referal_link">
+                                </div>
+                                <div class="col-xs-2">
+                                    <button class="btn btn-primary" onclick="myFunction()">Copy</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">My Fixed Deposits</h4>
+                    {% if next_payout %}
+                        <p>Next payout: {{ next_payout }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fixed Deposit Name</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th> Total Payouts </th>
+                                    <th>Remaining Payouts </th>
+                                    <th>Direct Out</th>
+                                    <th>Binary Payout</th>
+                                    <th>Weekly Payout</th>
+                                    <th>Total Payout</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for package in packages %}
+                                <tr>
+                                    <td>{{ package.package.package_name }}</td>
+                                    <td>{{ package.package.price }}</td>
+                                    <td>{{ package.status }}</td>
+                                    <td>{{ package.package.no_payout }}</td>
+                                    <td>{{ payout_remain }} </td>
+                                    <td>${{ package.direct }}</td>
+                                    <td>${{ package.binary }}</td>
+                                    <td>${{ package.weekly }}</td>
+                                    <td>${{ package.total_payout }}</td>
+                                </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td>
+                                            No fixed deposit.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Support Ticket</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Create Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for support_ticket in support_tickets %}
+                                <tr>
+                                    <td>{{ support_ticket.description|truncatechars:200 }}</td>
+                                    <td>{{ support_ticket.created_at }}</td>
+                                    <td>
+                                        {% for key,value in support_tickets_choices %}
+                                            {% if key == support_ticket.status %}
+                                                {{ value }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td>
+                                            No Support Tickets.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function myFunction() {
+        var copyText = document.getElementById("referal_link");
+        copyText.select();
+        document.execCommand("Copy");
+        alert("Copied the text: " + copyText.value);
+    }
+</script>
+
+<script>
+    var exchSettings = {
+        "async": true,
+        "crossDomain": true,
+        "url": "https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=BTC%2CXRP%2CINR%2CETH",
+        "method": "GET",
+        "headers": {}
+    };
+
+    function fetchRates() {
+        $.ajax(exchSettings).done(function (response) {
+            // update div tags
+            let
+                btc = response.BTC,
+                eth = response.ETH,
+                xrp = response.XRP,
+                inr = response.XRP,
+                roiVal = parseInt($("#roi-payout").val()),
+                binaryVal = parseInt($("#binary-payout").val()),
+                directVal = parseInt($("#direct-payout").val()),
+                btcRoi = roiVal * btc,
+                ethRoi = roiVal * eth,
+                xrpRoi = roiVal * xrp,
+                inrRoi = roiVal * inr,
+                btcBinary = binaryVal * btc,
+                ethBinary = binaryVal * eth,
+                xrpBinary = binaryVal * xrp,
+                inrBinary = binaryVal * inr,
+                btcDirect = directVal * btc,
+                ethDirect = directVal * eth,
+                xrpDirect = directVal * xrp,
+                inrDirect = directVal * inr;
+
+
+            $("#btc-roi").text(`BTC: ${btcRoi}`);
+            $("#eth-roi").text(`ETH: ${ethRoi}`);
+            $("#xrp-roi").text(`XRP: ${xrpRoi}`);
+            $("#inr-roi").text(`INR: ${inrRoi}`);
+
+            $("#btc-binary").text(`BTC: ${btcBinary}`);
+            $("#eth-binary").text(`ETH: ${ethBinary}`);
+            $("#xrp-binary").text(`XRP: ${xrpBinary}`);
+            $("#inr-binary").text(`INR: ${inrBinary}`);
+
+            $("#btc-direct").text(`BTC: ${btcDirect}`);
+            $("#eth-direct").text(`ETH: ${ethDirect}`);
+            $("#xrp-direct").text(`XRP: ${xrpDirect}`);
+            $("#inr-direct").text(`INR: ${inrDirect}`);
+
+        });
+    }
+
+    function stopOnUnload(intId) {
+        clearInterval(intId);
+    };
+
+    intId = setInterval(fetchRates, 5000);
+
+    window.onbeforeunload = function (evt) {
+        stopOnUnload(intId);
+    };
+</script>
+{% endblock %}

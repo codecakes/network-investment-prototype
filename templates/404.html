@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block page_stylesheet %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/pages/error.min.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="content-header row">
+</div>
+<div class="content-body">
+    <section class="flexbox-container">
+        <div class="col-md-4 offset-md-4 col-xs-10 offset-xs-1">
+            <div class="card-header bg-transparent no-border">
+                <h2 class="error-code text-xs-center mb-2">400</h2>
+                <h3 class="text-uppercase text-xs-center">Bad Request</h3>
+            </div>
+            <div class="card-body collapse in">
+                <div class="row py-2">
+                    <div class="offset-xs-3 col-xs-6">
+                        <a href="/" class="btn btn-primary btn-block font-small-3">
+                            <i class="icon-home3"></i> Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% endblock %}

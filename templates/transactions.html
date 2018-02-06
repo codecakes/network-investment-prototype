@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-body">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Wallet Summary</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Wallet</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Wallet Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for wallet in user.wallets %}
+                                    <tr>
+                                        <td>user.wallet.wallet_type</td>
+                                        <td>user.wallet.type</td>
+                                        <td>user.wallet.description</td>
+                                        <td>user.wallet.amount</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td>
+                                            You currently have no wallet
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Transactions Summary</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Transation ID</th>
+                                    <th>Receiver Wallet</th>
+                                    <th>Sender Wallet</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for txn in user.transactions %}
+                                    <tr>
+                                        <td>txn.txn_id</td>
+                                        <td>txn.receiver_wallet.user.name</td>
+                                        <th>txn.receiver_wallet.user.name</th>
+                                        <td>txn.description</td>
+                                        <td>txn.amount.wallet.amount</td>
+                                        <td>txn.type</td>
+                                        <td>txn.status</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td>
+                                            You have no transactions yet
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Package Summary</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Package Name</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Expiry date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for package in packages %}
+                                    <tr>
+                                        <td>{{package.package_name}}</td>
+                                        <td>{{package.price}}</td>
+                                        <td>{{package.status}}</td>
+                                        <td>{{package.expiry_date}}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td>
+                                            You have not bought any packages for your deposits
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

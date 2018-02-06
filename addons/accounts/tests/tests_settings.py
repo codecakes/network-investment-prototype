@@ -1,0 +1,1 @@
+from avicrypto.local_settings import *

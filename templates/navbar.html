@@ -1,0 +1,136 @@
+{% load staticfiles %}
+
+
+{% if user.is_authenticated %}
+    <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
+        <strong>You will be able to withdraw your funds soon!</strong>
+    </div>
+    <!-- navbar-fixed-top-->
+    <nav class="header-navbar navbar navbar-with-menu undefined navbar-light navbar-border navbar-brand-center">
+        <div class="navbar-wrapper">
+            <div class="navbar-header">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item mobile-menu hidden-md-up float-xs-left">
+                        <a class="nav-link nav-menu-main menu-toggle hidden-xs">
+                            <i class="icon-menu5 font-large-1"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="navbar-brand nav-link">
+                            <img alt="branding logo" src="{% static 'images/logo/logo-dark.png' %}" data-expand="{% static 'images/logo/logo-dark.png' %}" data-collapse="{% static 'images/logo/robust-logo-small.png' %}" class="brand-logo">
+                        </a>
+                    </li>
+                    <li class="nav-item hidden-md-up float-xs-right">
+                        <a data-toggle="collapse" data-target="#navbar-mobile" class="nav-link open-navbar-container">
+                            <i class="icon-ellipsis pe-2x icon-icon-rotate-right-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="navbar-container container center-layout">
+                <div id="navbar-mobile" class="collapse navbar-toggleable-sm">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item hidden-sm-down">
+                            <a class="nav-link nav-menu-main menu-toggle hidden-xs">
+                                <i class="icon-menu5"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item hidden-sm-down">
+                            <a href="#" class="nav-link nav-link-expand">
+                                <i class="ficon icon-expand2"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav float-xs-right">
+                        <li class="dropdown dropdown-user nav-item">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle nav-link dropdown-user-link" style="margin-top: 8px;">
+                                <!-- <span class="avatar avatar-online">
+                                    <img src="{% static 'images/portrait/small/avatar-s-1.png' %}" alt="avatar">
+                                    <i></i>
+                                </span> -->
+                                <span class="user-name">{{user.first_name}} {{user.last_name}}</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="/profile" class="dropdown-item">
+                                    <i class="icon-head"></i> Edit Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="/logout" class="dropdown-item">
+                                    <i class="icon-power3"></i> Logout
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Horizontal navigation-->
+    <div role="navigation" data-menu="menu-wrapper" class="header-navbar navbar navbar-horizontal navbar-fixed navbar-light navbar-without-dd-arrow navbar-bordered navbar-shadow">
+        <!-- Horizontal menu content-->
+        <div data-menu="menu-container" class="navbar-container main-menu-content container center-layout">
+            <!-- include ../../../includes/mixins-->
+            <ul id="main-menu-navigation" data-menu="menu-navigation" class="nav navbar-nav">
+                <li class="nav-item active">
+                    <a href="/home" class="nav-link">
+                        <i class="icon-home3"></i>
+                        <span data-i18n="nav.dash.main">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/transaction/summary" class="nav-link">
+                        <i class="icon-paper-stack"></i>
+                        <span data-i18n="nav.templates.main">Account</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/package/add" class="nav-link">
+                        <i class="icon-layout"></i>
+                        <span data-i18n="nav.layouts.temp">Fixed Deposit Plan</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/network" class="nav-link">
+                        <i class="icon-folder4"></i>
+                        <span data-i18n="nav.category.general">My Team</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/support" class="nav-link">
+                        <i class="icon-pencil22"></i>
+                        <span data-i18n="nav.category.ui">Support</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- /horizontal menu content-->
+    </div>
+    <!-- Horizontal navigation-->
+{% else %}
+    <nav class="header-navbar navbar navbar-with-menu undefined navbar-light navbar-border navbar-brand-center">
+        <div class="navbar-wrapper">
+            <div class="navbar-header">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item mobile-menu hidden-md-up float-xs-left"></li>
+                    <li class="nav-item">
+                        <a href="#" class="navbar-brand nav-link">
+                            <img alt="branding logo" src="{% static 'images/logo/logo-dark.png' %}" data-expand="{% static 'images/logo/logo-dark.png' %}" data-collapse="{% static 'images/logo/robust-logo-small.png' %}" class="brand-logo">
+                        </a>
+                    </li>
+                    <li class="nav-item hidden-md-up float-xs-right"></li>
+                </ul>
+            </div>
+            <div class="navbar-container container center-layout">
+                <div id="navbar-mobile" class="collapse navbar-toggleable-sm">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item hidden-sm-down"></li>
+                        <li class="nav-item hidden-sm-down"></li>
+                    </ul>
+                    <ul class="nav navbar-nav float-xs-right">
+                        <li class="dropdown dropdown-user nav-item"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+{% endif %}

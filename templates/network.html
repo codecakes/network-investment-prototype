@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block page_stylesheet %}
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'js/treant/Treant.css' %}">-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://rawgit.com/dabeng/OrgChart/master/demo/css/jquery.orgchart.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/network/tree.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="content-header row">
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-block">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <!--<div class="chart" id="networkTree"></div>-->
+                                <div id="chart-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <div class="tab-content">
+    <div class="tab-pane active" id="network_tree">
+    <br>
+        <h2>My Network</h2>
+        <div class="row" id="network_summary">
+        <br><br>
+            
+            <div id="networkContainer">
+            	
+            </div>
+            <div class="chart" id="networkTree"></div>
+
+        </div>
+    </div>
+</div> -->
+{% endblock %}
+
+{% block page_javascript %}
+    <!--<script src="{% static 'js/treant/raphael.js' %}"></script>-->
+    <!--<script src="{% static 'js/treant/Treant.js' %}"></script>-->
+    <!--<script src="{% static 'js/pages/network.js' %}"></script>-->
+    <script type="text/javascript" src="https://rawgit.com/dabeng/OrgChart/master/demo/js/jquery.orgchart.js"></script>
+    <script src="{% static 'js/network/render.js' %}"></script>
+{% endblock %}

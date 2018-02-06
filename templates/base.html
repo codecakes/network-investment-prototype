@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" data-textdirection="LTR" class="loading">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="Avicrypto">
+    <title>Avicrypto</title>
+    <meta name="google-site-verification" content="1qRM9BcxPDpamWi_calmOz2IhPKpxNiUis2XZ0xpg7Q" />
+
+    {% include 'stylesheet.html' %}
+
+    {% block page_stylesheet %}{% endblock %}
+
+</head>
+<body data-open="hover" data-menu="horizontal-menu" data-col="2-columns" class="horizontal-layout horizontal-menu 2-columns">
+
+    {% include 'navbar.html' %}
+
+    <div class="app-content container center-layout mt-2">
+        <div class="content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    {% include 'javascript.html' %}
+
+    {% block page_javascript %}{% endblock %}
+</body>
+</html>
