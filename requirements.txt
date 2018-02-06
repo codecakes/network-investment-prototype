@@ -41,14 +41,20 @@ lml==0.0.1
 Mako==1.0.7
 MarkupSafe==1.0
 mccabe==0.6.1
+<<<<<<< HEAD
 mock==2.0.0
+=======
+>>>>>>> 99e1fb7475f919c017a53f2385e024a4fb11df2b
 newrelic==2.98.0.81
 olefile==0.44
 openpyxl==2.4.9
 paramiko==2.4.0
 pathlib==1.0.1
 pathlib2==2.3.0
+<<<<<<< HEAD
 pbr==3.1.1
+=======
+>>>>>>> 99e1fb7475f919c017a53f2385e024a4fb11df2b
 pew==1.1.2
 pexpect==4.3.1
 pickleshare==0.7.4
