@@ -20,3 +20,4 @@ staticfiles/
 .vscode/bitbucket-pipelines.yml
 .vscode/
 
+local_settings.py
