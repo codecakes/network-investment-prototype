@@ -41,6 +41,8 @@ sys.path.append(settings.BASE_DIR)
 def app_404(request):
     return render(request, '404.html')
 
+def notactive(request):
+    return HttpResponse("User is not active")
 
 def traverse_tree(user, level=4):
     ref_code = "/add/user?ref={}&place={}".format(
@@ -504,7 +506,11 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
-        context = {}
+        context = {"package_access_disable":True}
+        user = request.user
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            context["package_access_disable"] = False
+        print context
         template = loader.get_template('network.html')
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
