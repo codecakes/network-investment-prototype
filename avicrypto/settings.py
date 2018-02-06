@@ -135,7 +135,7 @@ CACHES = {
 
 RQ_QUEUES = {
     'crypto_payments': {
-        'USE_REDIS_CACHE': 'redis-cache'
+        'USE_REDIS_CACHE': 'default'
     }
 }
 
