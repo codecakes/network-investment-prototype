@@ -510,7 +510,6 @@ def network(request):
         user = request.user
         if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
             context["package_access_disable"] = False
-        print context
         template = loader.get_template('network.html')
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
