@@ -24,8 +24,8 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import *
-
-from addons.accounts.models import Members, Profile, SupportTicket
+from django.core.exceptions import ObjectDoesNotExist
+from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
 from addons.packages.lib.payout import (UTC, calc, calculate_investment,
                                         find_next_monday)
 from addons.packages.models import Packages, User_packages
@@ -41,6 +41,8 @@ sys.path.append(settings.BASE_DIR)
 def app_404(request):
     return render(request, '404.html')
 
+def notactive(request):
+    return HttpResponse("User is not active")
 
 def traverse_tree(user, level=4):
     ref_code = "/add/user?ref={}&place={}".format(
@@ -116,7 +118,8 @@ def app_login(request):
                         if user is not None:
                             login(request, user)
                             return HttpResponse(json.dumps({
-                                "status": "ok"
+                                "status": "ok",
+                                "crypto_account": crypto_account_exists(user)
                             }))
                         else:
                             return HttpResponse(json.dumps({
@@ -207,7 +210,7 @@ def app_signup(request):
 
                     content = {
                         "status": "ok",
-                        "message": "Thank you for registration. Soon you will receive a conformation mail."
+                        "message": "Thank you for registration. Soon you will receive a confirmation mail."
                     }
                     return HttpResponse(json.dumps(content))
                 else:
@@ -451,15 +454,29 @@ def profile(request):
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         country = request.POST.get("country", "US")
-
+        btc_address = request.POST.get("btc_address")
+        eth_address = request.POST.get("eth_address")
+        xrp_address = request.POST.get("xrp_address")
+        destination_tag = request.POST.get("destination_tag")
         user = request.user
         user.first_name = first_name
         user.last_name = last_name
         user.save()
-
         user.profile.country = country
         user.profile.save()
-
+        try:
+            user.useraccount.btc_address = btc_address
+            user.useraccount.eth_address = eth_address
+            user.useraccount.xrp_address = xrp_address
+            user.useraccount.eth_destination_tag = destination_tag
+            user.useraccount.save()
+        except ObjectDoesNotExist:
+            user_account = UserAccount.objects.create(user=user)
+            user_account.btc_address = btc_address
+            user_account.eth_address = eth_address
+            user_account.xrp_address = xrp_address
+            user_account.eth_destination_tag = destination_tag
+            user_account.save()
         return HttpResponse(json.dumps({"status": "success"}))
     else:
         return HttpResponseRedirect('/error')
@@ -490,7 +507,10 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
-        context = {}
+        context = {"package_access_disable":True}
+        user = request.user
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            context["package_access_disable"] = False
         template = loader.get_template('network.html')
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
@@ -624,6 +644,14 @@ def add_user(request):
         email = data['email']
 
         if not User.objects.filter(email=email).exists():
+            placement_id = Profile.objects.get(
+                user_auto_id=data['placement_id'])
+            if placement_id.user.is_active == False:
+                content = {
+                    "status": "error",
+                    "message": "placement user is not active",
+                }
+                return HttpResponse(json.dumps(content))
             user = User.objects.create(email=email, username=email)
             user.first_name = data['first_name']
             user.last_name = data['last_name']
@@ -633,8 +661,8 @@ def add_user(request):
 
             profile = Profile.objects.get(user=user)
             sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
-            placement_id = Profile.objects.get(
-                user_auto_id=data['placement_id'])
+            
+            # check user active or not 
             profile.sponser_id = sponser_id.user
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
@@ -672,3 +700,16 @@ def add_user(request):
             }
 
         return HttpResponse(json.dumps(content))
+
+def crypto_account_exists(user):
+    try:
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            return True
+        else:
+            return  False
+    except ObjectDoesNotExist:
+        user_account = UserAccount.objects.create(user=user)
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            return True
+        else:
+            return False

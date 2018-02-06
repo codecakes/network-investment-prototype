@@ -31,6 +31,7 @@ $(function() {
         ajaxURL: ajaxURL,
         depth: 4,
         zoom: true,
+        pan: true,
         toggleSiblingsResp: true,
         initCompleted: obj => {
           console.log(`finished rendering network tree`);
