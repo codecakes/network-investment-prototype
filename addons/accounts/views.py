@@ -211,7 +211,7 @@ def app_signup(request):
 
                     content = {
                         "status": "ok",
-                        "message": "Thank you for registration. Soon you will receive a conformation mail."
+                        "message": "Thank you for registration. Soon you will receive a confirmation mail."
                     }
                     return HttpResponse(json.dumps(content))
                 else:

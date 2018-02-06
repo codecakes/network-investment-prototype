@@ -2,5 +2,5 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
+from addons.packages.lib.payout import calc
 
-# Create your tests here.
