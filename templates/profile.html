@@ -97,7 +97,7 @@
                                     <div class="form-group row">
                                         <label class="col-md-3 label-control">Etherum Address</label>
                                        <div class="col-md-9">
-                                            <input type="text" id="xrp_address" class="form-control" placeholder="First Name" name="xrp_address" value="{{user.xrp_address}}" required>
+                                            <input type="text" id="eth_address" class="form-control" placeholder="First Name" name="eth_address" value="{{user.eth_address}}" required>
                                         </div>
                                     </div>
 
@@ -131,9 +131,13 @@
         var data = {
             "first_name": $("#first_name").val(),
             "last_name": $("#last_name").val(),
-            "country": $("#country").val()
+            "country": $("#country").val(),
+            "btc_address": $("#btc_address").val(),
+            "eth_address": $("#eth_address").val(),
+            "xrp_address": $("#xrp_address").val(),
+            "destination_tag": $("#destination_tag").val(),
         }
-
+        console.log(data)
         $.ajax({
             type:"POST",
             url:"/profile",
