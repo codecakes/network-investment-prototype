@@ -139,8 +139,8 @@
                                                     </div>
 
                                                     <div class="form-group">
-                                                        <label>Transition Id*</label>
-                                                        <input id="transition_id" class="form-control border-primary" name="wallet" type="text" placeholder="Wallet Address" required/>
+                                                        <label>Transaction Id*</label>
+                                                        <input id="transaction_id" class="form-control border-primary" name="wallet" type="text" placeholder="Wallet Address" required/>
                                                     </div>
 
                                                     <div class="form-group">
@@ -216,7 +216,7 @@
     }
     
     $("#btcBuy,#xrpBuy,#ethBuy").click(function(event){
-        $("#transition_id,#wallet_adddress,#destinationTag").val("");
+        $("#transaction_id,#wallet_adddress,#destinationTag").val("");
         $("#cryptoContainer").toggle();
         $("#cryptoDetails").toggle();
         $($("#destinationTag").parent().get(0)).toggle();
