@@ -23,7 +23,13 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <!--<div class="chart" id="networkTree"></div>-->
-                                <div id="chart-container"></div>
+                                {% if not package_status%}
+                                    <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
+                                            <strong>Your Network Tree is disables as you Don't have any active package(s).</strong>
+                                        </div>
+                                {% else %}
+                                    <div id="chart-container"></div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
