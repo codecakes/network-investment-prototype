@@ -36,10 +36,10 @@
                         {% if package_access_disable %}
                             <div class="card-block">
                                 <div class="col-md-6">
-                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" disabled>Crypto</button>
+                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" >Crypto</button>
                                 </div>
                                 <div class="col-md-6">
-                                    <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
+                                    <button id="subscribeCash" class="btn btn-primary">Cash</button>
                                 </div>
                             </div>
                         {% else %}
@@ -139,8 +139,13 @@
                                                     </div>
 
                                                     <div class="form-group">
+                                                        <label>Transition Id*</label>
+                                                        <input id="transition_id" class="form-control border-primary" name="wallet" type="text" placeholder="Wallet Address" required/>
+                                                    </div>
+
+                                                    <div class="form-group">
                                                         <label>Wallet Address*</label>
-                                                        <input class="form-control border-primary" name="wallet" type="text" placeholder="Wallet Address" required/>
+                                                        <input id="wallet_adddress" class="form-control border-primary" name="wallet" type="text" placeholder="Wallet Address" required/>
                                                     </div>
 
                                                     <div class="form-group">
@@ -211,16 +216,19 @@
     }
     
     $("#btcBuy,#xrpBuy,#ethBuy").click(function(event){
+        $("#transition_id,#wallet_adddress,#destinationTag").val("");
         $("#cryptoContainer").toggle();
         $("#cryptoDetails").toggle();
         $($("#destinationTag").parent().get(0)).toggle();
         var cryptoType=""
         if(event.target.id==='btcBuy'){
             cryptoType="BTC";
+            $($("#destinationTag").parent().get(0)).hide();
         } else if(event.target.id==='xrpBuy'){
+            $($("#destinationTag").parent().get(0)).show();
             cryptoType="XRP";
         } else {
-            $($("#destinationTag").parent().get(0)).toggle();
+            $($("#destinationTag").parent().get(0)).hide();
             cryptoType="ETH";
 
         }
