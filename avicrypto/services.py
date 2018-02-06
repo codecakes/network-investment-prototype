@@ -4,6 +4,20 @@ from django.contrib.auth.decorators import user_passes_test
 uri = 'https://api.mailgun.net/v3/avicrypto.us/messages'
 key = 'key-1055741f06d43a548bf5def6962b536a'
 
+def send_email_results(amt, crypto_addr, bool_result):
+    """
+    @params:
+        crypto_addr: XRP/BTC/ETH address of a user
+        bool_result: True or False.
+
+    Write a function that :
+    1. Finds the user email based on their `crypto_addr` which could be anyone of XRP/ETH/BTC. 
+    2. Sends them an email telling them if their transaction was successful or not.
+    3. If it was successful then set their package to active for the price `amt`
+    else tell their transaction failed.
+    """
+    pass
+
 def send_email_mailgun(subject, body, receipient_emails, from_email="postmaster"):
     data = {
         "from": "AviCrypto <mail@avicrypto.us>",
