@@ -8,7 +8,9 @@ pyc
 .pyc
 /*.pyc
 **/*.pyc
-migrations/
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
 pyc
 addons/**/*.pyc
 avicrypto/*.pyc
@@ -17,12 +19,4 @@ media/
 staticfiles/
 .vscode/bitbucket-pipelines.yml
 .vscode/
-addons/*/migrations/
-addons/*/migrations
-addons/packages/migrations/
-addons/packages/migrations/
-addons/accounts/migrations/
-addons/wallet/migrations/
-addons/transactions/migrations/
-addons/packages/migrations/*
-migrations/
+
