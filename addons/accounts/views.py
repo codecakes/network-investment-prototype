@@ -649,6 +649,13 @@ def add_user(request):
             sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
             placement_id = Profile.objects.get(
                 user_auto_id=data['placement_id'])
+            if placement_id.user.is_active == False:
+                content = {
+                    "status": "error",
+                    "message": "placement user is not active",
+                }
+                return HttpResponse(json.dumps(content))
+            # check user active or not 
             profile.sponser_id = sponser_id.user
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
