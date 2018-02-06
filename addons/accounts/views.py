@@ -403,7 +403,9 @@ def home(request):
             'packages': packages,
             'support_tickets': support_tickets,
             'support_tickets_choices': SupportTicket.status_choices,
-            'enable_withdraw': False
+            'enable_withdraw': False,
+            'crypto_account':crypto_account_exists(request.user),
+            'package_status':has_package(request.user)
         }
 
         is_day = datetime.datetime.utcnow().day
@@ -521,7 +523,7 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
-        context = {"package_access_disable":True}
+        context = {"package_access_disable":True,'pacakage_status':has_package(request.user)}
         user = request.user
         if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
             context["package_access_disable"] = False
@@ -743,3 +745,6 @@ def validate_user_transaction(request):
             "status": "ok",
             "message": "We will send a conformation email, whether the transaction is valid or not."
         }))
+def has_package(user):    
+    pkg = User_packages.objects.filter(status='A', user = user)
+    return True if pkg else False 
