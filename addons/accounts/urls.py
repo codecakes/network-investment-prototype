@@ -45,6 +45,7 @@ urlpatterns = [
     url(r'^uploads/simple/$', views.simple_upload, name='simple_upload'),
     url(r'^uploads/form/$', views.model_form_upload, name='model_form_upload'),
     url(r'^add/user/', views.add_user, name='profile'),
+    url(r'^not-active', views.notactive, name="notactive"),
 
     # url(r'^add/user/(?P<id>[a-zA-Z0-9]{0,30})/$',views.add_user, name='add_user'),
     url(r'^404', views.app_404, name='app_404'),

@@ -5,8 +5,6 @@ import json
 import random
 import re
 import sys
-from datetime import datetime
-import calendar
 
 from django.conf import settings
 from django.contrib import messages
@@ -26,8 +24,8 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import *
-
-from addons.accounts.models import Members, Profile, SupportTicket
+from django.core.exceptions import ObjectDoesNotExist
+from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
 from addons.packages.lib.payout import (UTC, calc, calculate_investment,
                                         find_next_monday)
 from addons.packages.models import Packages, User_packages
@@ -36,7 +34,6 @@ from addons.wallet.models import Wallet
 from avicrypto import services
 from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of,
                       is_valid_leg, load_users)
-from lib.blockexplorer import validate_transaction
 
 sys.path.append(settings.BASE_DIR)
 
@@ -44,6 +41,8 @@ sys.path.append(settings.BASE_DIR)
 def app_404(request):
     return render(request, '404.html')
 
+def notactive(request):
+    return HttpResponse("User is not active")
 
 def traverse_tree(user, level=4):
     ref_code = "/add/user?ref={}&place={}".format(
@@ -119,7 +118,8 @@ def app_login(request):
                         if user is not None:
                             login(request, user)
                             return HttpResponse(json.dumps({
-                                "status": "ok"
+                                "status": "ok",
+                                "crypto_account": crypto_account_exists(user)
                             }))
                         else:
                             return HttpResponse(json.dumps({
@@ -147,8 +147,7 @@ def app_login(request):
 
 def app_signup(request):
     if request.method == "POST":
-        data = request.POST
-        email = data.get('email')
+        email = request.POST.get('email')
         referal_code = data.get('referal', None)
         sponcer_id = data.get('sponcer_id', None)
         placement_id = data.get('placement_id', None)
@@ -199,7 +198,7 @@ def app_signup(request):
                     user.set_password(str(password))
                     user.save()
 
-                    token = update_signup_user_profile(user, request.POST)
+                    token = update_user_profile(user, request.POST)
 
                     email_data = {
                         "user": user,
@@ -298,7 +297,11 @@ def app_reset_password(request, token):
 
         profile.save()
         profile.user.save()
-        return HttpResponseRedirect('/login')
+        content = {
+            "status": "ok",
+            "message": "Password has been successfully changed."
+        }
+        return render(request, 'reset-password.html', content)
     else:
         profile = get_object_or_404(Profile, token=token, user__is_active=True)
         return render(request, 'reset-password.html')
@@ -379,16 +382,11 @@ def error(request):
 
 @login_required(login_url="/login")
 def home(request):
-    # import datetime
-    from pytz import UTC
-    import calendar
+    import datetime
     if request.method == 'GET':
         user = request.user
         # TODO: TEMPORARY. Remove this line before next MONDAY!
-        today = UTC.normalize(UTC.localize(datetime.utcnow()))
-        is_day = calendar.weekday(today.year, today.month, today.day)
-        if today.hour == 23 and today.minute == 59 and is_day == 0:
-            calculate_investment(user)
+        calculate_investment(user)
 
         packages = User_packages.objects.filter(user=user)
         support_tickets = SupportTicket.objects.filter(user=user)
@@ -398,21 +396,14 @@ def home(request):
             'packages': packages,
             'support_tickets': support_tickets,
             'support_tickets_choices': SupportTicket.status_choices,
-            'enable_withdraw': False
         }
-
-        today = datetime.utcnow()
-        is_day = calendar.weekday(today.year, today.month, today.day)
-        if 0<= is_day < 2:
-            context["enable_withdraw"] = True
-
         user_active_package = [
             package for package in packages if package.status == 'A']
         if user_active_package:
             pkg = user_active_package[0]
             # today = UTC.normalize(UTC.localize(datetime.datetime.now()))
             dt = UTC.normalize(UTC.localize(
-                datetime.now())) - pkg.created_at
+                datetime.datetime.now())) - pkg.created_at
             context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
             next_payout = find_next_monday()
             context["next_payout"] = "%s-%s-%s" % (
@@ -422,12 +413,10 @@ def home(request):
             context["weekly_payout"] = 0
             context["direct_payout"] = 0
             context["binary_payout"] = 0
-            context["user_active_package_value"] = 0
         else:
             context["weekly_payout"] = user_active_package[0].weekly
             context["direct_payout"] = user_active_package[0].direct
             context["binary_payout"] = user_active_package[0].binary
-            context["user_active_package_value"] = user_active_package[0].package.price
 
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
@@ -465,15 +454,29 @@ def profile(request):
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         country = request.POST.get("country", "US")
-
+        btc_address = request.POST.get("btc_address")
+        eth_address = request.POST.get("eth_address")
+        xrp_address = request.POST.get("xrp_address")
+        destination_tag = request.POST.get("destination_tag")
         user = request.user
         user.first_name = first_name
         user.last_name = last_name
         user.save()
-
         user.profile.country = country
         user.profile.save()
-
+        try:
+            user.useraccount.btc_address = btc_address
+            user.useraccount.eth_address = eth_address
+            user.useraccount.xrp_address = xrp_address
+            user.useraccount.eth_destination_tag = destination_tag
+            user.useraccount.save()
+        except ObjectDoesNotExist:
+            user_account = UserAccount.objects.create(user=user)
+            user_account.btc_address = btc_address
+            user_account.eth_address = eth_address
+            user_account.xrp_address = xrp_address
+            user_account.eth_destination_tag = destination_tag
+            user_account.save()
         return HttpResponse(json.dumps({"status": "success"}))
     else:
         return HttpResponseRedirect('/error')
@@ -504,7 +507,10 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
-        context = {}
+        context = {"package_access_disable":True}
+        user = request.user
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            context["package_access_disable"] = False
         template = loader.get_template('network.html')
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
@@ -570,44 +576,6 @@ def model_form_upload(request):
     })
 
 
-# TODO: This is for signup purposes only. Refactor
-def update_signup_user_profile(user, data):
-    profile = Profile.objects.get(user=user)
-    profile.country = data.get('country', "US")
-    profile.mobile = data.get('mobile', None)
-
-    referal_code = data.get('referal', None)
-    sponcer_id = data.get('sponcer_id', None)
-    placement_id = data.get('placement_id', None)
-    placement_position = data.get('placement_position', "L")
-    token = get_token(user.username)
-
-    profile.token = token
-
-    if referal_code:
-        sponser_user = Profile.objects.get(my_referal_code=referal_code)
-
-        if placement_id:
-            p_user = Profile.objects.get(
-                user_auto_id=placement_id)
-            profile.placement_id = p_user.user 
-        else:
-            placement_users = find_min_max(sponser_user.user)
-
-            if placement_position == "R":
-                profile.placement_id = placement_users[1]
-            else:
-                profile.placement_id = placement_users[0]
-
-        profile.placement_position = placement_position
-        profile.referal_code = referal_code
-        profile.sponcer_id = sponser_user.user
-        Members.objects.create(parent_id=profile.placement_id, child_id=user)
-
-    profile.save()
-
-    return token
-
 @login_required(login_url="/login")
 def update_user_profile(user, data):
     profile = Profile.objects.get(user=user)
@@ -626,9 +594,8 @@ def update_user_profile(user, data):
         sponser_user = Profile.objects.get(my_referal_code=referal_code)
 
         if placement_id:
-            p_user = Profile.objects.get(
-                user_auto_id=placement_id)
-            profile.placement_id = p_user.user 
+            profile.placement_id = Profile.objects.get(
+                user_auto_id=placement_id).user
         else:
             placement_users = find_min_max(sponser_user.user)
 
@@ -677,9 +644,15 @@ def add_user(request):
         email = data['email']
 
         if not User.objects.filter(email=email).exists():
-            password = User.objects.make_random_password()
+            placement_id = Profile.objects.get(
+                user_auto_id=data['placement_id'])
+            if placement_id.user.is_active == False:
+                content = {
+                    "status": "error",
+                    "message": "placement user is not active",
+                }
+                return HttpResponse(json.dumps(content))
             user = User.objects.create(email=email, username=email)
-            user.set_password(password)
             user.first_name = data['first_name']
             user.last_name = data['last_name']
             user.username = user.profile.user_auto_id
@@ -688,7 +661,8 @@ def add_user(request):
 
             profile = Profile.objects.get(user=user)
             sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
-            placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
+            
+            # check user active or not 
             profile.sponser_id = sponser_id.user
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
@@ -708,11 +682,11 @@ def add_user(request):
 
             email_data = {
                 "user": user,
-                "token": token,
-                "password": password
+                "token": token
             }
             body = render_to_string('mail/welcome.html', email_data)
-            services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
+            services.send_email_mailgun(
+                'Welcome to Avicrypto', body, email, from_email="postmaster")
 
             Members.objects.create(parent_id=placement_id.user, child_id=user)
             content = {
@@ -726,3 +700,16 @@ def add_user(request):
             }
 
         return HttpResponse(json.dumps(content))
+
+def crypto_account_exists(user):
+    try:
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            return True
+        else:
+            return  False
+    except ObjectDoesNotExist:
+        user_account = UserAccount.objects.create(user=user)
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            return True
+        else:
+            return False
