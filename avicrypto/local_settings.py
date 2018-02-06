@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 # """
 # Django settings for avicrypto project.
 
@@ -178,7 +176,6 @@
 # )
 
 # # django_heroku.settings(locals())
->>>>>>> 99e1fb7475f919c017a53f2385e024a4fb11df2b
 """
 Django settings for avicrypto project.
 
