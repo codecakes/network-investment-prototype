@@ -118,7 +118,8 @@ def app_login(request):
                         if user is not None:
                             login(request, user)
                             return HttpResponse(json.dumps({
-                                "status": "ok"
+                                "status": "ok",
+                                "crypto_account": crypto_account_exists(user)
                             }))
                         else:
                             return HttpResponse(json.dumps({
@@ -699,3 +700,16 @@ def add_user(request):
             }
 
         return HttpResponse(json.dumps(content))
+
+def crypto_account_exists(user):
+    try:
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            return True
+        else:
+            return  False
+    except ObjectDoesNotExist:
+        user_account = UserAccount.objects.create(user=user)
+        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+            return True
+        else:
+            return False
