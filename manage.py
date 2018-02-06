@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-import rq
-import django_rq
+
 
 if __name__ == "__main__":
     if not os.environ.get("DJANGO_SETTINGS_MODULE"):
