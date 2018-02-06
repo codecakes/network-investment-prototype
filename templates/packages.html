@@ -126,31 +126,33 @@
                                     </div>
                                     <div class="card-body collapse in">
                                         <div class="card-block">
-                                            <form>
+                                            <form id="purchasePackageForm">
+                                                {% csrf_token %}
                                                 <div class="form-body">
                                                     <div class="form-group">
                                                         <label>Crypto Type</label>
-                                                        <input id="cryptoPackage" name="type" class="form-control border-primary" type="text" readonly>
+                                                        <input id="cryptoPackage" name="coin" class="form-control border-primary" type="text" readonly>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label>Package Code</label>
                                                         <input id="cryptoPackageCode" name="code" class="form-control border-primary" type="text" readonly>
+                                                        <input id="cryptoPackageAmount" name="amount" class="form-control border-primary" type="hidden">
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label>Transaction Id*</label>
-                                                        <input id="transaction_id" class="form-control border-primary" name="wallet" type="text" placeholder="Wallet Address" required/>
+                                                        <input id="transaction_id" class="form-control border-primary" name="txn_id" type="text" placeholder="Wallet Address" required/>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label>Wallet Address*</label>
-                                                        <input id="wallet_adddress" class="form-control border-primary" name="wallet" type="text" placeholder="Wallet Address" required/>
+                                                        <input id="wallet_adddress" class="form-control border-primary" name="source_address" type="text" placeholder="Wallet Address" required/>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label>Destination Tag*</label>
-                                                        <input id="destinationTag"class="form-control border-primary" name="tag" type="text" placeholder="Destination Tag">
+                                                        <input id="destinationTag"class="form-control border-primary" name="destination_tag" type="text" placeholder="Destination Tag">
                                                     </div>
                                                 </div>
                                                 <div class="form-actions">
@@ -234,7 +236,37 @@
         }
         $("#cryptoPackage").val(cryptoType);
         $("#cryptoPackageCode").val("usd"+$("#packCode").html())
+        $("#cryptoPackageAmount").val($("#packCode").html())
 
+    })
+
+    function getFormData($form) {
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function(n, i) {
+        indexed_array[n["name"]] = n["value"];
+        });
+
+        return indexed_array;
+    }
+
+    $("#purchasePackageForm").submit(function(event){
+        event.preventDefault();
+        var data = getFormData($(this));
+        $.ajax({
+        type: "POST",
+        url: "/validate-user-transaction",
+        data: data,
+        success: function(data) {
+            data = JSON.parse(data)
+            if(data.status == "error") {
+            toastr.warning(data.message, "Error");
+            } else {
+            toastr.success(data.message, "Success");
+            }
+        }
+        });
     })
 </script>
 

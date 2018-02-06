@@ -738,13 +738,15 @@ def validate_user_transaction(request):
         address = request.POST.get("address", "")
         txn_id = request.POST.get("txn_id", "")
         coin = request.POST.get("coin", "btc")
+        destination_tag = request.POST.get("destination_tag", "btc")
 
-        validate_transaction(amount, source_address, address, txn_id, coin)
+        validate_transaction(amount, source_address, address, txn_id, coin.lower())
 
         return HttpResponse(json.dumps({
             "status": "ok",
             "message": "We will send a conformation email, whether the transaction is valid or not."
         }))
+
 def has_package(user):    
     pkg = User_packages.objects.filter(status='A', user = user)
-    return True if pkg else False 
+    return True if pkg else False
