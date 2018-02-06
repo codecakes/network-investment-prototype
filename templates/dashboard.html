@@ -5,7 +5,19 @@
 {% load staticfiles %}
 
 {% load add %}
-<div class="content-header"></div>
+<div class="content-header">
+    {% if not crypto_account %}
+        <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
+                <strong>Kindly add your Crypto Account Details</strong>
+            </div>
+    {% endif %}
+
+    {% if not package_status%}
+        <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
+                <strong>You Don't have any active packages.</strong>
+            </div>
+    {% endif %}
+</div>
 <div class="content-body">
     <div class="row">
         <div class="col-xs-12">
