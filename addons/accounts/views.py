@@ -432,7 +432,7 @@ def home(request):
             context["weekly_payout"] = user_active_package[0].weekly
             context["direct_payout"] = user_active_package[0].direct
             context["binary_payout"] = user_active_package[0].binary
-            context["user_active_package_value"] = user_active_package[0].price
+            context["user_active_package_value"] = user_active_package[0].package.price
 
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
