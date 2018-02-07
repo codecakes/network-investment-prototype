@@ -9,6 +9,7 @@ pyc
 /*.pyc
 **/*.pyc
 **/migrations/**
+**/migrations/*.pyc
 !**/migrations
 !**/migrations/__init__.py
 pyc
