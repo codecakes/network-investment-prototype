@@ -20,13 +20,16 @@ def send_email_results(amt, crypto_addr, bool_result):
     else tell their transaction failed.
     """
     user = UserAccount.objects.get(Q(btc_address=crypto_addr) | Q(xrp_address=crypto_addr) | Q(eth_address=crypto_addr)).user
+    email_data = {
+        full_name:user.first_name+' '+user.last_name
+    }
     if bool_result:
-        body = 'Transactions Success'
+        body = render_to_string('mail/transaction_success.html', email_data)
         package = Packages.objects.get(price=amt)
         set_package_status(user, package, 'A')
         send_email_mailgun('AVI Crypto Transaction Success', body, user.email, from_email="postmaster")
     else:
-        body = 'Transations failed'
+        body = render_to_string('mail/transaction_failed.html', email_data)
         send_email_mailgun('AVI Crypto Transaction Failed', body, user_email, from_email="postmaster")
     pass
 
