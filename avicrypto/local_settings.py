@@ -285,17 +285,26 @@ WSGI_APPLICATION = 'avicrypto.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.environ["avicrypto_db"],
+#         'USER': os.environ["avicrypto_user"],
+#         'PASSWORD': os.environ["avicrypto_pwd"],
+#         'HOST': os.environ["avicrypto_host"],
+#         'PORT': 5432
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ["avicrypto_db"],
-        'USER': os.environ["avicrypto_user"],
-        'PASSWORD': os.environ["avicrypto_pwd"],
-        'HOST': os.environ["avicrypto_host"],
+        'NAME': 'avicrypto',
+        'USER': 'atul',
+        'PASSWORD': 'a',
+        'HOST': 'localhost',
         'PORT': 5432
     }
 }
-
 # using redis for caches
 REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL'))
 CACHES = {
