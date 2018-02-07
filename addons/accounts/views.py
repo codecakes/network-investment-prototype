@@ -392,7 +392,7 @@ def home(request):
         # TODO: TEMPORARY. Remove this line before next MONDAY!
         today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
         is_day = calendar.weekday(today.year, today.month, today.day)
-        if today.hour == 23 and today.minute == 59 and is_day == 0:
+        if today.hour == 23 and today.minute == 59 and is_day == 6:
             calculate_investment(user)
 
         packages = User_packages.objects.filter(user=user)
@@ -408,7 +408,6 @@ def home(request):
             'package_status':has_package(request.user)
         }
 
-        is_day = datetime.datetime.utcnow().day
         if 0<= is_day < 2:
             context["enable_withdraw"] = True
 
