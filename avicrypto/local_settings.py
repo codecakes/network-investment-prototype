@@ -400,6 +400,23 @@ mailgun_conf = {
     'api': 'https://api.mailgun.net/v3/avicrypto.us/messages'
 }
 # django_heroku.settings(locals())
+REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL'))
+CACHES = {
+    "default": {
+        #  "BACKEND": "redis_cache.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
+         "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
+         "OPTIONS": {
+             "PASSWORD": REDIS_URL.password,
+             "DB": 0,
+             "CLIENT_CLASS": "django_redis.client.DefaultClient"
+         }
+    }
+}
 
-
+RQ_QUEUES = {
+    'crypto_payments': {
+        'USE_REDIS_CACHE': 'default'
+    }
+}
 

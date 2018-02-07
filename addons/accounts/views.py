@@ -5,6 +5,9 @@ import json
 import random
 import re
 import sys
+import datetime
+from pytz import UTC
+import calendar
 
 from django.conf import settings
 from django.contrib import messages
@@ -34,6 +37,7 @@ from addons.wallet.models import Wallet
 from avicrypto import services
 from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of,
                       is_valid_leg, load_users)
+from addons.accounts.lib.blockexplorer import validate_transaction
 
 sys.path.append(settings.BASE_DIR)
 
@@ -383,11 +387,14 @@ def error(request):
 
 @login_required(login_url="/login")
 def home(request):
-    import datetime
+
     if request.method == 'GET':
         user = request.user
         # TODO: TEMPORARY. Remove this line before next MONDAY!
-        calculate_investment(user)
+        today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+        is_day = calendar.weekday(today.year, today.month, today.day)
+        if today.hour == 23 and today.minute == 59 and is_day == 6:
+            calculate_investment(user)
 
         packages = User_packages.objects.filter(user=user)
         support_tickets = SupportTicket.objects.filter(user=user)
@@ -397,12 +404,18 @@ def home(request):
             'packages': packages,
             'support_tickets': support_tickets,
             'support_tickets_choices': SupportTicket.status_choices,
+            'enable_withdraw': False,
+            'crypto_account':crypto_account_exists(request.user),
+            'package_status':has_package(request.user)
         }
+
+        if 0<= is_day < 2:
+            context["enable_withdraw"] = True
+
         user_active_package = [
             package for package in packages if package.status == 'A']
         if user_active_package:
             pkg = user_active_package[0]
-            # today = UTC.normalize(UTC.localize(datetime.datetime.now()))
             dt = UTC.normalize(UTC.localize(
                 datetime.datetime.now())) - pkg.created_at
             context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
@@ -414,10 +427,12 @@ def home(request):
             context["weekly_payout"] = 0
             context["direct_payout"] = 0
             context["binary_payout"] = 0
+            context["user_active_package_value"] = 0
         else:
             context["weekly_payout"] = user_active_package[0].weekly
             context["direct_payout"] = user_active_package[0].direct
             context["binary_payout"] = user_active_package[0].binary
+            context["user_active_package_value"] = user_active_package[0].package.price
 
         template = loader.get_template('dashboard.html')
         if not request.user.is_authenticated():
@@ -508,7 +523,7 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
-        context = {"package_access_disable":True}
+        context = {"package_access_disable":True,'pacakage_status':has_package(request.user)}
         user = request.user
         if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
             context["package_access_disable"] = False
@@ -747,3 +762,25 @@ def crypto_account_exists(user):
             return True
         else:
             return False
+
+@login_required(login_url="/login")
+def validate_user_transaction(request):
+    if request.method == "POST":
+        amount = request.POST.get("amount", 0)
+        source_address = request.POST.get("source_address", "")
+        address = request.POST.get("address", "")
+        txn_id = request.POST.get("txn_id", "")
+        coin = request.POST.get("coin", "btc")
+        destination_tag = request.POST.get("destination_tag", "btc")
+
+        validate_transaction(amount, source_address, address, txn_id, coin.lower())
+
+        return HttpResponse(json.dumps({
+            "status": "ok",
+            "message": "We will send a conformation email, whether the transaction is valid or not."
+        }))
+
+def has_package(user):    
+    pkg = User_packages.objects.filter(status='A', user = user)
+    print pkg
+    return True if pkg else False
