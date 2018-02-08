@@ -28,7 +28,6 @@ def send_email_results(amt, crypto_addr, bool_result):
     else:
         body = 'Transations failed'
         send_email_mailgun('AVI Crypto Transaction Failed', body, user_email, from_email="postmaster")
-    pass
 
 def send_email_mailgun(subject, body, receipient_emails, from_email="postmaster"):
     data = {
