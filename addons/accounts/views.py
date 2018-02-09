@@ -389,7 +389,6 @@ def home(request):
 
     if request.method == 'GET':
         user = request.user
-        # TODO: TEMPORARY. Remove this line before next MONDAY!
         today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
         is_day = calendar.weekday(today.year, today.month, today.day)
         if today.hour == 23 and today.minute == 59 and is_day == 6:
