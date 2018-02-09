@@ -7,6 +7,10 @@ from django.conf import settings
 from addons.accounts.models import User, Members
 from addons.packages.models import Packages, User_packages
 
+# from django.contrib.auth.models import User
+from addons.accounts.models import Profile, Members
+from addons.packages.models import Packages, User_packages
+
 import pytz
 import calendar
 from datetime import datetime, timedelta
@@ -26,3 +30,15 @@ from addons.packages.lib.payout import calc, START_TIME
 #         root_pkg = User_packages.objects.get(user = self.root_user)
 #         self.assertEqual(root_pkg.package.price, 1000, "Package should be $ 1000")
 #         # self.left_user
+
+class LogInTest(TestCase):
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuser',
+            'password': 'testpassword'}
+        User.objects.create_user(**self.credentials)
+    def test_login(self):
+        # send login data
+        response = self.client.post('/login/', self.credentials, follow=True)
+        # should be logged in now
+        self.assertTrue(response.context['user'].is_active)
