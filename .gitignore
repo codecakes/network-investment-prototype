@@ -20,4 +20,3 @@ media/
 staticfiles/
 .vscode/bitbucket-pipelines.yml
 .vscode/
-avicrypto/local_settings.py
