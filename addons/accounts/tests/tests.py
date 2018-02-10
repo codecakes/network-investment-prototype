@@ -7,6 +7,10 @@ from django.contrib.auth.models import User
 from addons.accounts.models import Profile, Members
 from addons.packages.models import Packages, User_packages
 
+# from django.contrib.auth.models import User
+from addons.accounts.models import Profile, Members
+from addons.packages.models import Packages, User_packages
+
 import pytz
 import calendar
 from datetime import datetime, timedelta

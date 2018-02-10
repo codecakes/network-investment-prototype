@@ -9,6 +9,7 @@ from avicrypto.local_settings import *
 
 # # # Application definition
 
+<<<<<<< HEAD
 # INSTALLED_APPS = [
 #     'django.contrib.admin',
 #     'django.contrib.auth',
@@ -40,3 +41,19 @@ from avicrypto.local_settings import *
 # TEMPLATE_DIRS = (
 #     '/home/moooeeeep/login_test/templates/',
 # )
+=======
+# # Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'addons.accounts',
+    'addons.packages',
+    'addons.transactions',
+    'addons.wallet',
+]
+>>>>>>> 9d436e8fec1ebca0b259ac093533d8f493c6a197

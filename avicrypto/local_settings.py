@@ -1,3 +1,4 @@
+
 """
 Django settings for avicrypto project.
 
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'addons.packages',
     'addons.transactions',
     'addons.wallet',
+    "django_rq",
 ]
 
 # MIDDLEWARE_CLASSES = (
@@ -129,6 +131,48 @@ DATABASES = {
 }
 # using redis for caches
 
+# using redis for caches
+# TODO: Need to have local redis url
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "rq_console": {
+            "format": "%(asctime)s %(message)s",
+            "datefmt": "%H:%M:%S",
+        },
+    },
+    "handlers": {
+        "rq_console": {
+            "level": "DEBUG",
+            "class": "rq.utils.ColorizingStreamHandler",
+            "formatter": "rq_console",
+            "exclude": ["%(asctime)s"],
+        }
+    },
+    'loggers': {
+        "rq.worker": {
+            "handlers": ["rq_console"],
+            "level": "DEBUG"
+        },
+    }
+}
+
+# From https://stackoverflow.com/questions/2037364/django-test-runner-not-finding-tests
+# http://niwinz.github.io/django-redis/latest/#_installation
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -202,6 +246,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
    'django.contrib.staticfiles.finders.DefaultStorageFinder',
     # 'compressor.finders.CompressorFinder'
+    'compressor.finders.CompressorFinder'
 )
 
 
@@ -231,4 +276,3 @@ RQ_QUEUES = {
         'USE_REDIS_CACHE': 'default'
     }
 }
-
