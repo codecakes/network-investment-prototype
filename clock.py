@@ -38,7 +38,7 @@ def send_mail_results(job_id):
     send_email_results(amt, addr, result)
     
 
-@sched.scheduled_job('cron', 'interval', minutes=2)
+@sched.scheduled_job('interval', minutes=2)
 def run_crypto_worker():
     from addons.accounts.lib.tree import divide_conquer
     enqueued_ids = Q.job_ids

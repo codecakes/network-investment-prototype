@@ -9,6 +9,7 @@ pyc
 /*.pyc
 **/*.pyc
 **/migrations/**
+**/migrations/*.pyc
 !**/migrations
 !**/migrations/__init__.py
 pyc
@@ -19,4 +20,5 @@ media/
 staticfiles/
 .vscode/bitbucket-pipelines.yml
 .vscode/
-
+local_settings.py
+avicrypto/local_settings.py
