@@ -121,6 +121,10 @@
                             </div>
                             <div id="cryptoDetails">
                                 <div class="card">
+                                    <div><label>Note: </label><p>Use the following Ethereum address to deposit funds:
+                                    Your deposit will take about one hour to complete.
+
+                                    Do not send any unsupported currency or token to this address! Currencies and tokens not supported by GateHub will NOT be credited and you will not be able to access them.</p></div>
                                     <div class="card-header">
                                         <h4 class="card-title" id="basic-layout-colored-form-control">Required Crypto Details</h4>
                                     </div>
@@ -132,6 +136,11 @@
                                                     <div class="form-group">
                                                         <label>Crypto Type</label>
                                                         <input id="cryptoPackage" name="coin" class="form-control border-primary" type="text" readonly>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Company Wallet Address</label>
+                                                        <input id="company_wallet_address" name="company_wallet_address" class="form-control border-primary" type="text" readonly="">
                                                     </div>
 
                                                     <div class="form-group">
@@ -225,12 +234,15 @@
         var cryptoType=""
         if(event.target.id==='btcBuy'){
             cryptoType="BTC";
-            $($("#destinationTag").parent().get(0)).hide();
+            $($("#destinationTag").parent().get(0)).show();
+            $("#company_wallet_address").val('13EwqEyfm8DfTVRcfLCxXYQdCUadXB1xXs');
         } else if(event.target.id==='xrpBuy'){
             $($("#destinationTag").parent().get(0)).show();
+            $("#company_wallet_address").val('rsfYuF1eLofJG1XUJZSMc6b2TRT8F9qfS1');
             cryptoType="XRP";
         } else {
-            $($("#destinationTag").parent().get(0)).hide();
+            $($("#destinationTag").parent().get(0)).show();
+            $("#company_wallet_address").val('0xe5b8b0ee07f1e1ea73052d7af4ec19292c060afes');
             cryptoType="ETH";
 
         }
