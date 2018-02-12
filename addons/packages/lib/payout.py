@@ -207,7 +207,7 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     pkg.right_binary_cf = right_binary_cf
     pkg.direct = direct
     pkg.weekly = weekly
-    pkg.total_payout += binary + direct + weekly
+    pkg.total_payout = binary + direct + weekly
     pkg.last_payout_date = next_payout
     pkg.save()
 
@@ -309,7 +309,7 @@ def find_next_monday():
     dt = datetime(cur_dt.year, cur_dt.month, cur_dt.day, cur_dt.hour,
                   cur_dt.minute, cur_dt.second, cur_dt.microsecond)
     rem_dt = timedelta(days=remaining_days)
-    return UTC.normalize(UTC.localize(dt + rem_dt)) if remaining_days != 0 else UTC.normalize(UTC.localize(dt + 7))
+    return UTC.normalize(UTC.localize(dt + rem_dt)) if remaining_days != 0 else UTC.normalize(UTC.localize(dt + timedelta(days=7)))
 
 def greater_date(dt1, dt2):
     return max(dt1, dt2)
