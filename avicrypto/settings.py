@@ -124,8 +124,10 @@ CACHES = {
     "default": {
         #  "BACKEND": "redis_cache.RedisCache",
         "BACKEND": "django_redis.cache.RedisCache",
-         "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
+        #  "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
+        "LOCATION": "redis://{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
          "OPTIONS": {
+             "USERNAME": REDIS_URL.username,
              "PASSWORD": REDIS_URL.password,
              "DB": 0,
              "CLIENT_CLASS": "django_redis.client.DefaultClient"

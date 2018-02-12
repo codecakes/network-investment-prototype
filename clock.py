@@ -40,6 +40,7 @@ def send_mail_results(job_id):
 
 @sched.scheduled_job('interval', minutes=2)
 def run_crypto_worker():
+    """Emails results of transaction's varification status used to buy package"""
     from addons.accounts.lib.tree import divide_conquer
     enqueued_ids = Q.job_ids
     divide_conquer(enqueued_ids, 0, len(enqueued_ids)-1, send_mail_results)
