@@ -1,21 +1,13 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-{% load staticfiles %}
-
-{% load add %}
+{% extends "base.html" %} {% block content %} {% load staticfiles %} {% load add %} {% csrf_token %}
 <div class="content-header">
     {% if not crypto_account %}
-        <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
-                <strong>Kindly add your Crypto Account Details</strong>
-            </div>
-    {% endif %}
-
-    {% if not package_status%}
-        <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
-                <strong>You Don't have any active packages.</strong>
-            </div>
+    <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
+        <strong>Kindly add your Crypto Account Details</strong>
+    </div>
+    {% endif %} {% if not package_status%}
+    <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
+        <strong>You Don't have any active packages.</strong>
+    </div>
     {% endif %}
 </div>
 <div class="content-body">
@@ -26,9 +18,9 @@
                     <h4 class="card-title">Payouts for package: ${{user_active_package_value}}</h4>
                     <div class="heading-elements" style="top: 9px;">
                         {% if enable_withdraw %}
-                            <button type="button" class="btn btn-primary btn-min-width">Withdraw</button>
+                        <button type="button" class="btn btn-primary btn-min-width" data-toggle="modal" data-target="#withdrawModal">Withdraw</button>
                         {% else %}
-                            <button type="button" class="btn btn-danger btn-min-width" disabled>Withdraw</button>
+                        <button type="button" class="btn btn-danger btn-min-width" disabled>Withdraw</button>
                         {% endif %}
                     </div>
                 </div>
@@ -61,7 +53,7 @@
                                         <span class="font-large-2 text-bold-300 deep-orange">Direct</span>
                                     </div>
                                     <div class="row mt-1">
-                                            <input type="hidden" id="direct-payout" value="{{direct_payout}}">
+                                        <input type="hidden" id="direct-payout" value="{{direct_payout}}">
                                         <div id="xrp-direct" class="col-xs-6"></div>
                                         <div id="eth-direct" class="col-xs-6"></div>
                                         <div id="btc-direct" class="col-xs-6"></div>
@@ -157,7 +149,7 @@
                 <div class="card-header">
                     <h4 class="card-title">My Fixed Deposits</h4>
                     {% if next_payout %}
-                        <p>Next payout: {{ next_payout }}</p>
+                    <p>Next payout: {{ next_payout }}</p>
                     {% endif %}
                 </div>
                 <div class="card-body collapse in">
@@ -190,11 +182,11 @@
                                     <td>${{ package.total_payout }}</td>
                                 </tr>
                                 {% empty %}
-                                    <tr>
-                                        <td>
-                                            No fixed deposit.
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td>
+                                        No fixed deposit.
+                                    </td>
+                                </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -226,24 +218,45 @@
                                     <td>{{ support_ticket.description|truncatechars:200 }}</td>
                                     <td>{{ support_ticket.created_at }}</td>
                                     <td>
-                                        {% for key,value in support_tickets_choices %}
-                                            {% if key == support_ticket.status %}
-                                                {{ value }}
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% for key,value in support_tickets_choices %} {% if key == support_ticket.status %} {{ value }} {% endif %} {% endfor %}
                                     </td>
                                 </tr>
                                 {% empty %}
-                                    <tr>
-                                        <td>
-                                            No Support Tickets.
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td>
+                                        No Support Tickets.
+                                    </td>
+                                </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade text-xs-left" id="withdrawModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel1">Withdraw</h4>
+            </div>
+            <div class="modal-body">
+                <select name="withdrawCurrency" id="withdrawCurrency">
+                    <option value="">Select wallet</option>
+                    {% for key, value in wallet_type_choices %}
+                        <option value="{{key}}">{{value}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">Close</button>
+                <button id="withdrawButton" type="button" class="btn btn-outline-primary">Withdraw</button>
             </div>
         </div>
     </div>
@@ -256,9 +269,7 @@
         document.execCommand("Copy");
         alert("Copied the text: " + copyText.value);
     }
-</script>
 
-<script>
     var exchSettings = {
         "async": true,
         "crossDomain": true,
@@ -319,5 +330,11 @@
     window.onbeforeunload = function (evt) {
         stopOnUnload(intId);
     };
+
 </script>
+
+{% endblock %}
+
+{% block page_javascript %}
+	<script type="text/javascript" src="{% static 'js/pages/dashboard.js' %}"></script>
 {% endblock %}
