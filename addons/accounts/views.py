@@ -499,13 +499,13 @@ def profile(request):
             user_account.xrp_address = xrp_address
             user_account.eth_destination_tag = destination_tag
 
-            if btc_address:
+            if btc_address and not Wallet.objects.filter(user=user, wallet_type="BTC").exists():
                 Wallet.objects.create(user=user, wallet_type="BTC")
             
-            if eth_address:
+            if eth_address and not Wallet.objects.filter(user=user, wallet_type="ETH").exists():
                 Wallet.objects.create(user=user, wallet_type="ETH")
 
-            if xrp_address:
+            if xrp_address and not Wallet.objects.filter(user=user, wallet_type="XRP").exists():
                 Wallet.objects.create(user=user, wallet_type="XRP")
 
             user_account.save()
