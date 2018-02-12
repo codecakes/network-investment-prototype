@@ -808,7 +808,7 @@ def withdraw(request):
                     if not user_account.btc_address or user_account.btc_address == "None":
                         return HttpResponse(json.dumps({
                             "status": "error",
-                            "message": "Add selected crypto currenct account first."
+                            "message": "Add selected crypto currency account first."
                         }))
                     else:
                         crypto_addr = user_account.btc_address
@@ -816,7 +816,7 @@ def withdraw(request):
                     if not user_account.xrp_address or user_account.xrp_address == "None":
                         return HttpResponse(json.dumps({
                             "status": "error",
-                            "message": "Add selected crypto currenct account first."
+                            "message": "Add selected crypto currency account first."
                         }))
                     else:
                         crypto_addr = user_account.xrp_address
@@ -824,7 +824,7 @@ def withdraw(request):
                     if not user_account.eth_address or user_account.eth_address == "None":
                         return HttpResponse(json.dumps({
                             "status": "error",
-                            "message": "Add selected crypto currenct account first."
+                            "message": "Add selected crypto currency account first."
                         }))
                     else:
                         crypto_addr = user_account.eth_address
