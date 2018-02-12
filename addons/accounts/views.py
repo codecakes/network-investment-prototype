@@ -474,7 +474,9 @@ def profile(request):
         btc_address = request.POST.get("btc_address")
         eth_address = request.POST.get("eth_address")
         xrp_address = request.POST.get("xrp_address")
-        destination_tag = request.POST.get("destination_tag")
+        eth_destination_tag = request.POST.get("eth_destination_tag")
+        xrp_destination_tag = request.POST.get("xrp_destination_tag")
+        btc_destination_tag = request.POST.get("btc_destination_tag")
         user = request.user
         user.first_name = first_name
         user.last_name = last_name
@@ -485,14 +487,18 @@ def profile(request):
             user.useraccount.btc_address = btc_address
             user.useraccount.eth_address = eth_address
             user.useraccount.xrp_address = xrp_address
-            user.useraccount.eth_destination_tag = destination_tag
+            user.useraccount.eth_destination_tag = eth_destination_tag
+            user.useraccount.xrp_destination_tag = xrp_destination_tag
+            user.useraccount.btc_destination_tag = btc_destination_tag
             user.useraccount.save()
         except ObjectDoesNotExist:
             user_account = UserAccount.objects.create(user=user)
             user_account.btc_address = btc_address
             user_account.eth_address = eth_address
             user_account.xrp_address = xrp_address
-            user_account.eth_destination_tag = destination_tag
+            user.useraccount.eth_destination_tag = eth_destination_tag
+            user.useraccount.xrp_destination_tag = xrp_destination_tag
+            user.useraccount.btc_destination_tag = btc_destination_tag
             user_account.save()
         return HttpResponse(json.dumps({"status": "success"}))
     else:
