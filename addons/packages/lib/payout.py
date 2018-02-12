@@ -181,6 +181,36 @@ def calc(user, last_date, investment_type):
     next_date = find_next_monday()
     return INVESTMENT_TYPE[investment_type](user, last_date, next_date)
 
+def run_investment_calc(user, pkg, last_date, next_payout):
+    state_m = StateMachine(user)        
+    state_m.add_state('weekly', INVESTMENT_TYPE, end_state='direct')
+    state_m.add_state('direct', INVESTMENT_TYPE, end_state='binary')
+    state_m.add_state('binary', INVESTMENT_TYPE, end_state='end')
+    # state_m.add_state('loyalty', INVESTMENT_TYPE, end_state='loyalty_booter')
+    # state_m.add_state('loyalty_booter', INVESTMENT_TYPE, end_state='loyalty_booter_super')
+    # state_m.add_state('loyalty_booter_super', INVESTMENT_TYPE, end_state='end')
+    # print "end states:", state_m.end_states
+    state_m.set_start('weekly')
+    state_m.run(last_date, next_payout)
+    state_m.set_start('direct')
+    state_m.run(last_date, next_payout)
+    state_m.set_start('binary')
+    state_m.run(last_date, next_payout)
+    
+    # print state_m.results
+    binary, left_binary_cf, right_binary_cf = state_m.results['binary']
+    direct = state_m.results['direct']
+    weekly = state_m.results['weekly']
+    
+    pkg.binary = binary
+    pkg.left_binary_cf = left_binary_cf
+    pkg.right_binary_cf = right_binary_cf
+    pkg.direct = direct
+    pkg.weekly = weekly
+    pkg.total_payout += binary + direct + weekly
+    pkg.last_payout_date = next_payout
+    pkg.save()
+
 
 def calculate_investment(user):
     """Calculates all investment schemes of the user"""
@@ -195,34 +225,7 @@ def calculate_investment(user):
         if last_date <= today < next_payout:
             # print "INSIDE calculate_investments"
             print "calculating for ", user
-            state_m = StateMachine(user)
-            
-            state_m.add_state('weekly', INVESTMENT_TYPE, end_state='direct')
-            state_m.add_state('direct', INVESTMENT_TYPE, end_state='binary')
-            state_m.add_state('binary', INVESTMENT_TYPE, end_state='end')
-            # state_m.add_state('loyalty', INVESTMENT_TYPE, end_state='end')
-            # state_m.add_state('loyalty_booter', INVESTMENT_TYPE, end_state='end')
-            # print "end states:", state_m.end_states
-            state_m.set_start('weekly')
-            state_m.run(last_date, next_payout)
-            state_m.set_start('direct')
-            state_m.run(last_date, next_payout)
-            state_m.set_start('binary')
-            state_m.run(last_date, next_payout)
-            
-            # print state_m.results
-            binary, left_binary_cf, right_binary_cf = state_m.results['binary']
-            direct = state_m.results['direct']
-            weekly = state_m.results['weekly']
-            
-            pkg.binary = binary
-            pkg.left_binary_cf = left_binary_cf
-            pkg.right_binary_cf = right_binary_cf
-            pkg.direct = direct
-            pkg.weekly = weekly
-            pkg.total_payout += binary + direct + weekly
-            pkg.last_payout_date = next_payout
-            pkg.save()
+            run_investment_calc(user, pkg, last_date, next_payout)
 
 
 def run_scheduler():
@@ -306,7 +309,7 @@ def find_next_monday():
     dt = datetime(cur_dt.year, cur_dt.month, cur_dt.day, cur_dt.hour,
                   cur_dt.minute, cur_dt.second, cur_dt.microsecond)
     rem_dt = timedelta(days=remaining_days)
-    return UTC.normalize(UTC.localize(dt + rem_dt))
+    return UTC.normalize(UTC.localize(dt + rem_dt)) if remaining_days != 0 else UTC.normalize(UTC.localize(dt + 7))
 
 def greater_date(dt1, dt2):
     return max(dt1, dt2)
