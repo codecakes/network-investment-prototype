@@ -207,9 +207,11 @@ def app_signup(request):
 
                     email_data = {
                         "user": user,
+                        "username":user.username,
+                        "password": password,
                         "token": token
                     }
-                    body = render_to_string('mail/welcome.html', email_data)
+                    body = render_to_string('mail/welcome_.html', email_data)
                     services.send_email_mailgun(
                         'Welcome to Avicrypto', body, email, from_email="postmaster")
 
@@ -268,9 +270,9 @@ def app_forgot_password(request):
             token = get_token(user.username)
             email_data = {
                 "token": token,
-                "user": user
+                "user": user.username
             }
-            body = render_to_string('mail/reset-password.html', email_data)
+            body = render_to_string('mail/reset.html', email_data)
             services.send_email_mailgun(
                 'Reset Password Avicrypto', body, email, from_email="postmaster")
             content = {
@@ -473,7 +475,9 @@ def profile(request):
         btc_address = request.POST.get("btc_address")
         eth_address = request.POST.get("eth_address")
         xrp_address = request.POST.get("xrp_address")
-        destination_tag = request.POST.get("destination_tag")
+        eth_destination_tag = request.POST.get("eth_destination_tag")
+        xrp_destination_tag = request.POST.get("xrp_destination_tag")
+        btc_destination_tag = request.POST.get("btc_destination_tag")
         user = request.user
         user.first_name = first_name
         user.last_name = last_name
@@ -484,7 +488,9 @@ def profile(request):
             user.useraccount.btc_address = btc_address
             user.useraccount.eth_address = eth_address
             user.useraccount.xrp_address = xrp_address
-            user.useraccount.eth_destination_tag = destination_tag
+            user.useraccount.eth_destination_tag = eth_destination_tag
+            user.useraccount.xrp_destination_tag = xrp_destination_tag
+            user.useraccount.btc_destination_tag = btc_destination_tag
             user.useraccount.save()
         except ObjectDoesNotExist:
             user_account = UserAccount.objects.create(user=user)

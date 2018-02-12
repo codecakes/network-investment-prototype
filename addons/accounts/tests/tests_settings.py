@@ -18,5 +18,5 @@ INSTALLED_APPS = [
     'addons.accounts',
     'addons.packages',
     'addons.transactions',
-    'addons.wallet',
+    'addons.wallet'
 ]
