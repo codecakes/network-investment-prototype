@@ -35,21 +35,21 @@
                     <div class="text-xs-center">
                         {% if package_access_disable %}
                             <div class="card-block">
-                                <div class="col-md-6">
+                                <div class="col-md-12 center">
                                     <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" disabled>Crypto</button>
                                 </div>
-                                <div class="col-md-6">
+                               <!--  <div class="col-md-6">
                                     <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
-                                </div>
+                                </div> -->
                             </div>
                         {% else %}
                             <div class="card-block">
-                                <div class="col-md-6">
+                                <div class="col-md-12 center">
                                     <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
-                                </div>
+                                </div> -->
                             </div>
                         {% endif%}
                     </div>
