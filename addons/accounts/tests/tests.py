@@ -36,9 +36,10 @@ class LogInTest(TestCase):
         self.credentials = {
             'username': 'testuser',
             'password': 'testpassword'}
-        User.objects.create_user(**self.credentials)
+        # User.objects.create_user(**self.credentials)
     def test_login(self):
+        # import pdb; pdb.set_trace()
         # send login data
-        response = self.client.post('/login/', self.credentials, follow=True)
+        # response = self.clients.post('/login/', self.credentials, follow=True)
         # should be logged in now
         self.assertTrue(response.context['user'].is_active)

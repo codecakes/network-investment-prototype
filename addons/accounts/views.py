@@ -207,9 +207,11 @@ def app_signup(request):
 
                     email_data = {
                         "user": user,
+                        "username":user.username,
+                        "password": password,
                         "token": token
                     }
-                    body = render_to_string('mail/welcome.html', email_data)
+                    body = render_to_string('mail/welcome_.html', email_data)
                     services.send_email_mailgun(
                         'Welcome to Avicrypto', body, email, from_email="postmaster")
 
@@ -268,9 +270,9 @@ def app_forgot_password(request):
             token = get_token(user.username)
             email_data = {
                 "token": token,
-                "user": user
+                "user": user.username
             }
-            body = render_to_string('mail/reset-password.html', email_data)
+            body = render_to_string('mail/reset.html', email_data)
             services.send_email_mailgun(
                 'Reset Password Avicrypto', body, email, from_email="postmaster")
             content = {
