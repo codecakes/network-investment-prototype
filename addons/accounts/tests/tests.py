@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 from django.conf import settings
-
-from addons.accounts.models import User, Members
+from django.contrib.auth.models import User
+from addons.accounts.models import Profile, Members
 from addons.packages.models import Packages, User_packages
 
 # from django.contrib.auth.models import User
