@@ -73,7 +73,7 @@ def validate(amt, src_addr, addr, txn_id, coin="btc"):
     # txn_res = requests.get(txn_api)
     # addr_res = requests.get(addr_api)
 
-    res = is_valid_btc_paid(amt, src_addr, addr, txn_id, addr_res, txn_res)
+    # return is_valid_btc_paid(amt, src_addr, addr, txn_id, addr_res, txn_res)
     # print "coin is %s" %coin
     # print "is_valid_btc_paid(amt, src_addr, addr, txn_id, j_addr, j_txn) is %s" %res
     if coin == "btc":

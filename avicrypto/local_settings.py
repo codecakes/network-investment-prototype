@@ -299,13 +299,18 @@ DATABASES = {
 
 # using redis for caches
 # TODO: Need to have local redis url
-REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL'))
+REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL', os.environ.get('REDISCLOUD_URL', "redis://h:pb103a8aff67a360322baba2563ca55a5c30184a2c57ab788339c131612ffb0b6@ec2-35-168-41-119.compute-1.amazonaws.com:55049")))
+print REDIS_URL.hostname, REDIS_URL.port, REDIS_URL.username
+print "redis://{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port)
+
 CACHES = {
     "default": {
         #  "BACKEND": "redis_cache.RedisCache",
         "BACKEND": "django_redis.cache.RedisCache",
-         "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
+        #  "LOCATION": "{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
+        "LOCATION": "redis://{0}:{1}".format(REDIS_URL.hostname, REDIS_URL.port),
          "OPTIONS": {
+             "USERNAME": REDIS_URL.username,
              "PASSWORD": REDIS_URL.password,
              "DB": 0,
              "CLIENT_CLASS": "django_redis.client.DefaultClient"
