@@ -31,18 +31,22 @@ def reset_these():
 
     users = User.objects.all()
     for u in users:
-        pkg = User_packages.objects.filter(user = u, status='A')
-        if pkg:
-            pkg = pkg[0]
-            pkg.last_payout_date = u.date_joined
-            # pkg.binary = 0.0
-            # pkg.weekly = 0.0
-            # pkg.direct = 0.0
-            # pkg.total_payout += pkg.weekly
-            # pkg.left_binary_cf = 0.0
-            # pkg.right_binary_cf = 0.0
-            # pkg.save()
-            run_investment_calc(u, pkg, pkg.last_payout_date, find_next_monday())
+        try:
+            profile = u.profile
+            pkg = User_packages.objects.filter(user = u, status='A')
+            if pkg:
+                pkg = pkg[0]
+                pkg.last_payout_date = u.date_joined
+                # pkg.binary = 0.0
+                # pkg.weekly = 0.0
+                # pkg.direct = 0.0
+                # pkg.total_payout += pkg.weekly
+                # pkg.left_binary_cf = 0.0
+                # pkg.right_binary_cf = 0.0
+                # pkg.save()
+                run_investment_calc(u, pkg, pkg.last_payout_date, find_next_monday())
+        except:
+            pass
     # print "running"
     # # print run_scheduler()
     # for u in users:
