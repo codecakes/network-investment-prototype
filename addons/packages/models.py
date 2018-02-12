@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.conf import settings
-
+import datetime
+from dateutil.relativedelta import relativedelta
 import uuid
 
 # Create your models here.
@@ -30,7 +31,7 @@ class Packages(models.Model):
 class User_packages(models.Model):
 	package = models.ForeignKey(Packages, null=True, related_name='+')
 	duration = models.IntegerField(null=True, blank=True)
-	expiry_date = models.DateTimeField(null=True)
+	expiry_date = models.DateTimeField(null=True, blank=True)
 	status_choices = (
 		('A', 'Active'),
 		('NA', 'Non-Active'),
@@ -48,4 +49,13 @@ class User_packages(models.Model):
 	total_payout = models.FloatField(null=True, blank=True, default=0.0)
 	left_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
 	right_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
+
+	def save(self):
+		if not self.pk:
+			self.expiry_date = datetime.date.today() + relativedelta(years=self.duration)
+			super(User_packages, self).save(self)
+		# else:
+		# 	self.expiry_date = datetime.date.today() + relativedelta(years=self.duration)
+		# 	super(User_packages, self).update(self)
+
 
