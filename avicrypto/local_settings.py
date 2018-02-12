@@ -133,6 +133,7 @@ DATABASES = {
 
 # using redis for caches
 # TODO: Need to have local redis url
+LOGIN_URL='/login'
 
 LOGGING = {
     "version": 1,
