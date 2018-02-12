@@ -247,12 +247,15 @@
                 <h4 class="modal-title" id="myModalLabel1">Withdraw</h4>
             </div>
             <div class="modal-body">
-                <select name="withdrawCurrency" id="withdrawCurrency">
+                <button data-value="BTC" class="btn btn-primary withdraw-currency">BTC</button>
+                <button data-value="XRP" class="btn btn-primary withdraw-currency">XRP</button>
+                <button data-value="ETH" class="btn btn-primary withdraw-currency">ETH</button>
+                <!-- <select name="withdrawCurrency" id="withdrawCurrency">
                     <option value="">Select wallet</option>
                     {% for key, value in wallet_type_choices %}
                         <option value="{{key}}">{{value}}</option>
                     {% endfor %}
-                </select>
+                </select> -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">Close</button>

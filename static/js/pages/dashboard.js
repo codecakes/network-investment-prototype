@@ -1,11 +1,11 @@
 jQuery(document).ready(function() {
-  jQuery("#withdrawButton").click(function() {
-    if ($("#withdrawCurrency").val()) {
+  jQuery(".withdraw-currency").click(function() {
+    if ($(this).data('value')) {
       $.ajax({
         type: "POST",
         url: "/withdraw",
         data: {
-          currency: $("#withdrawCurrency").val()
+          currency: $(this).data('value')
         },
         headers: {
             "X-CSRFToken": $("[name='csrfmiddlewaretoken']").val()
