@@ -522,7 +522,7 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
-        context = {"package_access_disable":True,'pacakage_status':has_package(request.user)}
+        context = {"package_access_disable":True,'package_status':has_package(request.user)}
         user = request.user
         if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
             context["package_access_disable"] = False

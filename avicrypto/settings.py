@@ -34,7 +34,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'q+@$$hpdjv$l-g9x7pz55_5#@fq29s@!25#r@_&$1_@l^j4-2z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -119,7 +119,7 @@ DATABASES = {
 }
 
 # using redis for caches
-REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL'))
+REDIS_URL = urlparse.urlparse(os.environ.get('REDIS_URL', os.environ.get('REDISCLOUD_URL', "redis://h:pb103a8aff67a360322baba2563ca55a5c30184a2c57ab788339c131612ffb0b6@ec2-35-168-41-119.compute-1.amazonaws.com:55049")))
 CACHES = {
     "default": {
         #  "BACKEND": "redis_cache.RedisCache",
