@@ -38,6 +38,11 @@ class User_packages(models.Model):
 		('C', 'Confirmed'),
 		('NC', 'Non-Confirmed')
 	)
+	cur_choice = (
+		('btc', 'Bitcoin'),
+		('xrp', 'Ripple'),
+		('eth', 'Ethereum')
+	)
 	status = models.CharField(max_length=50, choices=status_choices, default="NA")
 	user = models.ForeignKey(User, null=True, related_name='+')
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -49,6 +54,8 @@ class User_packages(models.Model):
 	total_payout = models.FloatField(null=True, blank=True, default=0.0)
 	left_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
 	right_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
+	paid_txn_id = models.UUIDField(default=uuid.uuid4, editable=False)
+	paid_cur = models.CharField(max_length=50, choices=cur_choice)
 
 	def save(self):
 		if not self.pk:
