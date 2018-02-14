@@ -55,7 +55,7 @@ class User_packages(models.Model):
 	left_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
 	right_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
 	paid_txn_id = models.UUIDField(default=uuid.uuid4, editable=False)
-	paid_cur = models.CharField(max_length=50, choices=cur_choice)
+	paid_cur = models.CharField(max_length=50, choices=cur_choice, default='btc')
 
 	def save(self):
 		if not self.pk:
