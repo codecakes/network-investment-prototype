@@ -782,19 +782,35 @@ def crypto_account_exists(user):
 @login_required(login_url="/login")
 def validate_user_transaction(request):
     if request.method == "POST":
-        amount = request.POST.get("amount", 0)
-        source_address = request.POST.get("source_address", "")
-        address = request.POST.get("address", "")
-        txn_id = request.POST.get("txn_id", "")
-        coin = request.POST.get("coin", "btc")
-        destination_tag = request.POST.get("destination_tag", "btc")
-
-        validate_transaction(amount, source_address, address, txn_id, coin.lower())
-
-        return HttpResponse(json.dumps({
-            "status": "ok",
-            "message": "We will send a conformation email, whether the transaction is valid or not."
-        }))
+        try:
+            pkg_txn = User_packages.objects.filter(paid_txn_id=request.POST.get("txn_id", ""))
+            if len(pkg_txn) == 0:
+                amount = request.POST.get("amount", 0)
+                source_address = request.POST.get("source_address", "")
+                address = request.POST.get("address", "")
+                txn_id = request.POST.get("txn_id", "")
+                coin = request.POST.get("coin", "btc")
+                destination_tag = request.POST.get("destination_tag", "btc")
+                # try:
+                package = Packages.objects.get(price=amount)
+                set_package_tx_id = User_packages.objects.create(user=request.user, package=package, status='NC', paid_txn_id=txn_id, paid_cur=coin.lower(), duration=1)
+                # except:
+                #     print 'error'
+                validate_transaction(amount, source_address, address, txn_id, coin.lower())
+                return HttpResponse(json.dumps({
+                    "status": "ok",
+                    "message": "We will send a conformation email, whether the transaction is valid or not."
+                }))
+            else:
+                return HttpResponse(json.dumps({
+                    "status": "ok",
+                    "message": "Transaction id is already exists"
+                }))
+        except ObjectDoesNotExist:
+            return HttpResponse(json.dumps({
+                    "status": "ok",
+                    "message": "Oopse somethign went wrong"
+                }))
 
 def has_package(user):    
     pkg = User_packages.objects.filter(status='A', user = user)
@@ -876,7 +892,7 @@ def withdraw(request):
                             "transaction": transaction,
                             "today": UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
                         }
-                        body = render_to_string('mail/welcome.html', email_data)
+                        body = render_to_string('mail/transaction-admin.html', email_data)
                         services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
 
                         return HttpResponse(json.dumps({
