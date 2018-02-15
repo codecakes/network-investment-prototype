@@ -22,3 +22,8 @@ staticfiles/
 .vscode/
 local_settings.py
 avicrypto/local_settings.py
+.DS_Store
+*.DS_Store
+**/*.DS_Store
+**/*/*.DS_Store
+templates/.DS_Store

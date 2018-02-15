@@ -1,33 +1,21 @@
 <!DOCTYPE html>
 <html>
-<style>
-body,html{ 
-    background-image: url('https://codecakes.github.io/avi.github.io/staticfiles/images/mail/reset-mailer.jpg');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center; 
-    background-size: contain;	
-}
-p{
-  margin: 1px
-}
-div{
-  position: absolute;
-  top: 59%;
-  left: 24%;  /* Put the left edge on the horizontal center */
-  margin-left: 148px; /* Move it 148px to the right of the horizontal center, placing it over the lightswitch */
- }
-</style>
 <body>
-
+  <table align="center" background="https://codecakes.github.io/avi.github.io/staticfiles/images/mail/reset-mailer.jpg" width="100%" height="1085px" style="background-repeat:no-repeat;background-position:center;">
+   <tr style="height:100%">
+     <table style="margin-top:370px;margin-left:180px;font-size:x-large;">
+       <tr>
+           	<p>Please go to following page and choose a new password</p>
+          	<center>
+              <p><a href="https://www.avicrypto.us/reset-password" target="#">www.avicrypto.us/reset-password</a></p>
+            </center>
+          	<p>Your login username in case you've forgotten is</p>
+            <p> {{username}}</p>
+       </tr>
+     </table>
+   </tr>
+  </table>
 <div>
-	<p>Please go to following page and choose a new password</p>
-	<center>
-    <p><a href="https://www.avicrypto.us/reset-password" target="#">www.avicrypto.us/reset-password</a></p>
-  </center>
-  <br>
-	<p>Your login username in case you've forgotten is</p>
-  <p> {{username}}</p>
 </div>
 
 </body>

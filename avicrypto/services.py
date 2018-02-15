@@ -21,7 +21,7 @@ def send_email_results(amt, crypto_addr, bool_result):
     """
     user = UserAccount.objects.get(Q(btc_address=crypto_addr) | Q(xrp_address=crypto_addr) | Q(eth_address=crypto_addr)).user
     email_data = {
-        "full_name": user.first_name+' '+user.last_name
+        full_name:user.first_name+' '+user.last_name
     }
     if bool_result:
         body = render_to_string('mail/transaction_success.html', email_data)
@@ -66,5 +66,5 @@ def active_required(function):
 
 
 def set_package_status(user, package, status):
-    set_package = User_packages.objects.save(user=user, package=package, status=status)
+    set_package = User_packages.objects.get_or_create(user=user, package=package, status=status)
     return True
