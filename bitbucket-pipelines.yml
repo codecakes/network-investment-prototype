@@ -18,7 +18,7 @@ pipelines:
           - mkdir -p staticfiles && mkdir -p media
           - python manage.py collectstatic --noinput
           - pwd_dir=$(pwd)
-          - cd .. && git clone git@github.com:codecakes/avi.github.io.git
+          - cd .. && git clone git@github.com/avicrypto-us/avi.github.io.git
           - cd avi.github.io && cp -R $pwd_dir/staticfiles ./
           - git config --global user.email $AKUL_GITHUB_EMAIL
           - git config --global user.name $AKUL_GITHUB_USER
