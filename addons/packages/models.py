@@ -54,8 +54,13 @@ class User_packages(models.Model):
 	total_payout = models.FloatField(null=True, blank=True, default=0.0)
 	left_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
 	right_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
+<<<<<<< HEAD
 	paid_txn_id = models.CharField(max_length=100, null=True, blank=True)
 	paid_cur = models.CharField(max_length=50, choices=cur_choice, null=True)
+=======
+	paid_txn_id = models.UUIDField(default=uuid.uuid4, editable=False)
+	paid_cur = models.CharField(max_length=50, choices=cur_choice, default='btc')
+>>>>>>> 0f7436f5e8dc6d0e536c2813e9f06470bba0c0cc
 
 	def save(self, **kwargs):
 		if not self.pk:
