@@ -43,9 +43,13 @@ def tot_txn_vol(user):
     # TODO: integrate a redis cache decorator
     res = (map(lambda w: Transactions.objects.filter(sender_wallet=w.uuid,
                                                          reciever_wallet=w.uuid).aggregate(Sum('amount')),
-                   Wallet.objects.filter(owner=user)))[0]
-    res = res.get('amount__sum', 0.0)
-    return res if res != None else 0.0
+                   Wallet.objects.filter(owner=user)))
+    if res:
+        res = res[0]
+        res = res.get('amount__sum', 0.0)
+        # print res
+        return res if res != None else 0.0
+    return 0.0
 
 
 def num_children(user):
