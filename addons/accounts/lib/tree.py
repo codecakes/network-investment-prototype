@@ -41,9 +41,11 @@ def is_right(member):
 def tot_txn_vol(user):
     """Helper function to calculate total aggregated amount"""
     # TODO: integrate a redis cache decorator
-    return sum(map(lambda w: Transactions.objects.filter(sender_wallet=w.uuid,
+    res = (map(lambda w: Transactions.objects.filter(sender_wallet=w.uuid,
                                                          reciever_wallet=w.uuid).aggregate(Sum('amount')),
-                   Wallet.objects.filter(owner=user)))
+                   Wallet.objects.filter(owner=user)))[0]
+    res = res.get('amount__sum', 0.0)
+    return res if res != None else 0.0
 
 
 def num_children(user):
