@@ -195,7 +195,7 @@ def is_parent_of(parent, child_user):
 
 def divide_conquer(arr, lo, hi, member_fn):
     mid = (hi - lo)/2 + lo
-    if mid > lo:
+    if hi > lo:
         return divide_conquer(arr, lo, mid, member_fn) + divide_conquer(arr, mid+1, hi, member_fn)
     else:
         return [member_fn(arr[lo])]
