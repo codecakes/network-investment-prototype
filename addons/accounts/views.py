@@ -861,44 +861,52 @@ def withdraw(request):
                 else:
                     user_wallet = Wallet.objects.get(owner=user, wallet_type=currency_type)
 
-                if User_packages.objects.filter(status='A', user = user).exists():
+                if User_packages.objects.filter(status='A', user=user).exists():
 
                     user_packages = User_packages.objects.get(user=user, status='A')
 
                     if user_packages.total_payout > 0:
-                        total_payout = user_packages.total_payout
-                        owner_amount = total_payout / 10
-                        user_amount = total_payout - owner_amount
 
-                        transaction = Transactions.objects.create(sender_wallet=owner_wallet, reciever_wallet=user_wallet, amount=user_amount)
+                        if not Transactions.objects.filter(sender_wallet=owner_wallet, reciever_wallet=user_wallet, status="P", tx_type="W").exists():
 
-                        owner_wallet.amount = owner_wallet.amount + owner_amount
-                        owner_wallet.save()
+                            total_payout = user_packages.total_payout
+                            owner_amount = total_payout / 10
+                            user_amount = total_payout - owner_amount
 
-                        user_wallet.amount = 0
-                        user_wallet.save()
+                            transaction = Transactions.objects.create(sender_wallet=owner_wallet, reciever_wallet=user_wallet, amount=user_amount, status="P", description="Withdraw Transaction", tx_type="W")
 
-                        user_packages.total_payout = 0
-                        user_packages.save()
+                            owner_wallet.amount = owner_wallet.amount + owner_amount
+                            owner_wallet.save()
 
-                        services.send_email_mailgun('AVI Crypto Transaction Success', "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account.", user.email, from_email="postmaster")
+                            user_wallet.amount = user_wallet.amount + user_amount
+                            user_wallet.save()
 
-                        email_data = {
-                            "user": user,
-                            "owner_amount": owner_amount,
-                            "user_amount": user_amount,
-                            "total_payout": total_payout,
-                            "currency_type": currency_type,
-                            "transaction": transaction,
-                            "today": UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
-                        }
-                        body = render_to_string('mail/transaction-admin.html', email_data)
-                        services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
+                            user_packages.total_payout = 0
+                            user_packages.save()
 
-                        return HttpResponse(json.dumps({
-                            "status": "ok",
-                            "message": "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account."
-                        }))
+                            services.send_email_mailgun('AVI Crypto Transaction Success', "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account.", user.email, from_email="postmaster")
+
+                            email_data = {
+                                "user": user,
+                                "owner_amount": owner_amount,
+                                "user_amount": user_amount,
+                                "total_payout": total_payout,
+                                "currency_type": currency_type,
+                                "transaction": transaction,
+                                "today": UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+                            }
+                            body = render_to_string('mail/transaction-admin.html', email_data)
+                            services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
+
+                            return HttpResponse(json.dumps({
+                                "status": "ok",
+                                "message": "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account."
+                            }))
+                        else:
+                            return HttpResponse(json.dumps({
+                                "status": "error",
+                                "message": "You already has a transaction in pending state."
+                            }))
                     else:
                         return HttpResponse(json.dumps({
                             "status": "error",
