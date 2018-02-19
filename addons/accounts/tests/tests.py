@@ -32,7 +32,7 @@ from addons.accounts.lib.blockexplorer import validate, is_valid_xrp_paid, is_va
 #         self.assertEqual(root_pkg.package.price, 1000, "Package should be $ 1000")
 #         # self.left_user
 
-class TreeTest(TestCase):
+class TreeFunctionTest(TestCase):
     def setUp(self):
         self.even = [1,2,3,4]
         self.odd = [1,2,3]
@@ -155,59 +155,69 @@ class CryptoTransactionTest(TestCase):
 
 class CreateUserTest(TestCase):
     def setUp(self):
+        UTC = pytz.UTC
+        tz = lambda r: (UTC.localize(r))
         self.package = Packages.objects.create(package_name="USD 1000", package_code="usd1000", payout="7", directout=3.5, binary_payout=6, capping=1000, no_payout=35, loyality=5, roi=2450, price=1000)
 
-        self.user1 = User.objects.create_user(username='user1', password='12345', date_joined=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
-        User_packages.objects.create(user=self.user1, package=self.package, status="A", created_at=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 3, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
+        self.user1 = User.objects.create_user(username='user1', password='12345', date_joined=tz(datetime(2018, 2, 11, 20, 8, 7, 127325)))
+        User_packages.objects.create(user=self.user1, package=self.package, status="A", created_at=(datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC)), last_payout_date=(datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC)), duration=1)
 
-        self.user2 = User.objects.create_user(username='self.user2', password='12345', date_joined=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
+        self.user2 = User.objects.create_user(username='self.user2', password='12345', date_joined=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
         self.user2.profile.sponser_id = self.user1
         self.user2.profile.placement_id = self.user1
         self.user2.profile.placement_position = 'L'
         self.user2.profile.save()
         Members.objects.create(parent_id=self.user1, child_id=self.user2)
-        User_packages.objects.create(user=self.user2, package=self.package, status="A", created_at=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 3, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
+        User_packages.objects.create(user=self.user2, package=self.package, status="A", created_at=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
 
-        self.user3 = User.objects.create_user(username='self.user3', password='12345', date_joined=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
+        self.user3 = User.objects.create_user(username='self.user3', password='12345', date_joined=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
         self.user3.profile.sponser_id = self.user1
         self.user3.profile.placement_id = self.user1
         self.user3.profile.placement_position = 'R'
         self.user3.profile.save()
         Members.objects.create(parent_id=self.user1, child_id=self.user3)
-        User_packages.objects.create(user=self.user3, package=self.package, status="A", created_at=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 3, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
+        User_packages.objects.create(user=self.user3, package=self.package, status="A", created_at=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
 
-        self.user4 = User.objects.create_user(username='self.user4', password='12345', date_joined=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
+        self.user4 = User.objects.create_user(username='self.user4', password='12345', date_joined=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
         self.user4.profile.sponser_id = self.user1
         self.user4.profile.placement_id = self.user2
         self.user4.profile.placement_position = 'L'
         self.user4.profile.save()
         Members.objects.create(parent_id=self.user2, child_id=self.user4)
-        User_packages.objects.create(user=self.user4, package=self.package, status="A", created_at=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 3, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
+        User_packages.objects.create(user=self.user4, package=self.package, status="A", created_at=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
 
-        self.user5 = User.objects.create_user(username='self.user5', password='12345', date_joined=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
+        self.user5 = User.objects.create_user(username='self.user5', password='12345', date_joined=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
         self.user5.profile.sponser_id = self.user1
         self.user5.profile.placement_id = self.user2
         self.user5.profile.placement_position = 'R'
         self.user5.profile.save()
         Members.objects.create(parent_id=self.user2, child_id=self.user5)
-        User_packages.objects.create(user=self.user5, package=self.package, status="A", created_at=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 3, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
+        User_packages.objects.create(user=self.user5, package=self.package, status="A", created_at=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
 
-        self.user6 = User.objects.create_user(username='self.user6', password='12345', date_joined=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
+        self.user6 = User.objects.create_user(username='self.user6', password='12345', date_joined=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
         self.user6.profile.sponser_id = self.user1
         self.user6.profile.placement_id = self.user3
         self.user6.profile.placement_position = 'L'
         self.user6.profile.save()
         Members.objects.create(parent_id=self.user3, child_id=self.user6)
-        User_packages.objects.create(user=self.user6, package=self.package, status="A", created_at=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 3, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
+        User_packages.objects.create(user=self.user6, package=self.package, status="A", created_at=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
 
-        self.user7 = User.objects.create_user(username='self.user7', password='12345', date_joined=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
+        self.user7 = User.objects.create_user(username='self.user7', password='12345', date_joined=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
         self.user7.profile.sponser_id = self.user1
         self.user7.profile.placement_id = self.user3
         self.user7.profile.placement_position = 'R'
         self.user7.profile.save()
         Members.objects.create(parent_id=self.user3, child_id=self.user7)
-        User_packages.objects.create(user=self.user7, package=self.package, status="A", created_at=datetime(2018, 3, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 3, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
+        User_packages.objects.create(user=self.user7, package=self.package, status="A", created_at=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
 
     def test_case(self):
         self.assertTrue(isinstance(self.user1, User))
         self.assertTrue(is_member_of(self.user1, self.user7), True)
+    
+    def test_calc_weekly(self):
+        res, _ = calc(self.user1, self.user1.date_joined, 'weekly')
+        self.assertEqual(res, 70, "should've been 70 but is %s" %res)
+    
+    def test_calc_direct(self):
+        res, _ = calc(self.user1, self.user1.date_joined, 'direct')
+        self.assertEqual(res, 105, "should've been 70 but is %s" %res)
