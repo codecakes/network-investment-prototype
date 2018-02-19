@@ -207,9 +207,11 @@ def app_signup(request):
 
                     email_data = {
                         "user": user,
+                        "username":user.username,
+                        "password": password,
                         "token": token
                     }
-                    body = render_to_string('mail/welcome.html', email_data)
+                    body = render_to_string('mail/welcome_.html', email_data)
                     services.send_email_mailgun(
                         'Welcome to Avicrypto', body, email, from_email="postmaster")
 
@@ -268,9 +270,9 @@ def app_forgot_password(request):
             token = get_token(user.username)
             email_data = {
                 "token": token,
-                "user": user
+                "user": user.username
             }
-            body = render_to_string('mail/reset-password.html', email_data)
+            body = render_to_string('mail/reset.html', email_data)
             services.send_email_mailgun(
                 'Reset Password Avicrypto', body, email, from_email="postmaster")
             content = {
@@ -405,7 +407,8 @@ def home(request):
             'support_tickets_choices': SupportTicket.status_choices,
             'enable_withdraw': False,
             'crypto_account':crypto_account_exists(request.user),
-            'package_status':has_package(request.user)
+            'package_status':has_package(request.user),
+            'wallet_type_choices': Wallet.wallet_type_choice
         }
 
         if 0<= is_day < 2:
@@ -472,7 +475,9 @@ def profile(request):
         btc_address = request.POST.get("btc_address")
         eth_address = request.POST.get("eth_address")
         xrp_address = request.POST.get("xrp_address")
-        destination_tag = request.POST.get("destination_tag")
+        eth_destination_tag = request.POST.get("eth_destination_tag")
+        xrp_destination_tag = request.POST.get("xrp_destination_tag")
+        btc_destination_tag = request.POST.get("btc_destination_tag")
         user = request.user
         user.first_name = first_name
         user.last_name = last_name
@@ -483,7 +488,9 @@ def profile(request):
             user.useraccount.btc_address = btc_address
             user.useraccount.eth_address = eth_address
             user.useraccount.xrp_address = xrp_address
-            user.useraccount.eth_destination_tag = destination_tag
+            user.useraccount.eth_destination_tag = eth_destination_tag
+            user.useraccount.xrp_destination_tag = xrp_destination_tag
+            user.useraccount.btc_destination_tag = btc_destination_tag
             user.useraccount.save()
         except ObjectDoesNotExist:
             user_account = UserAccount.objects.create(user=user)
@@ -491,6 +498,16 @@ def profile(request):
             user_account.eth_address = eth_address
             user_account.xrp_address = xrp_address
             user_account.eth_destination_tag = destination_tag
+
+            if btc_address and not Wallet.objects.filter(user=user, wallet_type="BTC").exists():
+                Wallet.objects.create(user=user, wallet_type="BTC")
+            
+            if eth_address and not Wallet.objects.filter(user=user, wallet_type="ETH").exists():
+                Wallet.objects.create(user=user, wallet_type="ETH")
+
+            if xrp_address and not Wallet.objects.filter(user=user, wallet_type="XRP").exists():
+                Wallet.objects.create(user=user, wallet_type="XRP")
+
             user_account.save()
         return HttpResponse(json.dumps({"status": "success"}))
     else:
@@ -765,21 +782,140 @@ def crypto_account_exists(user):
 @login_required(login_url="/login")
 def validate_user_transaction(request):
     if request.method == "POST":
-        amount = request.POST.get("amount", 0)
-        source_address = request.POST.get("source_address", "")
-        address = request.POST.get("address", "")
-        txn_id = request.POST.get("txn_id", "")
-        coin = request.POST.get("coin", "btc")
-        destination_tag = request.POST.get("destination_tag", "btc")
-
-        validate_transaction(amount, source_address, address, txn_id, coin.lower())
-
-        return HttpResponse(json.dumps({
-            "status": "ok",
-            "message": "We will send a conformation email, whether the transaction is valid or not."
-        }))
+        try:
+            pkg_txn = User_packages.objects.filter(paid_txn_id=request.POST.get("txn_id", ""))
+            if len(pkg_txn) == 0:
+                amount = request.POST.get("amount", 0)
+                source_address = request.POST.get("source_address", "")
+                address = request.POST.get("address", "")
+                txn_id = request.POST.get("txn_id", "")
+                coin = request.POST.get("coin", "btc")
+                destination_tag = request.POST.get("destination_tag", "btc")
+                # try:
+                package = Packages.objects.get(price=amount)
+                set_package_tx_id = User_packages.objects.create(user=request.user, package=package, status='NC', paid_txn_id=txn_id, paid_cur=coin.lower(), duration=1)
+                # except:
+                #     print 'error'
+                validate_transaction(amount, source_address, address, txn_id, coin.lower())
+                return HttpResponse(json.dumps({
+                    "status": "ok",
+                    "message": "We will send a conformation email, whether the transaction is valid or not."
+                }))
+            else:
+                return HttpResponse(json.dumps({
+                    "status": "ok",
+                    "message": "Transaction id is already exists"
+                }))
+        except ObjectDoesNotExist:
+            return HttpResponse(json.dumps({
+                    "status": "ok",
+                    "message": "Oopse somethign went wrong"
+                }))
 
 def has_package(user):    
     pkg = User_packages.objects.filter(status='A', user = user)
-    print pkg
     return True if pkg else False
+
+@login_required(login_url="/login")
+def withdraw(request):
+    if request.method == "POST":
+        user = request.user
+        currency_type = request.POST.get('currency', "")
+        if currency_type:
+            user_account = UserAccount.objects.filter(user=user)
+            owner = User.objects.get(id=1)
+            if user_account:
+                user_account = user_account[0]
+                if currency_type == "BTC":
+                    if not user_account.btc_address or user_account.btc_address == "None":
+                        return HttpResponse(json.dumps({
+                            "status": "error",
+                            "message": "Add selected crypto currency account first."
+                        }))
+                    else:
+                        crypto_addr = user_account.btc_address
+                elif currency_type == "XRP":
+                    if not user_account.xrp_address or user_account.xrp_address == "None":
+                        return HttpResponse(json.dumps({
+                            "status": "error",
+                            "message": "Add selected crypto currency account first."
+                        }))
+                    else:
+                        crypto_addr = user_account.xrp_address
+                elif currency_type == "ETH":
+                    if not user_account.eth_address or user_account.eth_address == "None":
+                        return HttpResponse(json.dumps({
+                            "status": "error",
+                            "message": "Add selected crypto currency account first."
+                        }))
+                    else:
+                        crypto_addr = user_account.eth_address
+
+                if not Wallet.objects.filter(owner=owner, wallet_type=currency_type).exists():
+                    owner_wallet = Wallet.objects.create(owner=owner, wallet_type=currency_type)
+                else:
+                    owner_wallet = Wallet.objects.get(owner=owner, wallet_type=currency_type)
+
+                if not Wallet.objects.filter(owner=user, wallet_type=currency_type).exists():
+                    user_wallet = Wallet.objects.create(owner=user, wallet_type=currency_type)
+                else:
+                    user_wallet = Wallet.objects.get(owner=user, wallet_type=currency_type)
+
+                if User_packages.objects.filter(status='A', user = user).exists():
+
+                    user_packages = User_packages.objects.get(user=user, status='A')
+
+                    if user_packages.total_payout > 0:
+                        total_payout = user_packages.total_payout
+                        owner_amount = total_payout / 10
+                        user_amount = total_payout - owner_amount
+
+                        transaction = Transactions.objects.create(sender_wallet=owner_wallet, reciever_wallet=user_wallet, amount=user_amount)
+
+                        owner_wallet.amount = owner_wallet.amount + owner_amount
+                        owner_wallet.save()
+
+                        user_wallet.amount = 0
+                        user_wallet.save()
+
+                        user_packages.total_payout = 0
+                        user_packages.save()
+
+                        services.send_email_mailgun('AVI Crypto Transaction Success', "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account.", user.email, from_email="postmaster")
+
+                        email_data = {
+                            "user": user,
+                            "owner_amount": owner_amount,
+                            "user_amount": user_amount,
+                            "total_payout": total_payout,
+                            "currency_type": currency_type,
+                            "transaction": transaction,
+                            "today": UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+                        }
+                        body = render_to_string('mail/transaction-admin.html', email_data)
+                        services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
+
+                        return HttpResponse(json.dumps({
+                            "status": "ok",
+                            "message": "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account."
+                        }))
+                    else:
+                        return HttpResponse(json.dumps({
+                            "status": "error",
+                            "message": "Amount is zero."
+                        }))
+                else:
+                    return HttpResponse(json.dumps({
+                        "status": "error",
+                        "message": "You dont have any package active packge to withdraw."
+                    }))
+            else:
+                return HttpResponse(json.dumps({
+                    "status": "error",
+                    "message": "Add crypto account address."
+                }))
+        else:
+            return HttpResponse(json.dumps({
+                "status": "error",
+                "message": "Select currency for withdraw."
+            }))

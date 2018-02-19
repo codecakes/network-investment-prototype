@@ -86,11 +86,24 @@
                                             <input type="text" id="btc_address" class="form-control" placeholder="Bitcoin Address" name="btc_address" value="{{user.useraccount.btc_address}}" required>
                                         </div>
                                     </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control">BTC Destination Tag</label>
+                                       <div class="col-md-9">
+                                            <input type="text" id="btc_destination_tag" class="form-control" placeholder="Destination Tag" name="btc_destination_tag" value="{{user.useraccount.btc_destination_tag}}">
+                                        </div>
+                                    </div>
 
                                     <div class="form-group row">
                                         <label class="col-md-3 label-control">Ripple Address</label>
                                        <div class="col-md-9">
                                             <input type="text" id="xrp_address" class="form-control" placeholder="Ripple Address" name="xrp_address" value="{{user.useraccount.xrp_address}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control">XRP Destination Tag</label>
+                                       <div class="col-md-9">
+                                            <input type="text" id="xrp_destination_tag" class="form-control" placeholder="Destination Tag" name="xrp_destination_tag" value="{{user.useraccount.xrp_destination_tag}}">
                                         </div>
                                     </div>
 
@@ -102,9 +115,9 @@
                                     </div>
 
                                     <div class="form-group row">
-                                        <label class="col-md-3 label-control">Destination Tag</label>
+                                        <label class="col-md-3 label-control">ETH Destination Tag</label>
                                        <div class="col-md-9">
-                                            <input type="text" id="destination_tag" class="form-control" placeholder="Destination Tag" name="destination_tag" value="{{user.useraccount.eth_destination_tag}}" required>
+                                            <input type="text" id="eth_destination_tag" class="form-control" placeholder="Destination Tag" name="eth_destination_tag" value="{{user.useraccount.eth_destination_tag}}">
                                         </div>
                                     </div>
                                 </div>
@@ -135,7 +148,9 @@
             "btc_address": $("#btc_address").val(),
             "eth_address": $("#eth_address").val(),
             "xrp_address": $("#xrp_address").val(),
-            "destination_tag": $("#destination_tag").val(),
+            "eth_destination_tag": $("#eth_destination_tag").val(),
+            "xrp_destination_tag": $("#xrp_destination_tag").val(),
+            "btc_destination_tag": $("#btc_destination_tag").val(),
         }
         console.log(data)
         $.ajax({

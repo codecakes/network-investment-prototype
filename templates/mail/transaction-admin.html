@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <div>
+        <p>Hi Admin,</p>
+        <p>{{ user.first_name }} {{ user.last_name }} has withdrawn {{ user_amount }} on {{ today }}. The 10% of {{ total_payout }} has been credited to your {{ currency_type }} wallet.</p>
+        <p>User's wallet details:</p>
+        <p>wallet type: {{ currency_type }}</p>
+        <p>total payout: {{ total_payout }}</p>
+        <p>Admin cut: {{ owner_amount }}</p>
+        <p>Amt Withdrawn : {{ user_amount }}</p>
+        <p>Time of Withdrawal: {{ today }}</p>
+        <p>Transaction id: {{ transaction.id }}</p>
+    </div>
+
+</body>
+
+</html>

@@ -41,9 +41,15 @@ def is_right(member):
 def tot_txn_vol(user):
     """Helper function to calculate total aggregated amount"""
     # TODO: integrate a redis cache decorator
-    return sum(map(lambda w: Transactions.objects.filter(sender_wallet=w.uuid,
+    res = (map(lambda w: Transactions.objects.filter(sender_wallet=w.uuid,
                                                          reciever_wallet=w.uuid).aggregate(Sum('amount')),
                    Wallet.objects.filter(owner=user)))
+    if res:
+        res = res[0]
+        res = res.get('amount__sum', 0.0)
+        # print res
+        return res if res != None else 0.0
+    return 0.0
 
 
 def num_children(user):
@@ -67,8 +73,10 @@ def new_user_text(ref_code, *ref_kw):
     href = "{}&{}".format(ref_code, '&'.join(*ref_kw))
     parent = '1'
     children = '0'
-    user_auto_id = urlparse.urlparse(
-        '&pos=right&parent_placement_id=AVI000000020').path.split('=')[-1]
+    # getting parent_placement_id from href query  
+    user_auto_id = urlparse.urlparse(href).query.split('=')[-1]
+    # why this is fix ? 
+    # user_auto_id = urlparse.urlparse('&pos=right&parent_placement_id=AVI000000020').path.split('=')[-1]
     profile = Profile.objects.get(user_auto_id=user_auto_id)
     parent_user = profile.user
     # ''1' if get_left(parent_user) else '1' if get_right(parent_user) else '0'
@@ -187,7 +195,7 @@ def is_parent_of(parent, child_user):
 
 def divide_conquer(arr, lo, hi, member_fn):
     mid = (hi - lo)/2 + lo
-    if mid > lo:
+    if hi > lo:
         return divide_conquer(arr, lo, mid, member_fn) + divide_conquer(arr, mid+1, hi, member_fn)
     else:
         return [member_fn(arr[lo])]

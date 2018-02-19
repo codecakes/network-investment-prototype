@@ -1,0 +1,23 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<body>
+  <table align="center" background="{% static 'images/mail/reset-mailer.jpg' %}" width="100%" height="1085px" style="background-repeat:no-repeat;background-position:center;">
+   <tr style="height:100%">
+     <table style="margin-top:370px;margin-left:180px;font-size:x-large;">
+       <tr>
+           	<p>Please go to following page and choose a new password</p>
+          	<center>
+              <p><a href="http://www.avicrypto.us/reset-password/{{ token }}" target="#">Reset</a></p>
+            </center>
+          	<p>Your login username in case you've forgotten is</p>
+            <p> {{user}}</p>
+       </tr>
+     </table>
+   </tr>
+  </table>
+<div>
+</div>
+
+</body>
+</html>

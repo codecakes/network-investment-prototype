@@ -66,5 +66,5 @@ def active_required(function):
 
 
 def set_package_status(user, package, status):
-    set_package = User_packages.objects.save(user=user, package=package, status=status)
+    set_package = User_packages.objects.get_or_create(user=user, package=package, status=status)
     return True

@@ -131,6 +131,7 @@ def calc_weekly(user, last_date, next_date):
     new_date = date.today()
     delta = new_date - old_date
     num_weeks = delta.days/7
+    print "old date is {}. new date is {}. difference in num weeks: {}".format(old_date, new_date, num_weeks)
     pkg = get_package(user)
     return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct') 
 

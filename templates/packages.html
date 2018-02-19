@@ -35,21 +35,21 @@
                     <div class="text-xs-center">
                         {% if package_access_disable %}
                             <div class="card-block">
-                                <div class="col-md-6">
-                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" disabled>Crypto</button>
+                                <div class="col-md-12 center">
+                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" >Crypto</button>
                                 </div>
-                                <div class="col-md-6">
+                               <!--  <div class="col-md-6">
                                     <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
-                                </div>
+                                </div> -->
                             </div>
                         {% else %}
                             <div class="card-block">
-                                <div class="col-md-6">
+                                <div class="col-md-12 center">
                                     <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
-                                </div>
+                                </div> -->
                             </div>
                         {% endif%}
                     </div>
@@ -121,10 +121,7 @@
                             </div>
                             <div id="cryptoDetails">
                                 <div class="card">
-                                    <div><label>Note: </label><p>Use the following Ethereum address to deposit funds:
-                                    Your deposit will take about one hour to complete.
-
-                                    Do not send any unsupported currency or token to this address! Currencies and tokens not supported by GateHub will NOT be credited and you will not be able to access them.</p></div>
+                                    <div id="message"></div>
                                     <div class="card-header">
                                         <h4 class="card-title" id="basic-layout-colored-form-control">Required Crypto Details</h4>
                                     </div>
@@ -232,20 +229,26 @@
         $("#cryptoDetails").toggle();
         $($("#destinationTag").parent().get(0)).toggle();
         var cryptoType=""
+        var cryptoName = ""
         if(event.target.id==='btcBuy'){
             cryptoType="BTC";
+            cryptoName = "Bitcoin";
             $($("#destinationTag").parent().get(0)).show();
             $("#company_wallet_address").val('13EwqEyfm8DfTVRcfLCxXYQdCUadXB1xXs');
         } else if(event.target.id==='xrpBuy'){
             $($("#destinationTag").parent().get(0)).show();
             $("#company_wallet_address").val('rsfYuF1eLofJG1XUJZSMc6b2TRT8F9qfS1');
             cryptoType="XRP";
+            cryptoName = "Ripple";
         } else {
             $($("#destinationTag").parent().get(0)).show();
             $("#company_wallet_address").val('0xe5b8b0ee07f1e1ea73052d7af4ec19292c060afes');
             cryptoType="ETH";
+            cryptoName = "Ethereum";
 
         }
+        var messageString = "<label>Note: </label><p>Use the following "+ cryptoName+" address to deposit funds:Your deposit will take about one hour to complete.Do not send any unsupported currency or token to this address! Currencies and tokens not supported by Avicrypto will NOT be credited and you will not be able to access them.</p>"
+        $("#message").html(messageString)
         $("#cryptoPackage").val(cryptoType);
         $("#cryptoPackageCode").val("usd"+$("#packCode").html())
         $("#cryptoPackageAmount").val($("#packCode").html())

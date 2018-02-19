@@ -114,4 +114,6 @@ class UserAccount(models.Model):
 	xrp_address = models.CharField(max_length=100, default=None, null=True, blank=True)
 	eth_address = models.CharField(max_length=100, default=None, null=True, blank=True)
 	eth_destination_tag = models.CharField(max_length=100, default=None, null=True, blank=True)
+	xrp_destination_tag = models.CharField(max_length=100, default=None, null=True, blank=True)
+	btc_destination_tag = models.CharField(max_length=100, default=None, null=True, blank=True)
 	created_at = models.DateTimeField(auto_now_add=True)

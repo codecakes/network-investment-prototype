@@ -14,12 +14,12 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-
+from django.contrib.auth.decorators import login_required
 from . import views
 # from views import ResetPasswordRequestView
 
 urlpatterns = [
-    url(r'^add/$', views.TransactionsCreate.as_view(), name='transactions_create'),
+    url(r'^add/$', login_required(views.TransactionsCreate.as_view()), name='transactions_create'),
     url(r'^list/$', views.TransactionsList.as_view(), name='transactions_list'),
-    url(r'^summary/$', views.TransactionsSummary.as_view(), name='transactions_list'),
+    url(r'^summary/$', login_required(views.TransactionsSummary.as_view()), name='transactions_list'),
 ]
