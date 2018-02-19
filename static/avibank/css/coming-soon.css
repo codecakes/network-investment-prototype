@@ -1,0 +1,171 @@
+html {
+  height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+}
+
+body {
+  height: 100%;
+  position: relative;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+}
+
+.overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 0.75;
+  z-index: -1;
+}
+
+.masthead {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 3rem;
+}
+
+.masthead .masthead-bg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1b1e2182;
+  transform: skewY(4deg);
+  transform-origin: bottom right;
+}
+
+.masthead .masthead-content h1 {
+  font-size: 2.5rem;
+}
+
+.masthead .masthead-content p {
+  font-size: 1.2rem;
+}
+
+.masthead .masthead-content p strong {
+  font-weight: 700;
+}
+
+.masthead .masthead-content .input-group-newsletter input {
+  font-size: 1rem;
+  padding: 1rem;
+}
+
+.masthead .masthead-content .input-group-newsletter button {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .masthead {
+    height: 100%;
+    width: 40.5rem;
+    padding-bottom: 0;
+  }
+  .masthead .masthead-bg {
+    transform: skewX(-8deg);
+    transform-origin: top right;
+  }
+  .masthead .masthead-content h1 {
+    font-size: 3.5rem;
+  }
+  .masthead .masthead-content p {
+    font-size: 1.3rem;
+  }
+}
+
+@media (min-width: 768px) {
+  	.social-icons {
+		position: fixed;
+		right: 2.5rem;
+		bottom: 2rem;
+		/* display: none; */
+		transition: 500ms all linear;
+		right: -350px;
+		opacity: 0;
+	}
+
+  	.social-icons.show {
+    	display: block;
+    	right: 40px;
+    	opacity: 1;
+	  }
+	
+	  .form{
+		  width: 25%;
+		margin: 0;
+	  }
+}
+
+.input {
+  font-weight: 300 !important;
+}
+
+.logo {
+  max-height: 300px;
+}
+
+.message-site {
+  color:#fff;
+  font-family: 'Roboto';
+  text-align: center;
+}
+
+.signup-Btn {
+  margin-top: 10px; 
+}
+
+.form {
+  color:#fff;
+  margin: 0px 15px;
+}
+
+.button {
+    border: 2px solid #fff;
+    color: #fff ;
+    width: 20%; /* Set your desired with */
+    z-index: 2; /* Make sure its above other items. */
+    padding: 10px;
+    text-align: center;
+    font-weight: 300    !important;
+    margin-top: 45px;
+}
+
+.button:hover {
+	color: #000 !important; 
+	background-color: #fff; 
+	border-bottom: 2px solid transparent; 
+}
+
+.form-button {
+    border: 2px solid #fff;
+    color: #fff ;
+    text-align: center;
+	font-weight: 300;
+	background: transparent;
+}
+
+.form-button:hover {
+	color: #000 !important; 
+	background-color: #fff; 
+	border-bottom: 2px solid white; 
+}
+
+.color-white {
+	color: #fff;
+}

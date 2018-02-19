@@ -19,7 +19,7 @@ from . import views
 
 urlpatterns = [
 	url(r'^$', views.index, name='index'),
-    url(r'^bank$', views.bank_website, name='bank_website'),
+    # url(r'^bank$', views.bank_website, name='bank_website'),
 
     url(r'^login$', views.app_login, name='app_login'),
     url(r'^signup', views.app_signup, name='app_signup'),
