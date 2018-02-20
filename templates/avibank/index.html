@@ -50,17 +50,21 @@
 	
 		<div class="form social-icons">
 			<div id="sign-up-form">
-				<form class="text-center">
+				<form class="text-center" id="bankSubscribeForm">
 					<button type="button" id="close-form-button" style="color:#fff;" class="close btn-right d-none d-md-inline-block" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 					<h2 style="padding-left: 15%" class="mb-3">Join the Team</h2>
 					<br>
 					<div>
-						<input type="text" class="form-control" placeholder="Name..." aria-label="Name..." aria-describedby="basic-addon" required>
+						<input type="text" class="form-control" name="name" placeholder="Name..." aria-label="Name..." aria-describedby="basic-addon" required>
 						<br>
+						<input type="email" class="form-control" name="email" placeholder="Email..." aria-label="Email..." aria-describedby="basic-addon" required>
 						<!-- <input type="text" class="form-control" placeholder="Country..." aria-label="Country..." aria-describedby="basic-addon" required> -->
-						<select class="form-control" placeholder="Country..." aria-label="Country..." aria-describedby="basic-addon" required>
+						<br>
+						<input type="number" class="form-control" name="mobile" placeholder="Mobile..." aria-label="Mobile..." aria-describedby="basic-addon" required>
+						<br>
+						<select class="form-control" name="country" placeholder="Country..." aria-label="Country..." aria-describedby="basic-addon" required>
 							<option data-code="00" value="">Country...</option>
 							<option data-code="+93" value="AF">Afghanistan</option>
 							<option data-code="+355" value="AL">Albania</option>
@@ -296,11 +300,7 @@
 							<option data-code="+263" value="ZW">Zimbabwe</option>
 						</select>
 						<br>
-						<input type="number" class="form-control" placeholder="Mobile..." aria-label="Mobile..." aria-describedby="basic-addon" required>
-						<br>
-						<input type="email" class="form-control" placeholder="Email..." aria-label="Email..." aria-describedby="basic-addon" required>
-						<br>
-						<button class="btn btn-secondary form-button" type="button">Notify</button>
+						<button class="btn btn-secondary form-button" id="bankSubscribe" type="button">Notify</button>
 					</div>
 				</form>
 	
@@ -321,7 +321,7 @@
 				<div class="col-12 text-center">
 					<h2 class="color-white">Join the Team</h2>
 					<form class="">
-						<input type="text" class="form-control" placeholder="Name..." aria-label="Name..." aria-describedby="basic-addon" required>
+						<input type="text" class="form-control" placeholder="Name.jhhh.." aria-label="Name..." aria-describedby="basic-addon" required>
 						<br>
 						<input type="text" class="form-control" placeholder="Country..." aria-label="Country..." aria-describedby="basic-addon" required>
 						<br>
@@ -345,7 +345,7 @@
 	<script src="{% static 'avibank/vendor/vide/jquery.vide.min.js' %}"></script>
 	<script>
 		bankMp4 = "{% static 'avibank/mp4/bg02.mp4' %}"
-		bankPoster = "{% static 'avibank/img/bg-mobile-fallback.jpg' %}"
+		//bankPoster = "{% static 'avibank/img/bg-mobile-fallback.jpg' %}"
 	</script>
 	
 	<!-- Custom scripts for this template -->
