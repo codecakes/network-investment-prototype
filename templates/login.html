@@ -64,75 +64,147 @@
 					<div class="card-body collapse in">
 						<div class="card-block">
 							<div>
-								<fieldset>
-									<div id="referal_confirmation_container" class="container">
-										<div class="row">
-											<center>
-												<div class="col-md-12"><h3>Do You have Referal Code</h3></div>
-											</center>
-										</div>
-										<h1></h1>
-										<div class="row">
-											<center>
-												<div class="col-md-6">
-													<button type="button" id="referal_yes" class="btn btn-primary pull-left">Yes</button>
-												</div>
-												<div class="col-md-6">
-													<button type="button" id="referal_no" class="btn btn-primary pull-right">No</button>
-												</div>
-											</center>
-										</div>
-									</div>
-								</fieldset>
-							</div>
-							<form id="registerForm" method="post" action="" class="form-horizontal form-simple" novalidate>
-								{% csrf_token %}
-								<div id="referal_container" class="hidden">
-									<fieldset class="form-group position-relative has-icon-left">
-										<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" value="{{referal}}" data-validation-callback-callback="checkReferal"/>
-										<div class="form-control-position">
-											<i class="icon-head"></i>
-										</div>
-										<div class="help-block font-small-3"></div>
-									</fieldset>
-								</div>
-								
-								<div id="sponcer_container" class="hidden">
-									<fieldset class="form-group position-relative has-icon-left">
-										<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" value="{{sponser_id}}" disabled/>
-										<div class="form-control-position">
-											<i class="icon-head"></i>
-										</div>
-										<div class="help-block font-small-3"></div>
-									</fieldset>
-									<fieldset class="form-group position-relative has-icon-left">
-										<label for="placement_position">Position</label>
-										<select name="placement_position" id="placement_position" class="form-control input-lg" data-validation-callback-callback="checkPlacement">
-											<option value="L">LEFT</option>
-											<option value="R">RIGHT</option>
-										</select>
-									</fieldset>
-									<div id="placement_confirmation_container" class="container">
-										<fieldset>
+								{% if referal %}	
+									<fieldset>
+										<div id="referal_confirmation_container" class="container hidden">
 											<div class="row">
 												<center>
-													<div class="col-md-12"><h3>Do You have Placement Id</h3></div>
+													<div class="col-md-12"><h3>Do You have Referal Code</h3></div>
 												</center>
 											</div>
 											<h1></h1>
 											<div class="row">
 												<center>
 													<div class="col-md-6">
-														<button type="button" id="placement_yes" class="btn btn-primary pull-left">Yes</button>
+														<button type="button" id="referal_yes" class="btn btn-primary pull-left">Yes</button>
 													</div>
 													<div class="col-md-6">
-														<button type="button" id="placement_no" class="btn btn-primary pull-right">No</button>
+														<button type="button" id="referal_no" class="btn btn-primary pull-right">No</button>
 													</div>
 												</center>
 											</div>
+										</div>
+									</fieldset>
+								{% else %}
+									<fieldset>
+										<div id="referal_confirmation_container" class="container">
+											<div class="row">
+												<center>
+													<div class="col-md-12"><h3>Do You have Referal Code</h3></div>
+												</center>
+											</div>
+											<h1></h1>
+											<div class="row">
+												<center>
+													<div class="col-md-6">
+														<button type="button" id="referal_yes" class="btn btn-primary pull-left">Yes</button>
+													</div>
+													<div class="col-md-6">
+														<button type="button" id="referal_no" class="btn btn-primary pull-right">No</button>
+													</div>
+												</center>
+											</div>
+										</div>
+									</fieldset>
+								{% endif %}
+							</div>
+							<form id="registerForm" method="post" action="" class="form-horizontal form-simple" novalidate>
+								{% csrf_token %}
+								{% if referal %}
+									<div id="referal_container" class="">
+										<fieldset class="form-group position-relative has-icon-left">
+											<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" value="{{referal}}" data-validation-callback-callback="checkReferal"/>
+											<div class="form-control-position">
+												<i class="icon-head"></i>
+											</div>
+											<div class="help-block font-small-3"></div>
 										</fieldset>
 									</div>
-								</div>
+									
+									<div id="sponcer_container" class="">
+										<fieldset class="form-group position-relative has-icon-left">
+											<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" value="{{sponser_id}}" disabled/>
+											<div class="form-control-position">
+												<i class="icon-head"></i>
+											</div>
+											<div class="help-block font-small-3"></div>
+										</fieldset>
+										<fieldset class="form-group position-relative has-icon-left">
+											<label for="placement_position">Position</label>
+											<select name="placement_position" id="placement_position" class="form-control input-lg" data-validation-callback-callback="checkPlacement">
+												<option value="L">LEFT</option>
+												<option value="R">RIGHT</option>
+											</select>
+										</fieldset>
+										<div id="placement_confirmation_container" class="container">
+											<fieldset>
+												<div class="row">
+													<center>
+														<div class="col-md-12"><h3>Do You have Placement Id</h3></div>
+													</center>
+												</div>
+												<h1></h1>
+												<div class="row">
+													<center>
+														<div class="col-md-6">
+															<button type="button" id="placement_yes" class="btn btn-primary pull-left">Yes</button>
+														</div>
+														<div class="col-md-6">
+															<button type="button" id="placement_no" class="btn btn-primary pull-right">No</button>
+														</div>
+													</center>
+												</div>
+											</fieldset>
+										</div>
+									</div>
+								{% else %}
+									<div id="referal_container" class="hidden">
+										<fieldset class="form-group position-relative has-icon-left">
+											<input type="text" name="referal" id="referal" class="form-control input-lg" placeholder="Referal" value="{{referal}}" data-validation-callback-callback="checkReferal"/>
+											<div class="form-control-position">
+												<i class="icon-head"></i>
+											</div>
+											<div class="help-block font-small-3"></div>
+										</fieldset>
+									</div>
+									
+									<div id="sponcer_container" class="hidden">
+										<fieldset class="form-group position-relative has-icon-left">
+											<input type="text" name="sponser_id" id="sponser_id" class="form-control input-lg" placeholder="Sponcer ID" value="{{sponser_id}}" disabled/>
+											<div class="form-control-position">
+												<i class="icon-head"></i>
+											</div>
+											<div class="help-block font-small-3"></div>
+										</fieldset>
+										<fieldset class="form-group position-relative has-icon-left">
+											<label for="placement_position">Position</label>
+											<select name="placement_position" id="placement_position" class="form-control input-lg" data-validation-callback-callback="checkPlacement">
+												<option value="L">LEFT</option>
+												<option value="R">RIGHT</option>
+											</select>
+										</fieldset>
+										<div id="placement_confirmation_container" class="container">
+											<fieldset>
+												<div class="row">
+													<center>
+														<div class="col-md-12"><h3>Do You have Placement Id</h3></div>
+													</center>
+												</div>
+												<h1></h1>
+												<div class="row">
+													<center>
+														<div class="col-md-6">
+															<button type="button" id="placement_yes" class="btn btn-primary pull-left">Yes</button>
+														</div>
+														<div class="col-md-6">
+															<button type="button" id="placement_no" class="btn btn-primary pull-right">No</button>
+														</div>
+													</center>
+												</div>
+											</fieldset>
+										</div>
+									</div>
+								{% endif %}	
 								<div id="placement_container" class="hidden">
 									<fieldset class="form-group position-relative has-icon-left">
 										<input type="text" name="placement_id_left" id="placement_id_left" class="form-control input-lg" placeholder="Placement ID" value="{{ placement_user_left_id }}" data-validation-callback-callback="checkPlacement"/>
