@@ -25,7 +25,12 @@ $(document).ready(function() {
         }
       });
     }
-  
+    
+    $("#country").change(function() {
+      var optionSelected = $("option:selected", this);
+      $("#countryCode").html(optionSelected.data("code"));
+    })
+    
     $("input,select,textarea")
       .not("[type=submit]")
       .jqBootstrapValidation({

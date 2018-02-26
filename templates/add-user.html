@@ -311,9 +311,11 @@
                                     <div class="form-group row">
                                         <label class="col-md-3 label-control" for="mobile">* Mobile</label>
                                         <div class="col-md-9">
-											<input type="text" id="mobile" class="form-control" placeholder="Mobile Number" name="mobile" pattern="^[0]?[789]\d{9}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number."/>
-											<div class="help-block font-small-3"></div>
+                                        <div class="input-group">
+                                        	<span class="input-group-addon" id="countryCode">+93</span>
+                                        	<input type="text" id="mobile" class="form-control" placeholder="Mobile Number" name="mobile" pattern="^\+?1?\d{9,15}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number." aria-describedby="countryCode"/>
                                         </div>
+                                        <div class="help-block font-small-3"></div>
                                     </div>
                                 </div>
     
