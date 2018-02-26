@@ -9,52 +9,54 @@
         </div>
 
         {% for package in packages %}
-            <div class="col-xl-4 col-md-6 col-xs-12">
-                <div class="card">
-                    <div class="text-xs-center">
-                        <div class="card-block">
-                            <h4 class="card-title">{{package.package_name}}</h4>
+            {% ifnotequal package.package_name 'USD 500,00,000' %}
+                <div class="col-xl-4 col-md-6 col-xs-12">
+                    <div class="card">
+                        <div class="text-xs-center">
+                            <div class="card-block">
+                                <h4 class="card-title">{{package.package_name}}</h4>
+                            </div>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <a class="list-group-item">
+                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.payout}} PAY-OUT %</a>
+                            <a class="list-group-item">
+                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.directout}} DIRECT OUT</a>
+                            <a class="list-group-item">
+                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.binary_payout}} BINARY PAY-OUT</a>
+                            <a class="list-group-item">
+                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.capping}} CAPPING (USD)</a>
+                            <a class="list-group-item">
+                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.no_payout}} NO OF PAY-OUT</a>
+                            <a class="list-group-item">
+                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.loyality}} LOYALITY</a>
+                            <a class="list-group-item">
+                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.roi}} ROI IN USD</a>
+                        </div>
+                        <div class="text-xs-center">
+                            {% if package_access_disable %}
+                                <div class="card-block">
+                                    <div class="col-md-12 center">
+                                        <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" >Crypto</button>
+                                    </div>
+                                   <!--  <div class="col-md-6">
+                                        <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
+                                    </div> -->
+                                </div>
+                            {% else %}
+                                <div class="card-block">
+                                    <div class="col-md-12 center">
+                                        <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
+                                    </div>
+                                    <!-- <div class="col-md-6">
+                                        <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
+                                    </div> -->
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="list-group list-group-flush">
-                        <a class="list-group-item">
-                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.payout}} PAY-OUT %</a>
-                        <a class="list-group-item">
-                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.directout}} DIRECT OUT</a>
-                        <a class="list-group-item">
-                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.binary_payout}} BINARY PAY-OUT</a>
-                        <a class="list-group-item">
-                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.capping}} CAPPING (USD)</a>
-                        <a class="list-group-item">
-                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.no_payout}} NO OF PAY-OUT</a>
-                        <a class="list-group-item">
-                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.loyality}} LOYALITY</a>
-                        <a class="list-group-item">
-                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.roi}} ROI IN USD</a>
-                    </div>
-                    <div class="text-xs-center">
-                        {% if package_access_disable %}
-                            <div class="card-block">
-                                <div class="col-md-12 center">
-                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" >Crypto</button>
-                                </div>
-                               <!--  <div class="col-md-6">
-                                    <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
-                                </div> -->
-                            </div>
-                        {% else %}
-                            <div class="card-block">
-                                <div class="col-md-12 center">
-                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
-                                </div>
-                                <!-- <div class="col-md-6">
-                                    <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
-                                </div> -->
-                            </div>
-                        {% endif%}
-                    </div>
                 </div>
-            </div>
+            {% endifnotequal %}
         {% endfor %}
             <div id="subscribeModal" class="modal fade">
                 <div class="modal-dialog">
