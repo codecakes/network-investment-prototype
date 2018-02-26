@@ -11,22 +11,20 @@
                 </div>
                 <div class="card-body collapse in">
                     <div class="table-responsive">
-                        <table class="table table-striped mb-0">
+                        <table class="table mb-0">
                             <thead>
                                 <tr>
-                                    <th>Wallet</th>
+                                    <th>Wallet Id</th>
                                     <th>Type</th>
-                                    <th>Description</th>
                                     <th>Wallet Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for wallet in user.wallets %}
+                                {% for wallet in wallets %}
                                     <tr>
-                                        <td>user.wallet.wallet_type</td>
-                                        <td>user.wallet.type</td>
-                                        <td>user.wallet.description</td>
-                                        <td>user.wallet.amount</td>
+                                        <td>{{ wallet.uuid }}</td>
+                                        <td>{{ wallet.wallet_type }}</td>
+                                        <td>{{ wallet.amount }}</td>
                                     </tr>
                                 {% empty %}
                                     <tr>
@@ -51,28 +49,38 @@
                 </div>
                 <div class="card-body collapse in">
                     <div class="table-responsive">
-                        <table class="table table-striped mb-0">
+                        <table class="table mb-0">
                             <thead>
                                 <tr>
                                     <th>Transation ID</th>
                                     <th>Receiver Wallet</th>
                                     <th>Sender Wallet</th>
-                                    <th>Description</th>
                                     <th>Price</th>
                                     <th>Type</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for txn in user.transactions %}
+                                {% for transaction in transactions %}
                                     <tr>
-                                        <td>txn.txn_id</td>
-                                        <td>txn.receiver_wallet.user.name</td>
-                                        <th>txn.receiver_wallet.user.name</th>
-                                        <td>txn.description</td>
-                                        <td>txn.amount.wallet.amount</td>
-                                        <td>txn.type</td>
-                                        <td>txn.status</td>
+                                        <td>{{ transaction.pk }}</td>
+                                        <td>{{ transaction.reciever_wallet.owner.username }}</td>
+                                        <td>
+                                            {% if transaction.sender_wallet.owner.username == 'harshul' %}
+                                                AVICRYPTO
+                                            {% else %}
+                                                {{ transaction.sender_wallet.owner.username }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ transaction.amount }}</td>
+                                        <td>{{ transaction.reciever_wallet.wallet_type }}</td>
+                                        <td>
+                                            {% for key,value in transaction_status_choices  %}
+                                                {% if key == transaction.status %}
+                                                    {{value}}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
                                     </tr>
                                 {% empty %}
                                     <tr>
@@ -97,7 +105,7 @@
                 </div>
                 <div class="card-body collapse in">
                     <div class="table-responsive">
-                        <table class="table table-striped mb-0">
+                        <table class="table mb-0">
                             <thead>
                                 <tr>
                                     <th>Package Name</th>
@@ -109,9 +117,15 @@
                             <tbody>
                                 {% for package in packages %}
                                     <tr>
-                                        <td>{{package.package_name}}</td>
-                                        <td>{{package.price}}</td>
-                                        <td>{{package.status}}</td>
+                                        <td>{{package.package.package_name}}</td>
+                                        <td>{{package.package.price}}</td>
+                                        <td>
+                                            {% for key,value in userpackage_status_choices  %}
+                                                {% if key == package.status %}
+                                                    {{value}}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
                                         <td>{{package.expiry_date}}</td>
                                     </tr>
                                 {% empty %}
