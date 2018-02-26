@@ -539,10 +539,14 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
-        context = {"package_access_disable":True,'package_status':has_package(request.user)}
-        user = request.user
-        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
-            context["package_access_disable"] = False
+        # context = {
+        #     "package_access_disable": True,
+        #     'package_status': has_package(request.user)
+        # }
+        # user = request.user
+        # if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+        #     context["package_access_disable"] = False
+        context = {}
         template = loader.get_template('network.html')
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
@@ -711,14 +715,15 @@ def add_user(request):
         email = data['email']
 
         if not User.objects.filter(email=email).exists():
-            placement_id = Profile.objects.get(
-                user_auto_id=data['placement_id'])
-            if placement_id.user.is_active == False:
-                content = {
-                    "status": "error",
-                    "message": "placement user is not active",
-                }
-                return HttpResponse(json.dumps(content))
+            placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
+
+            # if placement_id.user.is_active == False:
+            #     content = {
+            #         "status": "error",
+            #         "message": "placement user is not active",
+            #     }
+            #     return HttpResponse(json.dumps(content))
+
             user = User.objects.create(email=email, username=email)
             user.first_name = data['first_name']
             user.last_name = data['last_name']
