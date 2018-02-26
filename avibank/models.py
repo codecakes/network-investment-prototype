@@ -10,5 +10,5 @@ class Susbcription(models.Model):
 
     name = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100, null=True)
-    mobile = models.CharField(max_length=15,validators=[phone_regex], blank=True)
-    email = models.CharField(max_length=15, null=True, blank=True)
+    mobile = models.CharField(max_length=100,validators=[phone_regex], blank=True)
+    email = models.CharField(max_length=100, null=True, blank=True)
