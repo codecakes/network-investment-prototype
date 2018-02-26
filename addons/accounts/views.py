@@ -684,14 +684,16 @@ def update_user_profile(user, data):
 def add_user(request):
 
     if request.method == 'GET':
-        referal = request.GET.get('ref')
-        sponser_id = Profile.objects.filter(my_referal_code=referal)
-        sponser_id = sponser_id[0].user_auto_id
+        user = request.user
+        # referal = request.GET.get('ref')
+        # sponser_id = Profile.objects.filter(my_referal_code=referal)
+        # sponser_id = sponser_id[0].user_auto_id
+        sponser_id = user.profile.user_auto_id
         pos = request.GET.get('pos', "left")
         placement_id = request.GET.get('parent_placement_id')
 
+        # 'referal': referal,
         context = {
-            'referal': referal,
             'sponser_id': sponser_id,
             'placement_id': placement_id,
             'pos': pos
