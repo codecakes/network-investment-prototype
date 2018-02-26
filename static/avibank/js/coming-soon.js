@@ -19,17 +19,30 @@
 	})
 
 	$("#bankSubscribe").click(function(){
-		let result = { };
+		var data = { };
+	
 		$.each($('#bankSubscribeForm').serializeArray(), function() {
-		    result[this.name] = this.value;
+		    data[this.name] = this.value;
 		});
-		console.log("result ==",result)
 		$.ajax({
-		        type: "POST",
-		        url: "/bank",
-		        data: result,
-		        contentType: "application/json"
-		    })
+			type: "POST",
+			url: "/bank/",
+			data: data,
+			success: function(data) {
+				data = JSON.parse(data)
+				if(data.status == "error") {
+				toastr.warning(data.message, "Error");
+				} else {
+				toastr.success(data.message, "Success");
+				}
+			}
+		  });
+		// $.ajax({
+		//         type: "POST",
+		//         url: "/bank/",
+		//         data: result,
+		//         contentType: "application/json"
+		//     })
 	})
 
 })(jQuery);
