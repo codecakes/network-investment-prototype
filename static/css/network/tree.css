@@ -10,3 +10,15 @@
   overflow: auto;
   text-align: center;
 }
+
+.orgchart {
+  background: #fff;
+}
+
+.orgchart .node .content {
+  height: 55px;
+}
+
+.orgchart .node .horizontalEdge {
+  top: 15px;
+}
