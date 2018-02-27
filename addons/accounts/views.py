@@ -728,7 +728,8 @@ def add_user(request):
             user.first_name = data['first_name']
             user.last_name = data['last_name']
             user.username = user.profile.user_auto_id
-            user.is_active = False
+            user.is_active = True
+            user.set_password('avi123456')
             user.save()
 
             profile = Profile.objects.get(user=user)
@@ -754,9 +755,12 @@ def add_user(request):
 
             email_data = {
                 "user": user,
+                "sponcer":sponser_id.user,
+                "placement":placement_id.user,
+                "placement_pos":data['placement'],
                 "token": token
             }
-            body = render_to_string('mail/welcome.html', email_data)
+            body = render_to_string('mail/network_user_welcome.html', email_data)
             services.send_email_mailgun(
                 'Welcome to Avicrypto', body, email, from_email="postmaster")
 
