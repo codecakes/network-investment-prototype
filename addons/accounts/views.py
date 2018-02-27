@@ -265,7 +265,6 @@ def app_activate_account(request, token):
                 "message": "Your profile is already active or your email is not registered with us, please send a ticket to support@avicrypto.us" 
                 }
         return render(request, '404.html', content)
-        # return HttpResponse("You profile is already activated or you email is not registred with us")
 
 
 def app_forgot_password(request):
