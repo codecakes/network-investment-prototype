@@ -248,16 +248,24 @@ def app_logout(request):
 
 
 def app_activate_account(request, token):
-    profile = get_object_or_404(Profile, token=token, user__is_active=False)
-    profile.user.is_active = True
-    profile.user.save()
+    try:
+        profile = get_object_or_404(Profile, token=token, user__is_active=False)
+        profile.user.is_active = True
+        profile.user.save()
 
-    if profile.user.has_usable_password():
-        profile.token = ""
-        profile.save()
-        return HttpResponseRedirect("/login")
-    else:
-        return HttpResponseRedirect("/reset-password/" + profile.token)
+        if profile.user.has_usable_password():
+            profile.token = ""
+            profile.save()
+            return HttpResponseRedirect("/login")
+        else:
+            return HttpResponseRedirect("/reset-password/" + profile.token)
+    except:
+        content = {
+                "status": "error",
+                "message": "Your profile is already active or your email is not registered with us, please send a ticket to support@avicrypto.us" 
+                }
+        return render(request, '404.html', content)
+        # return HttpResponse("You profile is already activated or you email is not registred with us")
 
 
 def app_forgot_password(request):
