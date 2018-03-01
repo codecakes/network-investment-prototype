@@ -4,7 +4,7 @@ from avicrypto.settings import EPOCH_BEGIN
 from addons.accounts.models import User
 from addons.packages.models import User_packages
 from addons.accounts.lib.tree import divide_conquer
-from addons.packages.lib.payout import run_scheduler, get_package, calculate_investment, run_investment_calc, find_next_monday
+from addons.packages.lib.payout import calc_weekly, run_scheduler, get_package, calculate_investment, run_investment_calc, find_next_monday
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -21,8 +21,14 @@ def foo(user, dt):
         pkg.left_binary_cf = 0.0
         pkg.right_binary_cf = 0.0
         pkg.save()
-        run_investment_calc(user, pkg, EPOCH_BEGIN, dt)
-
+        doj = pkg.created_at
+        if not (doj >= dt):    
+            weekly, _ = calc_weekly(user, doj, dt)        
+            run_investment_calc(user, pkg, EPOCH_BEGIN, dt)
+            pkg = get_package(user)
+            print "pkg.weekly is %s and weekly is %s" %(pkg.weekly, weekly)
+            pkg.total_payout = pkg.total_payout - pkg.weekly + weekly
+            pkg.save()
 class Command(BaseCommand):
     help = 'runs and resets few accounts to initial values'
 

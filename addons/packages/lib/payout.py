@@ -99,18 +99,21 @@ def is_valid_date(func):
         Checks if user falls within valid date range else bypasses to its children 0
         """
         if user:
-            doj = UTC.normalize(user.date_joined)
-            if last_date <= doj < next_date:
-                #print "in if is valid_date  "
-                #print "func name is {}".format(func.__name__)
-                return func(user, last_date, next_date)
-            # elif doj == next_date:
-            #     return 0.0
-            # else:
-            #     print "in else is valid_date "
-            #     print "last_date <= doj < next_date is: {} <= {} < {}".format(last_date, doj, next_date)
-            #     print "user valid date check", user.username
-            #     return get_left_right_agg(user, last_date, next_date)
+            pkg = get_package(user)
+            if pkg:    
+                doj = UTC.normalize(pkg.created_at)
+                # doj = UTC.normalize(user.date_joined)
+                if last_date <= doj < next_date:
+                    #print "in if is valid_date  "
+                    #print "func name is {}".format(func.__name__)
+                    return func(user, last_date, next_date)
+                # elif doj == next_date:
+                #     return 0.0
+                # else:
+                #     print "in else is valid_date "
+                #     print "last_date <= doj < next_date is: {} <= {} < {}".format(last_date, doj, next_date)
+                #     print "user valid date check", user.username
+                #     return get_left_right_agg(user, last_date, next_date)
         return 0.0
     return wrapped_f
 
@@ -177,17 +180,21 @@ def calc_binary(user, last_date, next_date):
 def calc_weekly(user, last_date, next_date):
     from math import ceil, floor
     # calculate number of weeks passed since last_date before next_date
-    user_doj = user.date_joined
-    user_doj = date(user_doj.year, user_doj.month, user_doj.day)
-    old_date = greater_date(user_doj, date(
-        last_date.year, last_date.month, last_date.day))
+    print "for user %s" %(user.username)
+    pkg = get_package(user)
+    user_doj = pkg.created_at.date()
+    # user_doj = user.date_joined.date()
+    # user_doj = date(user_doj.year, user_doj.month, user_doj.day)
+    # old_date = greater_date(user_doj, date(
+    #     last_date.year, last_date.month, last_date.day))
+    old_date = user_doj  #greater_date(user_doj, last_date.date())
     new_date = next_date.date()
     # new_date = date(user_doj.year, user_doj.month, user_doj.day)
     delta = new_date - old_date
     num_weeks = floor(delta.days/7.0)
     # print "old date is {}, next_date is {}".format(old_date, next_date.date())
     # print "delta is %s" %delta
-    print "old date is {}. new date is {}. difference in num weeks: {}".format(old_date, new_date, num_weeks)
+    print "num of week: {}, old date is {}. new date is {}. difference in num weeks: {}".format(num_weeks, old_date, new_date, num_weeks)
     pkg = get_package(user)
     return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct')
 
@@ -371,6 +378,7 @@ def filter_by_sponsor(sponsor_id, last_date, next_date, members):
 def valid_payout_user(sponsor_id, member, last_date, next_date):
     """Filter users that have their Date of Joining between last payout and next payout day"""
     # print "member is", member
+    # pkg = get_package(member.child_id)
     doj = UTC.normalize(member.child_id.date_joined)
     # utc = pytz.UTC
     # if doj.day == next_date.day:
