@@ -15,7 +15,7 @@ import pytz
 import calendar
 from datetime import datetime, timedelta
 from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer, get_left, get_right
-from addons.packages.lib.payout import calc, calc_leg, START_TIME, get_direct_pair, get_user_from_member, get_active_mem_price, filter_by_sponsor, find_next_monday, valid_payout_user, filter_by_leg_user
+from addons.packages.lib.payout import calc, calc_leg, START_TIME, get_direct_pair, get_user_from_member, get_active_mem_price, filter_by_sponsor, find_next_monday, valid_payout_user, filter_by_leg_user, run_investment_calc
 from addons.accounts.lib.blockexplorer import validate, is_valid_xrp_paid, is_valid_btc_paid, get_btc, get_xrp
 
 # TODO: Do it in time
@@ -221,7 +221,7 @@ class CreateUserTest(TestCase):
     ########### CALCULATE WEEKLY #############
     def test_calc_weekly(self):
         res, _ = calc(self.user1, self.user1.date_joined, 'weekly')
-        self.assertEqual(res, 140, "should've been 70 but is %s" %res)
+        self.assertEqual(res, 140, "should've been 140 but is %s" %res)
     
     
     def test_all_members_traversed(self):
@@ -306,6 +306,15 @@ class CreateUserTest(TestCase):
     def test_get_direct_pair(self):
         res = get_direct_pair(self.user1, self.user1.date_joined, self.next_date)
         self.assertTrue(res, "Is %s" %res)
+
+    def test_run_investment_calc(self):
+        pkg = User_packages.objects.filter(user = self.user1, status='A')
+        pkg = pkg[0]
+        run_investment_calc(self.user1, pkg, self.user1.date_joined, self.next_date)
+        pkg = User_packages.objects.filter(user = self.user1, status='A')
+        pkg = pkg[0]
+        print [pkg.binary, pkg.direct, pkg.weekly]
+        self.assertListEqual([pkg.binary, pkg.direct, pkg.weekly], [180, 210, 140], "Failed. value is {}".format([pkg.binary, pkg.direct, pkg.weekly]))
 
     def test_calc_binary(self):
         res, _ = calc(self.user1, self.user1.date_joined, 'binary')

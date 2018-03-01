@@ -67,8 +67,8 @@ def get_direct_pair(user, last_date, next_date):
     right_members = filter(
         lambda m: LEG['r'](m), filtered_members)
 
-    active_left = User_packages.objects.filter(user=left_members[0].child_id, status='A')
-    active_right = User_packages.objects.filter(user=right_members[0].child_id, status='A')
+    active_left = User_packages.objects.filter(user=left_members[0].child_id, status='A') if left_members else None
+    active_right = User_packages.objects.filter(user=right_members[0].child_id, status='A') if right_members else None
     return True if (active_left and active_right) else False
     # # traverse left members
     # left_members = traverse_members(
@@ -83,6 +83,23 @@ def get_direct_pair(user, last_date, next_date):
     # print l_count, r_count
     # diff = r_count - l_count if r_count > l_count else l_count - r_count
     # return diff
+
+def is_valid_date(func):
+    """Decorator for calculation function"""
+    @wraps(func)
+    def wrapped_f(user, last_date, next_date):
+        """
+        Checks if user falls within valid date range else bypasses to its children 0
+        """
+        if user:    
+            doj = UTC.normalize(user.date_joined)
+            if last_date <= doj < next_date:
+                return func(user, last_date, next_date)
+            else:
+                return get_left_right_agg(user, last_date, next_date)
+        return 0.0
+    return wrapped_f
+
 
 def is_eligible(func):
     """Decorator for calculation function"""
@@ -130,7 +147,7 @@ def calc_binary(user, last_date, next_date):
         binary_payout = pkg.package.binary_payout/100.0
         # finds leg with minimium total package prices
         # leg = find_min_leg(user)
-        left_sum, right_sum = get_left_right_agg(user)
+        left_sum, right_sum = get_left_right_agg(user, last_date, next_date)
         left_sum += pkg.left_binary_cf
         right_sum += pkg.right_binary_cf
         l_cf, r_cf = calc_cf(left_sum, right_sum)
@@ -185,7 +202,9 @@ def calc_sum(sponsor_id, last_date, next_date, members):
     """Used for Direct Sum Calculation:
     Calculates total package price of all members under a user sponsored by that user"""
     users_sum = 0.0
-    u = User.objects.get(username=sponsor_id)
+    # u = User.objects.get(username=sponsor_id)
+    profile = Profile.objects.get(user_auto_id=sponsor_id)
+    u = profile.user
     # print "u is {}".format(u)
     # tot = [u]
     # print "members {}".format([m.child_id.username for m in members])
@@ -269,33 +288,33 @@ def run_scheduler():
     users = User.objects.all()
     divide_conquer(users, 0, len(users)-1, calculate_investment)
 
-
-def get_left_right_agg(user):
+@is_valid_date
+def get_left_right_agg(user, last_date, next_date):
     """Returns aggregate package of both legs"""
     left_user = get_left(user)
     right_user = get_right(user)
-    return (calc_aggregate_left(left_user), calc_aggregate_right(right_user))
+    return (calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date))
 
-
-def calc_aggregate_left(user):
+@is_valid_date
+def calc_aggregate_left(user, last_date, next_date):
     """Find the aggregate sum of all packages in left leg"""
     if user:
         left_user = get_left(user)
         pkg = get_package(user)
         if pkg:
-            return pkg.package.price + calc_aggregate_left(left_user) + calc_aggregate_right(left_user)
+            return pkg.package.price + calc_aggregate_left(left_user, last_date, next_date) + calc_aggregate_right(left_user, last_date, next_date)
         return 0.0
     else:
         return 0.0
 
-
-def calc_aggregate_right(user):
+@is_valid_date
+def calc_aggregate_right(user, last_date, next_date):
     """Find the aggregate sum of all packages in right leg"""
     if user:
         right_user = get_right(user)
         pkg = get_package(user)
         if pkg:
-            return pkg.package.price + calc_aggregate_left(right_user) + calc_aggregate_right(right_user)
+            return pkg.package.price + calc_aggregate_left(right_user, last_date, next_date) + calc_aggregate_right(right_user, last_date, next_date)
         return 0.0
     else:
         return 0.0
@@ -333,8 +352,12 @@ def valid_payout_user(sponsor_id, member, last_date, next_date):
     pkg = get_package(member.child_id)
     # check if member falls within this cycle. 
     # check if is a direct sponsor
-    return (last_date <= doj < next_date) and (member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id) and pkg
-
+    # print "member is ", member.child_id.username
+    # print "member.child_id.profile.sponser_id ", member.child_id.profile.sponser_id
+    try:
+        return (last_date <= doj < next_date) and (member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id) and pkg
+    except:
+        return False
 
 
 def find_next_monday():
