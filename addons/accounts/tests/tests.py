@@ -15,7 +15,7 @@ import pytz
 import calendar
 from datetime import datetime, timedelta
 from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer, get_left, get_right
-from addons.packages.lib.payout import calc, START_TIME
+from addons.packages.lib.payout import calc, calc_leg, START_TIME, get_direct_pair, get_user_from_member, get_active_mem_price, filter_by_sponsor, find_next_monday, valid_payout_user, filter_by_leg_user
 from addons.accounts.lib.blockexplorer import validate, is_valid_xrp_paid, is_valid_btc_paid, get_btc, get_xrp
 
 # TODO: Do it in time
@@ -155,8 +155,8 @@ class CryptoTransactionTest(TestCase):
 
 class CreateUserTest(TestCase):
     def setUp(self):
-        UTC = pytz.UTC
-        tz = lambda r: (UTC.localize(r))
+        self.UTC = pytz.UTC
+        tz = lambda r: (self.UTC.localize(r))
         self.package = Packages.objects.create(package_name="USD 1000", package_code="usd1000", payout="7", directout=3.5, binary_payout=6, capping=1000, no_payout=35, loyality=5, roi=2450, price=1000)
 
         self.user1 = User.objects.create_user(username='user1', password='12345', date_joined=tz(datetime(2018, 2, 11, 20, 8, 7, 127325)))
@@ -167,6 +167,7 @@ class CreateUserTest(TestCase):
         self.user2.profile.placement_id = self.user1
         self.user2.profile.placement_position = 'L'
         self.user2.profile.save()
+
         Members.objects.create(parent_id=self.user1, child_id=self.user2)
         User_packages.objects.create(user=self.user2, package=self.package, status="A", created_at=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
 
@@ -210,14 +211,105 @@ class CreateUserTest(TestCase):
         Members.objects.create(parent_id=self.user3, child_id=self.user7)
         User_packages.objects.create(user=self.user7, package=self.package, status="A", created_at=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC), last_payout_date=datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC), duration=1)
 
+        self.next_date = self.UTC.normalize(self.UTC.localize(datetime(2018, 02, 19, 00, 00, 00, 00)))
+
     def test_case(self):
         self.assertTrue(isinstance(self.user1, User))
         self.assertTrue(is_member_of(self.user1, self.user7), True)
     
+    
+    ########### CALCULATE WEEKLY #############
     def test_calc_weekly(self):
         res, _ = calc(self.user1, self.user1.date_joined, 'weekly')
-        self.assertEqual(res, 70, "should've been 70 but is %s" %res)
+        self.assertEqual(res, 140, "should've been 70 but is %s" %res)
     
+    
+    def test_all_members_traversed(self):
+        tot = [self.user1]
+        members = Members.objects.filter(parent_id=self.user1)
+        [tot.append(m) for m in members]
+        while members:    
+            members = reduce(lambda x, y: x|y, divide_conquer(members, 0, len(members)-1, get_user_from_member))
+            [tot.append(m) for m in members]
+        # print "users are: {}".format([m.child_id.username if type(m)==Members else m.username for m in tot])
+        self.assertEqual(len(tot), 7, "should be 7 users in all but are: %s" %(len(tot)))
+    
+    def test_tot_package_sum(self):
+        "find total package sum of all users"
+        res = sum(map(lambda u: get_active_mem_price(u), User.objects.all()))
+        self.assertEqual(res, 7000, "total package sum should be 7000 but is %s" %res)
+    
+    def test_valid_payout_user(self):
+        "validate if a user has last_date <= doj < next_date is s.t."
+        sponsor_id = self.user1.profile.user_auto_id
+        last_date = self.user1.date_joined
+        next_date =  self.next_date
+        members = Members.objects.filter(parent_id=self.user1)
+        bl = valid_payout_user(sponsor_id, members[0], last_date, next_date)
+        # doj = self.UTC.normalize(members[0].child_id.date_joined)
+        # bl = last_date <= doj < next_date
+        # print "user: {} | parent: {} | child: {} | child's sponsor: {}".format(self.user1.profile.user_auto_id, members[0].parent_id.profile.user_auto_id, members[0].child_id.profile.user_auto_id, members[0].child_id.profile.sponser_id)
+        # bl = members[0].child_id.profile.sponser_id.profile.user_auto_id == sponsor_id
+        # print "last date: {}, doj: {}, next_date: {}".format(last_date, doj, next_date)
+        # self.assertEqual(sponsor_id, members[0].child_id.profile.sponser_id.profile.user_auto_id)
+        self.assertTrue(bl, "should be True but is %s" %bl)
+        
+    
+    def test_filter_valid_users(self):
+        "find valid users for calculation between last_date and next_date"
+        filtered_members = []
+        sponsor_id = self.user1.profile.user_auto_id
+        last_date = self.user1.date_joined
+        next_date =  self.next_date
+        members = Members.objects.filter(parent_id=self.user1)
+        while members:
+            filtered_members.extend(filter_by_sponsor(sponsor_id, last_date, next_date, members))
+            members = reduce(lambda x, y: x|y, divide_conquer(members, 0, len(members)-1, get_user_from_member))
+        
+        self.assertEqual(len(filtered_members), 6, "should be 6 but is {}".format(len(filtered_members)))
+
+    def test_calc_left_leg(self):
+        """Calculate left leg sum"""
+        last_date = self.user1.date_joined
+        next_date =  self.next_date
+        res = calc_leg(self.user1, last_date, next_date, leg='l')
+        self.assertEqual(res, 3000, "left leg sum should be 3000 but is %s" %res)
+    
+    def test_calc_right_leg(self):
+        """Calculate right leg sum"""
+        last_date = self.user1.date_joined
+        next_date =  self.next_date
+        res = calc_leg(self.user1, last_date, next_date, leg='r')
+        self.assertEqual(res, 3000, "right leg sum should be 3000 but is %s" %res)
+
+    
+    ####### CALCULATE DIRECT ########
     def test_calc_direct(self):
         res, _ = calc(self.user1, self.user1.date_joined, 'direct')
-        self.assertEqual(res, 105, "should've been 70 but is %s" %res)
+        self.assertEqual(res, 210, "should've been 210 but is {}".format(res))
+    
+
+    ########## CALCULATE BINARY ##########
+    def test_filter_by_sponsor(self):
+        sponsor_id = self.user1.profile.user_auto_id
+        members = Members.objects.filter(parent_id=self.user1.id)
+        fl_mem = filter_by_sponsor(sponsor_id, self.user1.date_joined, self.next_date, members)
+        self.assertTrue(fl_mem, "Should have members but is {}".format(fl_mem))
+    
+    def test_filter_by_left_leg_user(self):
+        sponsor_id = self.user1.profile.user_auto_id
+        members = Members.objects.filter(parent_id=self.user1.id)
+        fl_mem = filter_by_sponsor(sponsor_id, self.user1.date_joined, self.next_date, members)
+        left_mem = filter(lambda m: LEG['l'](m), fl_mem)
+        self.assertEqual(len(left_mem), 1, "should be 1 but is %s" %(len(left_mem)))
+    
+    def test_get_direct_pair(self):
+        res = get_direct_pair(self.user1, self.user1.date_joined, self.next_date)
+        self.assertTrue(res, "Is %s" %res)
+
+    def test_calc_binary(self):
+        res, _ = calc(self.user1, self.user1.date_joined, 'binary')
+        # print res
+        self.assertEqual(res[0], 180, "Should be 180 but is %s" %res[0])
+
+    

@@ -1,4 +1,4 @@
-from addons.accounts.models import User, Members
+from addons.accounts.models import User, Members, Profile
 from addons.packages.models import Packages, User_packages
 from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer, get_left, get_right
 from django.conf import settings
@@ -19,8 +19,8 @@ START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
 def get_package(user):
     packages = User_packages.objects.filter(user=user, status='A')
     if packages:
-        packages = User_packages.objects.get(user=user, status='A')
-        return packages if packages else None
+        # packages = User_packages.objects.get(user=user, status='A')
+        return packages[0] if packages else None
     return None
 
 
@@ -32,11 +32,14 @@ def filter_by_leg_user(member, leg):
 
 def traverse_members(filtered_members, sponsor_id, last_date, next_date):
     # tree level traversal - get more members per child level
-    child_members = map(get_user_from_member, filtered_members)
+    # child_members = map(get_user_from_member, filtered_members)
+    child_members = reduce(lambda x, y: x|y, [Members.objects.filter(parent_id=m.child_id) for m in filtered_members])
     # filter paying sponsored members
-    child_members = filter_by_sponsor(
-        sponsor_id, last_date, next_date, child_members)
-    if child_members:
+    child_members = filter_by_sponsor(sponsor_id, last_date, next_date, child_members)
+    if len(child_members):
+        print "child_members is", child_members
+        # res = traverse_members(child_members, sponsor_id, last_date, next_date)
+        # print "traverse_members is ", res
         return filtered_members + traverse_members(child_members, sponsor_id, last_date, next_date)
     else:
         return []
@@ -54,22 +57,32 @@ def get_direct_pair(user, last_date, next_date):
     filtered_members = filter_by_sponsor(
         sponsor_id, last_date, next_date, members)
     # filter only left `leg` members
+    # left_members = filter(
+    #     lambda m: filter_by_leg_user(m, 'l'), filtered_members)
     left_members = filter(
-        lambda m: filter_by_leg_user(m, 'l'), filtered_members)
+        lambda m: LEG['l'](m), filtered_members)
     # filter only right `leg` members
+    # right_members = filter(
+    #     lambda m: filter_by_leg_user(m, 'r'), filtered_members)
     right_members = filter(
-        lambda m: filter_by_leg_user(m, 'r'), filtered_members)
-    # traverse left members
-    left_members = traverse_members(
-        left_members, sponsor_id, last_date, next_date)
-    # traverse right members
-    right_members = traverse_members(
-        right_members, sponsor_id, last_date, next_date)
-    # get total left and right count and return pairs
-    l_count = len(left_members)
-    r_count = len(right_members)
-    diff = r_count - l_count if r_count > l_count else l_count - r_count
-    return diff
+        lambda m: LEG['r'](m), filtered_members)
+
+    active_left = User_packages.objects.filter(user=left_members[0].child_id, status='A')
+    active_right = User_packages.objects.filter(user=right_members[0].child_id, status='A')
+    return True if (active_left and active_right) else False
+    # # traverse left members
+    # left_members = traverse_members(
+    #     left_members, sponsor_id, last_date, next_date)
+    # # traverse right members
+    # right_members = traverse_members(
+    #     right_members, sponsor_id, last_date, next_date)
+    # # get total left and right count and return pairs
+    # l_count = len(left_members)
+    # r_count = len(right_members)
+    # print [m.parent_id.profile.user_auto_id for m in left_members+right_members]
+    # print l_count, r_count
+    # diff = r_count - l_count if r_count > l_count else l_count - r_count
+    # return diff
 
 def is_eligible(func):
     """Decorator for calculation function"""
@@ -77,23 +90,27 @@ def is_eligible(func):
     def wrapped_f(user, last_date, next_date):
         """
         Checks if user has active package else returns end state for relevant investment
-        """
-        name = func.__name__
+        """ 
         pkg = get_package(user)
         if pkg:
             return func(user, last_date, next_date)
         else:
-            return ((0.0, 0.0, 0.0), 'end') if name=='calc_binary' else (0.0, 'end') 
+            return ((0.0, 0.0, 0.0), 'end') if func.__name__=='calc_binary' else (0.0, 'end') 
     return wrapped_f
 
 @is_eligible
 def calc_direct(user, last_date, next_date):
-    """calculate the direct on each leg"""
+    """calculate the direct:
+        - For the cycle with time T for all T i.e. last_date <= T < next_date
+        - filter users with (doj = T) and with active package
+        - calculate their package price
+        - sum * direct_payout %  
+    """
     pkg = get_package(user)
     direct_payout = pkg.package.directout
-    # finds leg with minimium total package prices
-    leg = find_min_leg(user)
-    return (calc_leg(user, last_date, next_date, leg=leg) * direct_payout, 'binary')
+    l_sum = calc_leg(user, last_date, next_date, leg='l')
+    r_sum = calc_leg(user, last_date, next_date, leg='r')
+    return ((l_sum + r_sum) * direct_payout/100.0, 'binary')
 
 
 # ################# Binary sum calculation #######################
@@ -110,7 +127,7 @@ def calc_binary(user, last_date, next_date):
     pairs = get_direct_pair(user, last_date, next_date)
     if pairs:
         pkg = get_package(user)
-        binary_payout = pkg.package.binary_payout
+        binary_payout = pkg.package.binary_payout/100.0
         # finds leg with minimium total package prices
         # leg = find_min_leg(user)
         left_sum, right_sum = get_left_right_agg(user)
@@ -131,7 +148,7 @@ def calc_weekly(user, last_date, next_date):
     new_date = date.today()
     delta = new_date - old_date
     num_weeks = delta.days/7
-    print "old date is {}. new date is {}. difference in num weeks: {}".format(old_date, new_date, num_weeks)
+    # print "old date is {}. new date is {}. difference in num weeks: {}".format(old_date, new_date, num_weeks)
     pkg = get_package(user)
     return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct') 
 
@@ -148,21 +165,40 @@ def calc_leg(user, last_date, next_date, leg='l'):
     return calc_sum(sponsor_id, last_date, next_date, filter_members)
 
 
+def filter_by_active_package(member):
+    # print member, type(member)
+    if type(member) == Members:
+        child_id = member.child_id
+    elif type(member) == User:
+        child_id = member.id
+    return get_package(child_id)
+
+
 def get_active_mem_price(member):
     res = filter_by_active_package(member)
-    return getattr(getattr(res, 'package'), 'price', 0) if res else 0.0
+    if res:
+        return res.package.price
+    return 0.0
 
 
 def calc_sum(sponsor_id, last_date, next_date, members):
     """Used for Direct Sum Calculation:
     Calculates total package price of all members under a user sponsored by that user"""
     users_sum = 0.0
+    u = User.objects.get(username=sponsor_id)
+    # print "u is {}".format(u)
+    # tot = [u]
+    # print "members {}".format([m.child_id.username for m in members])
+    # [tot.append(m) for m in members]
     while members:
         # find active members' total package price sum in current cycle by sponsor id
         users_sum += sum(map(lambda m: get_active_mem_price(m),
                              filter_by_sponsor(sponsor_id, last_date, next_date, members)))
         # tree level traversal - get more members per child level
-        members = reduce(lambda x, y: x+y, divide_conquer(members, 0, len(members)-1, get_user_from_member))
+        # print "FUNCTION calc_sum > users_sum is: %s" %users_sum
+        members = reduce(lambda x, y: x | y, divide_conquer(members, 0, len(members)-1, get_user_from_member))
+        # [tot.append(m) for m in members]
+    # print "users are: {}".format([m.child_id.username if type(m)==Members else m.username for m in tot])
     return users_sum
 
 
@@ -273,33 +309,32 @@ def find_min_leg(user):
 
 # ############### HELPER FUNCTIONS ###############
 def get_user_from_member(member):
-    return Members.objects.filter(parent_id=member.child_id)
+    res = Members.objects.filter(parent_id=member.child_id)
+    # print "get_user_from_member", res
+    return res
+
 
 # filter functions
-
-
 def filter_by_sponsor(sponsor_id, last_date, next_date, members):
+    # print "filter_by_sponsor members ", members
     return [m for m in members if valid_payout_user(sponsor_id, m, last_date, next_date)]
 
 
 def valid_payout_user(sponsor_id, member, last_date, next_date):
     """Filter users that have their Date of Joining between last payout and next payout day"""
+    # print "member is", member
     doj = UTC.normalize(member.child_id.date_joined)
     # utc = pytz.UTC
-    if doj.day == next_date.day:
-        next_date = UTC.normalize(UTC.localize(datetime(
-            next_date.year, next_date.month, next_date.day, doj.hour, doj.minute, doj.second, doj.microsecond)))
+    # if doj.day == next_date.day:
+    #     next_date = UTC.normalize(UTC.localize(datetime(
+    #         next_date.year, next_date.month, next_date.day, doj.hour, doj.minute, doj.second, doj.microsecond)))
+    
+    # check if member is active
     pkg = get_package(member.child_id)
-    return (last_date <= doj < next_date) and (member.child_id.profile.sponser_id == sponsor_id) and pkg
+    # check if member falls within this cycle. 
+    # check if is a direct sponsor
+    return (last_date <= doj < next_date) and (member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id) and pkg
 
-
-def filter_by_active_package(member):
-    # print member, type(member)
-    if type(member) == Members:
-        child_id = member.child_id
-    elif type(member) == User:
-        child_id = member.id
-    return get_package(child_id)
 
 
 def find_next_monday():
