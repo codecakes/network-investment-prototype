@@ -295,31 +295,31 @@
                 btcRoi = roiVal * btc,
                 ethRoi = roiVal * eth,
                 xrpRoi = roiVal * xrp,
-                inrRoi = roiVal * inr,
+                inrRoi = roiVal,
                 btcBinary = binaryVal * btc,
                 ethBinary = binaryVal * eth,
                 xrpBinary = binaryVal * xrp,
-                inrBinary = binaryVal * inr,
+                inrBinary = binaryVal,
                 btcDirect = directVal * btc,
                 ethDirect = directVal * eth,
                 xrpDirect = directVal * xrp,
-                inrDirect = directVal * inr;
+                inrDirect = directVal;
 
 
             $("#btc-roi").text(`BTC: ${btcRoi}`);
             $("#eth-roi").text(`ETH: ${ethRoi}`);
             $("#xrp-roi").text(`XRP: ${xrpRoi}`);
-            $("#inr-roi").text(`INR: ${inrRoi}`);
+            $("#inr-roi").text(`USD: ${inrRoi}`);
 
             $("#btc-binary").text(`BTC: ${btcBinary}`);
             $("#eth-binary").text(`ETH: ${ethBinary}`);
             $("#xrp-binary").text(`XRP: ${xrpBinary}`);
-            $("#inr-binary").text(`INR: ${inrBinary}`);
+            $("#inr-binary").text(`USD: ${inrBinary}`);
 
             $("#btc-direct").text(`BTC: ${btcDirect}`);
             $("#eth-direct").text(`ETH: ${ethDirect}`);
             $("#xrp-direct").text(`XRP: ${xrpDirect}`);
-            $("#inr-direct").text(`INR: ${inrDirect}`);
+            $("#inr-direct").text(`USD: ${inrDirect}`);
 
         });
     }
