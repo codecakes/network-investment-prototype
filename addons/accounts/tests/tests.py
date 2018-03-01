@@ -15,7 +15,7 @@ import pytz
 import calendar
 from datetime import datetime, timedelta
 from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer, get_left, get_right
-from addons.packages.lib.payout import calc, calc_leg, START_TIME, get_direct_pair, get_user_from_member, get_active_mem_price, filter_by_sponsor, find_next_monday, valid_payout_user, filter_by_leg_user, run_investment_calc
+from addons.packages.lib.payout import calc, calc_weekly, calc_leg, START_TIME, get_direct_pair, get_user_from_member, get_active_mem_price, filter_by_sponsor, find_next_monday, valid_payout_user, filter_by_leg_user, run_investment_calc
 from addons.accounts.lib.blockexplorer import validate, is_valid_xrp_paid, is_valid_btc_paid, get_btc, get_xrp
 
 # TODO: Do it in time
@@ -157,6 +157,12 @@ class CreateUserTest(TestCase):
     def setUp(self):
         self.UTC = pytz.UTC
         tz = lambda r: (self.UTC.localize(r))
+        
+        self.packageA = Packages.objects.create(package_name="USD 5000", package_code="usd5000", payout="7.5", directout=3.5, binary_payout=6, capping=5000, no_payout=35, loyality=5, roi=2450, price=5000)
+        self.userA = User.objects.create_user(username='userA', password='12345', date_joined=tz(datetime(2018, 1, 03, 00, 8, 7, 127325)))
+        User_packages.objects.create(user=self.userA, package=self.packageA, status="A", created_at=(datetime(2018, 1, 03, 00, 8, 7, 127325, tzinfo=pytz.UTC)), last_payout_date=(datetime(2018, 1, 03, 00, 8, 7, 127325, tzinfo=pytz.UTC)), duration=1)
+        
+
         self.package = Packages.objects.create(package_name="USD 1000", package_code="usd1000", payout="7", directout=3.5, binary_payout=6, capping=1000, no_payout=35, loyality=5, roi=2450, price=1000)
 
         self.user1 = User.objects.create_user(username='user1', password='12345', date_joined=tz(datetime(2018, 2, 11, 20, 8, 7, 127325)))
@@ -219,9 +225,14 @@ class CreateUserTest(TestCase):
     
     
     ########### CALCULATE WEEKLY #############
+    def test_weekly(self):
+        next_date = self.UTC.normalize(self.UTC.localize(datetime(2018, 02, 26, 00, 00, 00, 00)))
+        res, _ = calc_weekly(self.userA, self.userA.date_joined, next_date)
+        self.assertEqual(res, 3000, "should be 3000 but is %s" %res)
+
     def test_calc_weekly(self):
         res, _ = calc(self.user1, self.user1.date_joined, 'weekly')
-        self.assertEqual(res, 140, "should've been 140 but is %s" %res)
+        self.assertEqual(res, 210, "should've been 140 but is %s" %res)
     
     
     def test_all_members_traversed(self):

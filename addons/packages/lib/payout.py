@@ -16,6 +16,8 @@ START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
 # TODO: Lotsa caching decorators
 
 # ################# direct sum calculation #######################
+
+
 def get_package(user):
     packages = User_packages.objects.filter(user=user, status='A')
     if packages:
@@ -33,11 +35,13 @@ def filter_by_leg_user(member, leg):
 def traverse_members(filtered_members, sponsor_id, last_date, next_date):
     # tree level traversal - get more members per child level
     # child_members = map(get_user_from_member, filtered_members)
-    child_members = reduce(lambda x, y: x|y, [Members.objects.filter(parent_id=m.child_id) for m in filtered_members])
+    child_members = reduce(lambda x, y: x | y, [Members.objects.filter(
+        parent_id=m.child_id) for m in filtered_members])
     # filter paying sponsored members
-    child_members = filter_by_sponsor(sponsor_id, last_date, next_date, child_members)
+    child_members = filter_by_sponsor(
+        sponsor_id, last_date, next_date, child_members)
     if len(child_members):
-        print "child_members is", child_members
+        #print "child_members is", child_members
         # res = traverse_members(child_members, sponsor_id, last_date, next_date)
         # print "traverse_members is ", res
         return filtered_members + traverse_members(child_members, sponsor_id, last_date, next_date)
@@ -67,8 +71,10 @@ def get_direct_pair(user, last_date, next_date):
     right_members = filter(
         lambda m: LEG['r'](m), filtered_members)
 
-    active_left = User_packages.objects.filter(user=left_members[0].child_id, status='A') if left_members else None
-    active_right = User_packages.objects.filter(user=right_members[0].child_id, status='A') if right_members else None
+    active_left = User_packages.objects.filter(
+        user=left_members[0].child_id, status='A') if left_members else None
+    active_right = User_packages.objects.filter(
+        user=right_members[0].child_id, status='A') if right_members else None
     return True if (active_left and active_right) else False
     # # traverse left members
     # left_members = traverse_members(
@@ -84,6 +90,7 @@ def get_direct_pair(user, last_date, next_date):
     # diff = r_count - l_count if r_count > l_count else l_count - r_count
     # return diff
 
+
 def is_valid_date(func):
     """Decorator for calculation function"""
     @wraps(func)
@@ -91,12 +98,19 @@ def is_valid_date(func):
         """
         Checks if user falls within valid date range else bypasses to its children 0
         """
-        if user:    
+        if user:
             doj = UTC.normalize(user.date_joined)
             if last_date <= doj < next_date:
+                #print "in if is valid_date  "
+                #print "func name is {}".format(func.__name__)
                 return func(user, last_date, next_date)
-            else:
-                return get_left_right_agg(user, last_date, next_date)
+            # elif doj == next_date:
+            #     return 0.0
+            # else:
+            #     print "in else is valid_date "
+            #     print "last_date <= doj < next_date is: {} <= {} < {}".format(last_date, doj, next_date)
+            #     print "user valid date check", user.username
+            #     return get_left_right_agg(user, last_date, next_date)
         return 0.0
     return wrapped_f
 
@@ -107,13 +121,14 @@ def is_eligible(func):
     def wrapped_f(user, last_date, next_date):
         """
         Checks if user has active package else returns end state for relevant investment
-        """ 
+        """
         pkg = get_package(user)
         if pkg:
             return func(user, last_date, next_date)
         else:
-            return ((0.0, 0.0, 0.0), 'end') if func.__name__=='calc_binary' else (0.0, 'end') 
+            return ((0.0, 0.0, 0.0), 'end') if func.__name__ == 'calc_binary' else (0.0, 'end')
     return wrapped_f
+
 
 @is_eligible
 def calc_direct(user, last_date, next_date):
@@ -136,7 +151,8 @@ def calc_cf(left_sum, right_sum):
     returns carry forward in the relevant leg"""
     res = abs(left_sum - right_sum)
     return (res, 0) if left_sum > right_sum else (0, res)
-    
+
+
 @is_eligible
 def calc_binary(user, last_date, next_date):
     """calculate the binary on minimum of two legs"""
@@ -151,23 +167,29 @@ def calc_binary(user, last_date, next_date):
         left_sum += pkg.left_binary_cf
         right_sum += pkg.right_binary_cf
         l_cf, r_cf = calc_cf(left_sum, right_sum)
-        return ((min(left_sum, right_sum) * binary_payout, l_cf, r_cf), 'end')  # TODO: add 'loyalty' when implemented
+        # TODO: add 'loyalty' when implemented
+        return ((min(left_sum, right_sum) * binary_payout, l_cf, r_cf), 'end')
     return ((0.0, 0.0, 0.0), 'end')
 
 
 # ################# Weekly sum calculation #######################
 @is_eligible
 def calc_weekly(user, last_date, next_date):
+    from math import ceil, floor
     # calculate number of weeks passed since last_date before next_date
     user_doj = user.date_joined
     user_doj = date(user_doj.year, user_doj.month, user_doj.day)
-    old_date = greater_date(user_doj, date(last_date.year, last_date.month, last_date.day))
-    new_date = date.today()
+    old_date = greater_date(user_doj, date(
+        last_date.year, last_date.month, last_date.day))
+    new_date = next_date.date()
+    # new_date = date(user_doj.year, user_doj.month, user_doj.day)
     delta = new_date - old_date
-    num_weeks = delta.days/7
-    # print "old date is {}. new date is {}. difference in num weeks: {}".format(old_date, new_date, num_weeks)
+    num_weeks = floor(delta.days/7.0)
+    # print "old date is {}, next_date is {}".format(old_date, next_date.date())
+    # print "delta is %s" %delta
+    print "old date is {}. new date is {}. difference in num weeks: {}".format(old_date, new_date, num_weeks)
     pkg = get_package(user)
-    return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct') 
+    return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct')
 
 
 def calc_leg(user, last_date, next_date, leg='l'):
@@ -215,7 +237,8 @@ def calc_sum(sponsor_id, last_date, next_date, members):
                              filter_by_sponsor(sponsor_id, last_date, next_date, members)))
         # tree level traversal - get more members per child level
         # print "FUNCTION calc_sum > users_sum is: %s" %users_sum
-        members = reduce(lambda x, y: x | y, divide_conquer(members, 0, len(members)-1, get_user_from_member))
+        members = reduce(lambda x, y: x | y, divide_conquer(
+            members, 0, len(members)-1, get_user_from_member))
         # [tot.append(m) for m in members]
     # print "users are: {}".format([m.child_id.username if type(m)==Members else m.username for m in tot])
     return users_sum
@@ -237,8 +260,9 @@ def calc(user, last_date, investment_type):
     next_date = find_next_monday()
     return INVESTMENT_TYPE[investment_type](user, last_date, next_date)
 
+
 def run_investment_calc(user, pkg, last_date, next_payout):
-    state_m = StateMachine(user)        
+    state_m = StateMachine(user)
     state_m.add_state('weekly', INVESTMENT_TYPE, end_state='direct')
     state_m.add_state('direct', INVESTMENT_TYPE, end_state='binary')
     state_m.add_state('binary', INVESTMENT_TYPE, end_state='end')
@@ -252,12 +276,12 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     state_m.run(last_date, next_payout)
     state_m.set_start('binary')
     state_m.run(last_date, next_payout)
-    
+
     # print state_m.results
     binary, left_binary_cf, right_binary_cf = state_m.results['binary']
     direct = state_m.results['direct']
     weekly = state_m.results['weekly']
-    
+
     pkg.binary = binary
     pkg.left_binary_cf = left_binary_cf
     pkg.right_binary_cf = right_binary_cf
@@ -268,7 +292,7 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     pkg.save()
 
 
-def calculate_investment(user):
+def calculate_investment(user, **kw):
     """Calculates all investment schemes of the user"""
     packages = User_packages.objects.filter(user=user, status='A')
     if packages:
@@ -276,24 +300,28 @@ def calculate_investment(user):
         # last_date = pkg.last_payout_date
         last_date = START_TIME
         today = UTC.normalize(UTC.localize(datetime.utcnow()))
-        next_payout = find_next_monday()
-        
+        next_payout = kw.get('next_date', find_next_monday())
+
         if last_date <= today < next_payout:
             # print "INSIDE calculate_investments"
-            print "calculating for ", user
+            #print "calculating for ", user
             run_investment_calc(user, pkg, last_date, next_payout)
 
 
-def run_scheduler():
+def run_scheduler(**kw):
     users = User.objects.all()
-    divide_conquer(users, 0, len(users)-1, calculate_investment)
+    divide_conquer(users, 0, len(users)-1,
+                   lambda user: calculate_investment(user, **kw))
+
 
 @is_valid_date
 def get_left_right_agg(user, last_date, next_date):
     """Returns aggregate package of both legs"""
     left_user = get_left(user)
     right_user = get_right(user)
+#print "left user {} and right users {}".format(left_user.username, right_user.username)
     return (calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date))
+
 
 @is_valid_date
 def calc_aggregate_left(user, last_date, next_date):
@@ -306,6 +334,7 @@ def calc_aggregate_left(user, last_date, next_date):
         return 0.0
     else:
         return 0.0
+
 
 @is_valid_date
 def calc_aggregate_right(user, last_date, next_date):
@@ -347,10 +376,10 @@ def valid_payout_user(sponsor_id, member, last_date, next_date):
     # if doj.day == next_date.day:
     #     next_date = UTC.normalize(UTC.localize(datetime(
     #         next_date.year, next_date.month, next_date.day, doj.hour, doj.minute, doj.second, doj.microsecond)))
-    
+
     # check if member is active
     pkg = get_package(member.child_id)
-    # check if member falls within this cycle. 
+    # check if member falls within this cycle.
     # check if is a direct sponsor
     # print "member is ", member.child_id.username
     # print "member.child_id.profile.sponser_id ", member.child_id.profile.sponser_id
@@ -369,6 +398,7 @@ def find_next_monday():
                   cur_dt.minute, cur_dt.second, cur_dt.microsecond)
     rem_dt = timedelta(days=remaining_days)
     return UTC.normalize(UTC.localize(dt + rem_dt)) if remaining_days != 0 else UTC.normalize(UTC.localize(dt + timedelta(days=7)))
+
 
 def greater_date(dt1, dt2):
     return max(dt1, dt2)
