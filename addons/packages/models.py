@@ -61,13 +61,8 @@ class User_packages(models.Model):
     paid_txn_id = models.CharField(max_length=100, null=True, blank=True)
     paid_cur = models.CharField(max_length=50, choices=cur_choice, null=True)
 
-    def save(self, **kwargs):
-    	# import pytz
-        # UTC = pytz.UTC
-        if not self.pk:
-            self.expiry_date = datetime.date.today() + relativedelta(years=self.duration)
-            super(User_packages, self).save(self)
-        # else:
-        #   print '-'
-        # 	self.expiry_date = datetime.date.today() + relativedelta(years=self.duration)
-        # 	super(User_packages, self).update(self)
+    def save(self, *args, **kwargs):
+		if not self.pk:
+			self.expiry_date = datetime.date.today() + relativedelta(years=self.duration)
+
+		super(User_packages, self).save(*args, **kwargs)

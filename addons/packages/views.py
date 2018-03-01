@@ -35,7 +35,7 @@ def add_years(d, years):
 def PackagesCreate(request):
 
     context = {
-        "packages": Packages.objects.all(),
+        "packages": Packages.objects.all().order_by('price'),
         "package_access_disable": True
     }
     user_account = UserAccount.objects.filter(user=request.user)

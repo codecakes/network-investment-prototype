@@ -248,16 +248,23 @@ def app_logout(request):
 
 
 def app_activate_account(request, token):
-    profile = get_object_or_404(Profile, token=token, user__is_active=False)
-    profile.user.is_active = True
-    profile.user.save()
+    try:
+        profile = get_object_or_404(Profile, token=token, user__is_active=False)
+        profile.user.is_active = True
+        profile.user.save()
 
-    if profile.user.has_usable_password():
-        profile.token = ""
-        profile.save()
-        return HttpResponseRedirect("/login")
-    else:
-        return HttpResponseRedirect("/reset-password/" + profile.token)
+        if profile.user.has_usable_password():
+            profile.token = ""
+            profile.save()
+            return HttpResponseRedirect("/login")
+        else:
+            return HttpResponseRedirect("/reset-password/" + profile.token)
+    except:
+        content = {
+                "status": "error",
+                "message": "Your profile is already active or your email is not registered with us, please send a ticket to support@avicrypto.us" 
+                }
+        return render(request, '404.html', content)
 
 
 def app_forgot_password(request):
@@ -539,10 +546,14 @@ def support(request):
 @csrf_exempt
 def network(request):
     if request.method == 'GET':
-        context = {"package_access_disable":True,'package_status':has_package(request.user)}
-        user = request.user
-        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
-            context["package_access_disable"] = False
+        # context = {
+        #     "package_access_disable": True,
+        #     'package_status': has_package(request.user)
+        # }
+        # user = request.user
+        # if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
+        #     context["package_access_disable"] = False
+        context = {}
         template = loader.get_template('network.html')
         return HttpResponse(template.render(context, request))
     if request.method == 'POST':
@@ -684,14 +695,16 @@ def update_user_profile(user, data):
 def add_user(request):
 
     if request.method == 'GET':
-        referal = request.GET.get('ref')
-        sponser_id = Profile.objects.filter(my_referal_code=referal)
-        sponser_id = sponser_id[0].user_auto_id
+        user = request.user
+        # referal = request.GET.get('ref')
+        # sponser_id = Profile.objects.filter(my_referal_code=referal)
+        # sponser_id = sponser_id[0].user_auto_id
+        sponser_id = user.profile.user_auto_id
         pos = request.GET.get('pos', "left")
         placement_id = request.GET.get('parent_placement_id')
 
+        # 'referal': referal,
         context = {
-            'referal': referal,
             'sponser_id': sponser_id,
             'placement_id': placement_id,
             'pos': pos
@@ -709,19 +722,21 @@ def add_user(request):
         email = data['email']
 
         if not User.objects.filter(email=email).exists():
-            placement_id = Profile.objects.get(
-                user_auto_id=data['placement_id'])
-            if placement_id.user.is_active == False:
-                content = {
-                    "status": "error",
-                    "message": "placement user is not active",
-                }
-                return HttpResponse(json.dumps(content))
+            placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
+
+            # if placement_id.user.is_active == False:
+            #     content = {
+            #         "status": "error",
+            #         "message": "placement user is not active",
+            #     }
+            #     return HttpResponse(json.dumps(content))
+
             user = User.objects.create(email=email, username=email)
             user.first_name = data['first_name']
             user.last_name = data['last_name']
             user.username = user.profile.user_auto_id
-            user.is_active = False
+            user.is_active = True
+            user.set_password('avi123456')
             user.save()
 
             profile = Profile.objects.get(user=user)
@@ -747,9 +762,12 @@ def add_user(request):
 
             email_data = {
                 "user": user,
+                "sponcer":sponser_id.user,
+                "placement":placement_id.user,
+                "placement_pos":data['placement'],
                 "token": token
             }
-            body = render_to_string('mail/welcome.html', email_data)
+            body = render_to_string('mail/network_user_welcome.html', email_data)
             services.send_email_mailgun(
                 'Welcome to Avicrypto', body, email, from_email="postmaster")
 
@@ -861,44 +879,52 @@ def withdraw(request):
                 else:
                     user_wallet = Wallet.objects.get(owner=user, wallet_type=currency_type)
 
-                if User_packages.objects.filter(status='A', user = user).exists():
+                if User_packages.objects.filter(status='A', user=user).exists():
 
                     user_packages = User_packages.objects.get(user=user, status='A')
 
                     if user_packages.total_payout > 0:
-                        total_payout = user_packages.total_payout
-                        owner_amount = total_payout / 10
-                        user_amount = total_payout - owner_amount
 
-                        transaction = Transactions.objects.create(sender_wallet=owner_wallet, reciever_wallet=user_wallet, amount=user_amount)
+                        if not Transactions.objects.filter(sender_wallet=owner_wallet, reciever_wallet=user_wallet, status="P", tx_type="W").exists():
 
-                        owner_wallet.amount = owner_wallet.amount + owner_amount
-                        owner_wallet.save()
+                            total_payout = user_packages.total_payout
+                            owner_amount = total_payout / 10
+                            user_amount = total_payout - owner_amount
 
-                        user_wallet.amount = 0
-                        user_wallet.save()
+                            transaction = Transactions.objects.create(sender_wallet=owner_wallet, reciever_wallet=user_wallet, amount=user_amount, status="P", description="Withdraw Transaction", tx_type="W")
 
-                        user_packages.total_payout = 0
-                        user_packages.save()
+                            owner_wallet.amount = owner_wallet.amount + owner_amount
+                            owner_wallet.save()
 
-                        services.send_email_mailgun('AVI Crypto Transaction Success', "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account.", user.email, from_email="postmaster")
+                            user_wallet.amount = user_wallet.amount + user_amount
+                            user_wallet.save()
 
-                        email_data = {
-                            "user": user,
-                            "owner_amount": owner_amount,
-                            "user_amount": user_amount,
-                            "total_payout": total_payout,
-                            "currency_type": currency_type,
-                            "transaction": transaction,
-                            "today": UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
-                        }
-                        body = render_to_string('mail/transaction-admin.html', email_data)
-                        services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
+                            user_packages.total_payout = 0
+                            user_packages.save()
 
-                        return HttpResponse(json.dumps({
-                            "status": "ok",
-                            "message": "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account."
-                        }))
+                            services.send_email_mailgun('AVI Crypto Transaction Success', "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account.", user.email, from_email="postmaster")
+
+                            email_data = {
+                                "user": user,
+                                "owner_amount": owner_amount,
+                                "user_amount": user_amount,
+                                "total_payout": total_payout,
+                                "currency_type": currency_type,
+                                "transaction": transaction,
+                                "today": UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+                            }
+                            body = render_to_string('mail/transaction-admin.html', email_data)
+                            services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
+
+                            return HttpResponse(json.dumps({
+                                "status": "ok",
+                                "message": "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account."
+                            }))
+                        else:
+                            return HttpResponse(json.dumps({
+                                "status": "error",
+                                "message": "You already has a transaction in pending state."
+                            }))
                     else:
                         return HttpResponse(json.dumps({
                             "status": "error",

@@ -1,10 +1,12 @@
 from addons.accounts.models import Profile, Members, User
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
+from addons.packages.models import Packages, User_packages
 from django.db.models import Count, Min, Sum, Avg
 from django.conf import settings
 from urllib2 import urlparse
 from functools import wraps
+
 
 ICON = urlparse.urljoin(getattr(settings, "STATIC_URL",
                                 "/static"), "images/node2.png")
@@ -275,15 +277,27 @@ def get_relationship(user):
 
 
 def get_user_json(user, profile):
+    try:
+        user_package = User_packages.objects.get(user=user, status="A")
+        package = user_package.package.price
+    except User_packages.DoesNotExist:
+        package = 0
+
+    user_investment = User_packages.objects.filter(user=user).annotate(investment=Sum('package__price')).values()
+    investment = user_investment[0]['investment'] if user_investment else 0
+
     return dict(id=user.id,
+                avi_id=profile.user_auto_id,
                 relationship=get_relationship(user),
                 name="%s %s" % (user.first_name, user.last_name),
-                content="Total Transactional Volume: %s" % (tot_txn_vol(user)),
+                # content="Total Transactional Volume: %s" % (tot_txn_vol(user)),
                 sponsor_id=None if profile.sponser_id is None else profile.sponser_id.id,
                 placement_id=None if profile.placement_id is None else profile.placement_id.id,
                 placement_position=profile.placement_position, image=ICON,
-                link=dict(
-                    href=urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"))
+                link=dict(href=urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"),
+                package=package,
+                investment=investment,
+                transaction=tot_txn_vol(user))
 
 
 def load_next_subtree(func):

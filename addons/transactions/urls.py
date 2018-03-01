@@ -21,5 +21,5 @@ from . import views
 urlpatterns = [
     url(r'^add/$', login_required(views.TransactionsCreate.as_view()), name='transactions_create'),
     url(r'^list/$', views.TransactionsList.as_view(), name='transactions_list'),
-    url(r'^summary/$', login_required(views.TransactionsSummary.as_view()), name='transactions_list'),
+    url(r'^summary/$', login_required(views.TransactionsSummary.as_view()), name='transactions_summary'),
 ]

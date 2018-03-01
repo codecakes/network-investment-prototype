@@ -21,6 +21,7 @@ from django.contrib.auth.models import User
 # from server.accounts.models import Profile
 
 from addons.packages.models import Packages, User_packages
+from addons.wallet.models import Wallet
 from models import Transactions
 from forms import transactions_form
 
@@ -79,10 +80,14 @@ class TransactionsSummary(ListView):
 
     def get(self, request):
         user = request.user
-        transactions = Transactions.objects.all()
+        transactions = Transactions.objects.filter(reciever_wallet__owner=user)
         packages = User_packages.objects.filter(user=user)
+        wallets = Wallet.objects.filter(owner=user)
         context = {
             'packages': packages,
-            'transactions': transactions
+            'transactions': transactions,
+            'wallets': wallets,
+            'transaction_status_choices': Transactions.status_choices,
+            'userpackage_status_choices': User_packages.status_choices,
         }
         return HttpResponse(self.template.render(context, request))
