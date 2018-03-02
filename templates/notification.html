@@ -1,0 +1,73 @@
+<li class="dropdown dropdown-notification nav-item">
+	<a href="#" data-toggle="dropdown" class="nav-link nav-link-label">
+		<i class="ficon icon-bell4"></i>
+		{% if enable_notification %}
+			<span class="tag tag-pill tag-default tag-danger tag-default tag-up">{{notification_count}}</span>
+		{% endif %}
+	</a>
+	<ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
+		<li class="dropdown-menu-header">
+			<h6 class="dropdown-header m-0">
+				<span class="grey darken-2">Notifications</span>
+				<span class="notification-tag tag tag-default tag-danger float-xs-right m-0">{{notification_count}}</span>
+			</h6>
+		</li>
+		<li class="list-group scrollable-container ps-container ps-theme-dark ps-active-y">
+			{% if not email_verified %}
+				<a href="javascript:void(0)" class="list-group-item">
+					<div class="media">
+						<div class="media-left valign-middle">
+							<i class="icon-alert-circled icon-bg-circle bg-warning"></i>
+						</div>
+						<div class="media-body">
+							<h6 class="media-heading">Email</h6>
+							<p class="notification-text font-small-3 text-muted">Your email address id not verified.</p>
+						</div>
+					</div>
+				</a>
+			{% endif %}
+
+			{% if not has_package %}
+				<a href="{% url 'package:packages_add' %}" class="list-group-item">
+					<div class="media">
+						<div class="media-left valign-middle">
+							<i class="icon-cube icon-bg-circle bg-warning"></i>
+						</div>
+						<div class="media-body">
+							<h6 class="media-heading">Package</h6>
+							<p class="notification-text font-small-3 text-muted">You Don't have any active packages.</p>
+						</div>
+					</div>
+				</a>
+			{% endif %}
+
+			{% if not has_crypto_account %}
+				<a href="{% url 'accounts:profile' %}" class="list-group-item">
+					<div class="media">
+						<div class="media-left valign-middle">
+							<i class="icon-cube icon-bg-circle bg-warning"></i>
+						</div>
+						<div class="media-body">
+							<h6 class="media-heading">Crypto Accounts</h6>
+							<p class="notification-text font-small-3 text-muted">Kindly add your Crypto Account Details.</p>
+						</div>
+					</div>
+				</a>
+			{% endif %}
+
+			{% if not enable_notification %}
+				<a href="javascript:void(0)" class="list-group-item">
+					<div class="media">
+						<div class="media-left valign-middle">
+							<i class="icon-happy icon-bg-circle bg-primary"></i>
+						</div>
+						<div class="media-body">
+							<h6 class="media-heading">Looks good.</h6>
+							<p class="notification-text font-small-3 text-muted">Every thing seems good.</p>
+						</div>
+					</div>
+				</a>
+			{% endif %}
+		</li>
+	</ul>
+</li>

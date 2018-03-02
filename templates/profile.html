@@ -2,166 +2,210 @@
 
 {% load staticfiles %}
 
+{% block page_stylesheet %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/pages/profile.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <div class="content-header"></div>
 
-<div class="content-body">
-    <section id="profile-form">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title" id="horz-layout-basic">Profile</h4>
-                    </div>
-                    <div class="card-body collapse in">
-                        <div class="card-block">
-                            <form id="profile_form" class="form form-horizontal">
-                                <div class="form-body">
-                                    <h4 class="form-section"><i class="icon-head"></i> Network Detail</h4>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control" for="projectinput1">Sponsor ID</label>
-                                        <div class="col-md-9">
-                                            {{user.profile.sponser_id}}
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control" for="projectinput2">Placement ID</label>
-                                        <div class="col-md-9">
-                                            {{user.profile.placement_id}}
-                                        </div>
-                                    </div>
-    
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control" for="projectinput3">Position of placement</label>
-                                        <div class="col-md-9">
-                                            {{user.profile.placement_position}}
-                                        </div>
-                                    </div>
-
-                                    <h4 class="form-section"><i class="icon-clipboard4"></i> Personal Detail</h4>
-    
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control" for="first_name">*First Name</label>
-                                        <div class="col-md-9">
-                                            <input type="text" id="first_name" class="form-control" placeholder="First Name" name="first_name" value="{{user.first_name}}" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control" for="last_name">*Last Name</label>
-                                        <div class="col-md-9">
-                                            <input type="text" id="last_name" class="form-control" placeholder="Last Name" name="last_name" value="{{user.last_name}}" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control" for="last_name">Email</label>
-                                        <div class="col-md-9">
-                                            {{user.email}}
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control" for="last_name">Mobile</label>
-                                        <div class="col-md-9">
-                                            {{user.profile.mobile}}
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control" for="last_name">Country</label>
-                                        <div class="col-md-9">
-                                            <select name="country" id="country" class="form-control">
-                                                {% for country in countries %}
-                                                    <option {% if user.profile.country == country.country_code %}selected{% endif %} data-code="{{country.dialling_code}}" value="{{country.country_code}}">{{country.country_name}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control">Bitcoin Address</label>
-                                       <div class="col-md-9">
-                                            <input type="text" id="btc_address" class="form-control" placeholder="Bitcoin Address" name="btc_address" value="{{user.useraccount.btc_address}}" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control">BTC Destination Tag</label>
-                                       <div class="col-md-9">
-                                            <input type="text" id="btc_destination_tag" class="form-control" placeholder="Destination Tag" name="btc_destination_tag" value="{{user.useraccount.btc_destination_tag}}">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control">Ripple Address</label>
-                                       <div class="col-md-9">
-                                            <input type="text" id="xrp_address" class="form-control" placeholder="Ripple Address" name="xrp_address" value="{{user.useraccount.xrp_address}}" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control">XRP Destination Tag</label>
-                                       <div class="col-md-9">
-                                            <input type="text" id="xrp_destination_tag" class="form-control" placeholder="Destination Tag" name="xrp_destination_tag" value="{{user.useraccount.xrp_destination_tag}}">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control">Etherum Address</label>
-                                       <div class="col-md-9">
-                                            <input type="text" id="eth_address" class="form-control" placeholder="Etherum Address" name="eth_address" value="{{user.useraccount.eth_address}}" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-md-3 label-control">ETH Destination Tag</label>
-                                       <div class="col-md-9">
-                                            <input type="text" id="eth_destination_tag" class="form-control" placeholder="Destination Tag" name="eth_destination_tag" value="{{user.useraccount.eth_destination_tag}}">
-                                        </div>
-                                    </div>
+<div class="content-detached content-right">
+    <div class="content-body">
+        <section id="profile_network_details" class="card">
+            <div class="card-header">
+                <h4 class="card-title">Network Details</h4>
+            </div>
+            <div class="card-body collapse in">
+                <div class="card-block">
+                    <form class="form form-horizontal">
+                        <div class="form-body">
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="projectinput1">Sponsor ID</label>
+                                <div class="col-md-9">
+                                    {{user.profile.sponser_id}}
                                 </div>
-    
-                                <div class="form-actions">
-                                    <button id="profile_update" type="submit" class="btn btn-primary">
-                                        <i class="icon-check2"></i> Save
-                                    </button>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="projectinput2">Placement ID</label>
+                                <div class="col-md-9">
+                                    {{user.profile.placement_id}}
                                 </div>
-                            </form>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="projectinput3">Position of placement</label>
+                                <div class="col-md-9">
+                                    {{user.profile.placement_position}}
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+        <section id="profile_personal_detail" class="card">
+            <div class="card-header">
+                <h4 class="card-title" id="horz-layout-basic">Personal Detail</h4>
+            </div>
+            <div class="card-body collapse in">
+                <div class="card-block">
+                    <form id="profile_personal_detail_form" class="form form-horizontal form-simple" novalidate>
+                        <div class="form-body">
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="first_name">*First Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" id="first_name" class="form-control" placeholder="First Name" name="first_name" value="{{user.first_name|default_if_none:""}}" required>
+                                    <div class="help-block font-small-3"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="last_name">*Last Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" id="last_name" class="form-control" placeholder="Last Name" name="last_name" value="{{user.last_name|default_if_none:""}}" required>
+                                    <div class="help-block font-small-3"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control">Email</label>
+                                <div class="col-md-9">
+                                    {{user.email}}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control">Mobile</label>
+                                <div class="col-md-9">
+                                    {{user.profile.mobile}}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="country">Country</label>
+                                <div class="col-md-9">
+                                    <select name="country" id="country" class="form-control">
+                                        {% for country in countries %}
+                                            <option {% if user.profile.country == country.country_code %}selected{% endif %} data-code="{{country.dialling_code}}" value="{{country.country_code}}">{{country.country_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="profile_personal_detail_submit" type="submit" class="btn btn-primary">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <section id="profile_crypto_accounts" class="card">
+            <div class="card-header">
+                <h4 class="card-title" id="horz-layout-basic">Crypto Accounts</h4>
+            </div>
+            <div class="card-body collapse in">
+                <div class="card-block">
+                    <form id="profile_crypto_accounts_form" class="form form-horizontal form-simple" novalidate>
+                        <div class="form-body">
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="btc_address">Bitcoin Address</label>
+                                <div class="col-md-9">
+                                    <input type="text" id="btc_address" class="form-control" placeholder="Bitcoin Address" name="btc_address" value="{{user.useraccount.btc_address|default_if_none:""}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="eth_address">Etherum Address</label>
+                                <div class="col-md-9">
+                                    <input type="text" id="eth_address" class="form-control" placeholder="Etherum Address" name="eth_address" value="{{user.useraccount.eth_address|default_if_none:""}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="xrp_address">Ripple Address</label>
+                                <div class="col-md-9">
+                                    <input type="text" id="xrp_address" class="form-control" placeholder="Ripple Address" name="xrp_address" value="{{user.useraccount.xrp_address|default_if_none:""}}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="xrp_destination_tag">Ripple Destination Tag</label>
+                                <div class="col-md-9">
+                                    <input type="text" id="xrp_destination_tag" class="form-control" placeholder="Ripple Destination Tag" name="xrp_destination_tag" value="{{user.useraccount.xrp_destination_tag|default_if_none:""}}">
+                                    <div id="xrp_error" class="help-block font-small-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="profile_crypto_accounts_submit" type="submit" class="btn btn-primary">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <section id="profile_change_password" class="card">
+            <div class="card-header">
+                <h4 class="card-title" id="horz-layout-basic">Change Password</h4>
+            </div>
+            <div class="card-body collapse in">
+                <div class="card-block">
+                    <form id="profile_change_password_form" class="form form-horizontal form-simple" novalidate>
+                        <div class="form-body">
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="password">Password</label>
+                                <div class="col-md-9">
+                                    <input type="password" id="password" class="form-control" placeholder="Password" name="password" required data-validation-required-message="Please enter password.">
+                                    <div class="help-block font-small-3"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control" for="c_password">Confirm Password</label>
+                                <div class="col-md-9">
+                                    <input type="password" id="c_password" class="form-control" placeholder="Confirm Password" name="c_password" data-validation-matches-match="password" data-validation-matches-message="Password &amp; Confirm Password must be the same.">
+                                    <div class="help-block font-small-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="profile_change_password_submit" type="submit" class="btn btn-primary">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
+
+<div class="sidebar-detached sidebar-left">
+    <div class="sidebar sidebar-sticky">
+        <div class="sidebar-content card hidden-md-down">
+            <div class="card-block">
+                <div class="category-title pb-1">
+                    <h6>Profile</h6>
+                </div>
+
+                <div class="text-xs-center">
+                    <img class="card-img-top mb-1 img-fluid"  src="{% static 'images/edit_user.png' %}" alt="Card image cap">
+                </div>
+
+                <p class="mt-2">
+                    <a href="#profile_network_details" class="scroll">Network Details</a>
+                </p>
+                <p>
+                    <a href="#profile_personal_detail" class="scroll">Personal Detail</a>
+                </p>
+                <p>
+                    <a href="#profile_crypto_accounts" class="scroll">Crypto Accounts</a>
+                </p>
+                <p>
+                    <a href="#profile_change_password" class="scroll">Change Password</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block page_javascript %}
-<script type="text/javascript">
-    $('#profile_form').submit(function(event) {
-        event.preventDefault()
-        var data = {
-            "first_name": $("#first_name").val(),
-            "last_name": $("#last_name").val(),
-            "country": $("#country").val(),
-            "btc_address": $("#btc_address").val(),
-            "eth_address": $("#eth_address").val(),
-            "xrp_address": $("#xrp_address").val(),
-            "eth_destination_tag": $("#eth_destination_tag").val(),
-            "xrp_destination_tag": $("#xrp_destination_tag").val(),
-            "btc_destination_tag": $("#btc_destination_tag").val(),
-        }
-        console.log(data)
-        $.ajax({
-            type:"POST",
-            url:"/profile",
-            dataType: 'json',
-            data: data,
-            success: function(data) {
-                toastr.success("update", "Profile updated.")
-            }
-        });
-    });
-</script>
+<script type="text/javascript" src="{% static 'js/pages/profile.js' %}"></script>
 {% endblock %}
