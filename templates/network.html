@@ -5,7 +5,8 @@
 {% block page_stylesheet %}
     <!--<link rel="stylesheet" type="text/css" href="{% static 'js/treant/Treant.css' %}">-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://rawgit.com/dabeng/OrgChart/master/demo/css/jquery.orgchart.css">
+    <!-- <link rel="stylesheet" href="https://rawgit.com/dabeng/OrgChart/master/demo/css/jquery.orgchart.css"> -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/network/jquery.OrgChart.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/network/tree.css' %}">
 
 {% endblock %}
@@ -14,8 +15,100 @@
 <div class="content-header row">
 </div>
 
-<div class="content-body">
+<!-- <div class="content-body">
     <div id="chart-container"></div>
+</div> -->
+<div class="content-body">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Business Detail: Selected User Name</h4>
+                </div>
+                <div class="card-body">
+                    <div class="card-block">
+                        <div class="row">
+                            <div class="col-xl-6 col-sm-12 border-right-blue-grey border-right-lighten-5">
+                                <div class="media px-1">
+                                    <div class="media-left media-middle">
+                                        <i class="icon-box font-large-1 blue-grey"></i>
+                                    </div>
+                                    <div class="media-body text-xs-center">
+                                        <span class="font-large-2 text-bold-300 info">Left</span>
+                                    </div>
+                                    <div class="row mt-1">
+                                        <div>
+                                            <table class="table aling-center">
+                                               <tbody>
+                                                   <tr>
+                                                       <td>Total: </td>
+                                                       <td>0000</td>
+                                                   </tr>         
+                                                   <tr>
+                                                       <td>Binary: </td>
+                                                       <td>0000</td>
+                                                   </tr>
+                                                   <tr>
+                                                       <td>Direct: </td>
+                                                       <td>0000</td>
+                                                   </tr>
+                                               </tbody> 
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-sm-12 border-right-blue-grey border-right-lighten-5">
+                                <div class="media px-1">
+                                    <div class="media-left media-middle">
+                                        <i class="icon-tag3 font-large-1 blue-grey"></i>
+                                    </div>
+                                    <div class="media-body text-xs-center">
+                                        <span class="font-large-2 text-bold-200 deep-orange">Right</span>
+                                    </div>
+                                    <div class="row mt-1">
+                                        <div>
+                                            <table class="table aling-center">
+                                               <tbody>
+                                                   <tr>
+                                                       <td>Total: </td>
+                                                       <td>0000</td>
+                                                   </tr>         
+                                                   <tr>
+                                                       <td>Binary: </td>
+                                                       <td>0000</td>
+                                                   </tr>
+                                                   <tr>
+                                                       <td>Direct: </td>
+                                                       <td>0000</td>
+                                                   </tr>
+                                               </tbody> 
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <!--<div class="chart" id="networkTree"></div>-->
+                                <div id="chart-container"></div>
+                                <!-- {% if package_status %}
+                                {% else %}
+                                    <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
+                                        <strong>Your network tree is disabled as you don't have any active package.</strong>
+                                        <a href="package/add/">
+                                            <button>Buy Package</button>
+                                        </a>
+                                    </div>
+                                {% endif %} -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- <div class="tab-content">
     <div class="tab-pane active" id="network_tree">
@@ -38,6 +131,7 @@
     <!--<script src="{% static 'js/treant/raphael.js' %}"></script>-->
     <!--<script src="{% static 'js/treant/Treant.js' %}"></script>-->
     <!--<script src="{% static 'js/pages/network.js' %}"></script>-->
-    <script type="text/javascript" src="https://rawgit.com/dabeng/OrgChart/master/demo/js/jquery.orgchart.js"></script>
+    <!-- <script type="text/javascript" src="https://rawgit.com/dabeng/OrgChart/master/demo/js/jquery.orgchart.js"></script> -->
+    <script src="{% static 'js/network/jquery.orgchart.js' %}"></script>
     <script src="{% static 'js/network/render.js' %}"></script>
 {% endblock %}
