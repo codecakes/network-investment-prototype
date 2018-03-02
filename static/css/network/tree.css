@@ -3,8 +3,8 @@
   display: inline-block;
   top: 10px;
   left: 10px;
-  height: 420px;
-  width: calc(100% - 24px);
+  height: 100%;
+  width: 100%;
   border: 1px dashed grey;
   border-radius: 2px;
   overflow: auto;
