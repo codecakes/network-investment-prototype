@@ -85,7 +85,7 @@ def send_sms(number, otp):
 
     message = client.messages.create(
         to=number, 
-        from_="+919685268234",
-        body="Here is your varifation code- %s", %(otp)
+        from_="+19252663148",
+        body="Here is your varifation code- %s" %otp
         )
-    print(message.sid)
+    print message.sid
