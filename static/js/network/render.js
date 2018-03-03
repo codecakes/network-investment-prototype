@@ -9,6 +9,7 @@
 // clicking a node with id=58 automatically calls GET:'/network/children/58'
 
 $(function() {
+  var loaded = false
   var nodeTemplate = function(data) {
     if(data.id) {
       return `
@@ -342,9 +343,16 @@ $(function() {
     // renderTree(orgData);
 
     initOrgchart = function(nodeId) {
+      var url="";
+      if(loaded == true) {
+        url = '/network/children/'+nodeId;
+      } else {
+        url = '/network/init';
+        loaded=true;      
+      }
       console.log(nodeId)
         $('#chart-container').orgchart({
-          'data' : '/network/children/' + nodeId,
+          'data' : url,
           visibleLevel:4,
           'collapsed': false,
           zoom: false,  
