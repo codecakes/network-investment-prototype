@@ -395,7 +395,8 @@ def home(request):
             'support_tickets': support_tickets,
             'support_tickets_choices': SupportTicket.status_choices,
             'enable_withdraw': False,
-            'wallet_type_choices': Wallet.wallet_type_choice
+            'wallet_type_choices': Wallet.wallet_type_choice,
+            'userpackages_status_choices': User_packages.status_choices
         }
 
         if 0<= is_day < 2:

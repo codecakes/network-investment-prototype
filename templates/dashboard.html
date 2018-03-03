@@ -163,9 +163,15 @@
                                 <tr>
                                     <td>{{ package.package.package_name }}</td>
                                     <td>{{ package.package.price }}</td>
-                                    <td>{{ package.status }}</td>
+                                    <td>
+                                        {% for key,value in userpackages_status_choices %}
+                                            {% if key == package.status %}
+                                                {{ value }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
                                     <td>{{ package.package.no_payout }}</td>
-                                    <td>{{ payout_remain }} </td>
+                                    <td>{{ package.payout_remain }} </td>
                                     <td>${{ package.direct }}</td>
                                     <td>${{ package.binary }}</td>
                                     <td>${{ package.weekly }}</td>
