@@ -35,13 +35,13 @@
   right: -10px;
   top: -10px;
   z-index: 2;
-  color: rgba(68, 157, 68, 0.5);
-  font-size: 24px;
+  color: #000;
+  font-size: 30px;
   position: absolute;
 }
 
 .orgchart .drill-icon:hover {
-  color: #449d44;
+  color: #000;
 }
 
 .orgchart .node:hover .drill-icon {

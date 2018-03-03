@@ -176,15 +176,15 @@
 }
 
 .orgchart .node:hover {
-  background-color: rgba(238, 217, 54, 0.5);
+  background-color: #3BAFDA;
   transition: .5s;
   cursor: default;
   z-index: 20;
 }
 
-.orgchart .node.focused {
+/*.orgchart .node.focused {
   background-color: rgba(238, 217, 54, 0.5);
-}
+}*/
 
 .orgchart .ghost-node {
   position: fixed;
