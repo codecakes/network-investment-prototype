@@ -947,7 +947,10 @@ def withdraw(request):
             }))
 
 # OTP Based authentication
+<<<<<<< HEAD
 # @api_view(['POST'])
+=======
+>>>>>>> ac27b54c91c2cd90bf8aa1061d874bcd5b1916e8
 def send_otp(request):
     if request.method == 'POST':
         mobile = request.data.get('mobile', None)
@@ -970,4 +973,8 @@ def verify_otp(request):
                 return HttpResponse({'message': 'Invalid OTP'})
             return HttpResponse('Success')
         else:
+<<<<<<< HEAD
             return HttpResponse('Invalid otp or mobile number')
+=======
+            return HttpResponse('Invalid otp or mobile number')
+>>>>>>> ac27b54c91c2cd90bf8aa1061d874bcd5b1916e8
