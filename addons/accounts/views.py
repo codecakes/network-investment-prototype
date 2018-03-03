@@ -945,3 +945,29 @@ def withdraw(request):
                 "status": "error",
                 "message": "Select currency for withdraw."
             }))
+
+# OTP Based authentication
+# @api_view(['POST'])
+def send_otp(request):
+    if request.method == 'POST':
+        mobile = request.data.get('mobile', None)
+        if mobile:
+            otp = random.randrange(lower_limit, upper_limit+1)
+            # send_sms(mobile, otp)
+            User.objects.create(mobile=mobile, otp=otp)
+            return HttpResponse({'success': True})
+        else:
+            return HttpResponse("Invalid mobile number")
+
+def verify_otp(request):
+    if request.method == 'POST':
+        mobile = request.data.get('mobile', None)
+        otp = request.data.get('otp', None)
+        if mobile and otp:
+            try:
+                user = User.objects.get(mobile=mobile, otp=otp)
+            except User.DoesNotExist:
+                return HttpResponse({'message': 'Invalid OTP'})
+            return HttpResponse('Success')
+        else:
+            return HttpResponse('Invalid otp or mobile number')
