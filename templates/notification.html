@@ -13,7 +13,7 @@
 			</h6>
 		</li>
 		<li class="list-group scrollable-container ps-container ps-theme-dark ps-active-y">
-			{% if not email_verified %}
+			{% if email_verified == False %}
 				<a href="javascript:void(0)" class="list-group-item">
 					<div class="media">
 						<div class="media-left valign-middle">
@@ -27,7 +27,7 @@
 				</a>
 			{% endif %}
 
-			{% if not has_package %}
+			{% if has_package == False %}
 				<a href="{% url 'package:packages_add' %}" class="list-group-item">
 					<div class="media">
 						<div class="media-left valign-middle">
@@ -41,7 +41,7 @@
 				</a>
 			{% endif %}
 
-			{% if not has_crypto_account %}
+			{% if has_crypto_account == False %}
 				<a href="{% url 'accounts:profile' %}" class="list-group-item">
 					<div class="media">
 						<div class="media-left valign-middle">
@@ -55,7 +55,7 @@
 				</a>
 			{% endif %}
 
-			{% if not enable_notification %}
+			{% if enable_notification == False %}
 				<a href="javascript:void(0)" class="list-group-item">
 					<div class="media">
 						<div class="media-left valign-middle">

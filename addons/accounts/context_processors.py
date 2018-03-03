@@ -9,6 +9,7 @@ def notification(request):
         notification_count = 0
 
         email_verified = user.profile.email_verified
+
         if not email_verified:
             notification_count += 1
 
@@ -17,7 +18,13 @@ def notification(request):
             notification_count += 1
 
         has_crypto_account = True
-        if not user.useraccount.btc_address or not user.useraccount.eth_address or not (user.useraccount.xrp_address and user.useraccount.xrp_destination_tag):
+        has_btc = True if user.useraccount.btc_address and user.useraccount.btc_address != 'None' else False
+        has_eth = True if user.useraccount.eth_address and user.useraccount.eth_address != 'None' else False
+        has_xrp = True if (user.useraccount.xrp_address and user.useraccount.xrp_destination_tag and user.useraccount.xrp_address != 'None' and user.useraccount.xrp_destination_tag != 'None') else False
+
+        if has_btc or has_eth or has_xrp:
+            has_crypto_account = True
+        else:
             has_crypto_account = False
             notification_count += 1
 
