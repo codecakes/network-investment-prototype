@@ -48,7 +48,7 @@ def app_404(request):
 def notactive(request):
     return HttpResponse("User is not active")
 
-def traverse_tree(user, level=4):
+def traverse_tree(user, level=3):
     ref_code = "/add/user?ref={}&place={}".format(
         user.profile.my_referal_code, user.profile.user_auto_id)
     data = load_users(user, ref_code, level=level)
@@ -583,9 +583,10 @@ def network_children(request, user_id):
     user = User.objects.get(id=user_id)
     data = traverse_tree(user)
     data = json.loads(data)
-    data = {
-        'children': data['children']
-    }
+    data['className'] = 'drill-up'
+    # data = {
+    #     'children': data['children']
+    # }
     return HttpResponse(json.dumps(data))
 
 
