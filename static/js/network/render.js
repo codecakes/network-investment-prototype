@@ -9,6 +9,7 @@
 // clicking a node with id=58 automatically calls GET:'/network/children/58'
 
 $(function() {
+  var loaded = false
   var nodeTemplate = function(data) {
     if(data.id) {
       return `
@@ -21,8 +22,7 @@ $(function() {
         </div>
       `;
     } else {
-      return `
-      <span>No User</span>
+      return ` 
       <div class="title">${data.name}</div>
     `;
     }
@@ -37,18 +37,72 @@ $(function() {
         return `/network/families/${node.id}`;
       }
     },
-    renderTree = function() {
-      // TODO: id = getCurrentUserId - implement a function that takes the logged in users user.id
-      // then use that here like `/network/init/${id}`
-      let oc = $("#chart-container").orgchart({
-        data: `/network/init/`,
-        ajaxURL: ajaxURL,
-        depth: 4,
-        zoom: true,
-        pan: true,
-        toggleSiblingsResp: true,
-        nodeTemplate: nodeTemplate
-      });
-    };
-  renderTree();
+
+    initOrgchart = function(nodeId, chartClass) {
+      var url="";
+      if(loaded == true) {
+        url = '/network/children/'+nodeId;
+      } else {
+        url = '/network/init';
+        loaded=true;      
+      }
+        $('#chart-container').orgchart({
+          'data' : url,
+          visibleLevel:4,
+          'collapsed': false,
+          zoom: false,
+          depth:4,
+          chartClass:chartClass||"root",  
+          pan: false,
+          toggleSiblingsResp: false,
+          nodeTemplate: nodeTemplate,
+          'createNode': function($node, data) {
+            if(!data.has_pkg){
+              $($node).find(".title").addClass("inactive-node-title")
+              $($node).find(".content").addClass("inactive-node-border")
+              $($node).addClass('inactive-node')
+            }
+
+            if(!data.avi_id){
+              $($node).find(".title").addClass("nouser-node-title")
+              $($node).find(".content").addClass("nouser-node-border")
+              $($node).addClass('nouser-node')
+            }
+
+            if(data.avi_id && data.className && data.className.match(/top-level/)) {
+              $("#sequence").html("root");
+            } else if(data.className && data.className.match(/drill-up/)) {
+                  $($node).addClass(data.avi_id)             
+                var drillUpIcon = $('<i>', {
+                  'class': 'fa fa-arrow-circle-up drill-icon',
+                  'click': function() {
+                    $('#chart-container').find('.orgchart:visible').remove();
+                    var reverseList = $("#sequence").html().split("-");
+                    console.log(reverseList, reverseList[reverseList.length-1])
+                    var targetChart = reverseList[reverseList.length-2]
+                    reverseList.pop();
+                    $("#sequence").html(reverseList.join("-"))
+                    $("."+targetChart).removeClass("hidden")
+                  }
+                });
+                $node.append(drillUpIcon);
+            } else  if(data.avi_id){
+                $($node).addClass('drill-down');
+                $($node).addClass(data.avi_id)
+                var drillDownIcon = $('<i>', {
+                  'class': 'fa fa-arrow-circle-down drill-icon',
+                  'click': function() {
+                    var sequenceList = $("#sequence").html();
+                    $("#sequence").html(sequenceList+"-"+data.avi_id)
+                    $('#chart-container').find('.orgchart:visible').addClass('hidden');
+                    initOrgchart(data.id,data.avi_id)
+                  }
+                });
+                $node.append(drillDownIcon);
+              }
+            }
+        });
+      }
+
+      initOrgchart(1)
 });

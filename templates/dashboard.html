@@ -150,7 +150,7 @@
                                     <th>Fixed Deposit Name</th>
                                     <th>Price</th>
                                     <th>Status</th>
-                                    <th> Total Payouts </th>
+                                    <th>Total Payouts </th>
                                     <th>Remaining Payouts </th>
                                     <th>Direct Out</th>
                                     <th>Binary Payout</th>
@@ -163,13 +163,19 @@
                                 <tr>
                                     <td>{{ package.package.package_name }}</td>
                                     <td>{{ package.package.price }}</td>
-                                    <td>{{ package.status }}</td>
+                                    <td>
+                                        {% for key,value in userpackages_status_choices %}
+                                            {% if key == package.status %}
+                                                {{ value }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
                                     <td>{{ package.package.no_payout }}</td>
                                     <td>{{ payout_remain }} </td>
-                                    <td>${{ package.direct }}</td>
-                                    <td>${{ package.binary }}</td>
-                                    <td>${{ package.weekly }}</td>
-                                    <td>${{ package.total_payout }}</td>
+                                    <td>${{ direct }}</td>
+                                    <td>${{ binary }}</td>
+                                    <td>${{ weekly }}</td>
+                                    <td>${{ total }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>

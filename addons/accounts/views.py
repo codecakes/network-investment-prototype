@@ -28,19 +28,23 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import *
 from django.core.exceptions import ObjectDoesNotExist
+<<<<<<< HEAD
 from addons.accounts.models import Members, Profile, SupportTicket, UserAccount, Userotp
 from addons.packages.lib.payout import (UTC, calc, calculate_investment,
                                         find_next_monday)
+=======
+from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
+from addons.packages.lib.payout import (UTC, calc, calculate_investment, find_next_monday)
+from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
+>>>>>>> 9481ac06881e9c8ff6c4d9e142aec882278d4e58
 from addons.packages.models import Packages, User_packages
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
 from avicrypto import services
-from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of,
-                      is_valid_leg, load_users)
+from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of, is_valid_leg, load_users)
 from addons.accounts.lib.blockexplorer import validate_transaction
 
 sys.path.append(settings.BASE_DIR)
-
 
 def app_404(request):
     return render(request, '404.html')
@@ -48,7 +52,7 @@ def app_404(request):
 def notactive(request):
     return HttpResponse("User is not active")
 
-def traverse_tree(user, level=4):
+def traverse_tree(user, level=3):
     ref_code = "/add/user?ref={}&place={}".format(
         user.profile.my_referal_code, user.profile.user_auto_id)
     data = load_users(user, ref_code, level=level)
@@ -389,13 +393,22 @@ def home(request):
         packages = User_packages.objects.filter(user=user)
         support_tickets = SupportTicket.objects.filter(user=user)
 
+        user_direct = calc_direct(user, None, None)[0]
+        user_binary = calc_binary(user, None, None)[0][0]
+        user_weekly = calc_weekly(user, None, None)[0]
+
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
             'packages': packages,
             'support_tickets': support_tickets,
             'support_tickets_choices': SupportTicket.status_choices,
             'enable_withdraw': False,
-            'wallet_type_choices': Wallet.wallet_type_choice
+            'wallet_type_choices': Wallet.wallet_type_choice,
+            'userpackages_status_choices': User_packages.status_choices,
+            "direct": user_direct,
+            "binary": user_binary,
+            "weekly": user_weekly,
+            "total": user_direct + user_binary + user_weekly
         }
 
         if 0<= is_day < 2:
@@ -405,8 +418,7 @@ def home(request):
             package for package in packages if package.status == 'A']
         if user_active_package:
             pkg = user_active_package[0]
-            dt = UTC.normalize(UTC.localize(
-                datetime.datetime.now())) - pkg.created_at
+            dt = UTC.normalize(UTC.localize(datetime.datetime.now())) - pkg.created_at
             context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
             next_payout = find_next_monday()
             context["next_payout"] = "%s-%s-%s" % (
@@ -418,9 +430,9 @@ def home(request):
             context["binary_payout"] = 0
             context["user_active_package_value"] = 0
         else:
-            context["weekly_payout"] = user_active_package[0].weekly
-            context["direct_payout"] = user_active_package[0].direct
-            context["binary_payout"] = user_active_package[0].binary
+            context["weekly_payout"] = user_weekly
+            context["direct_payout"] = user_direct
+            context["binary_payout"] = user_binary
             context["user_active_package_value"] = user_active_package[0].package.price
 
         template = loader.get_template('dashboard.html')
@@ -583,9 +595,10 @@ def network_children(request, user_id):
     user = User.objects.get(id=user_id)
     data = traverse_tree(user)
     data = json.loads(data)
-    data = {
-        'children': data['children']
-    }
+    data['className'] = 'drill-up'
+    # data = {
+    #     'children': data['children']
+    # }
     return HttpResponse(json.dumps(data))
 
 
@@ -647,7 +660,7 @@ def update_signup_user_profile(user, data):
 
         profile.placement_position = placement_position
         profile.referal_code = referal_code
-        profile.sponcer_id = sponser_user.user
+        profile.sponser_id = sponser_user.user
         Members.objects.create(parent_id=profile.placement_id, child_id=user)
     profile.save()
 
@@ -683,7 +696,7 @@ def update_user_profile(user, data):
 
         profile.placement_position = placement_position
         profile.referal_code = referal_code
-        profile.sponcer_id = sponser_user.user
+        profile.sponser_id = sponser_user.user
         Members.objects.create(parent_id=profile.placement_id, child_id=user)
 
     profile.save()
@@ -734,6 +747,7 @@ def add_user(request):
             
             # check user active or not 
             profile.sponser_id = sponser_id.user
+            profile.referal_code = sponser_id.my_referal_code
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
             profile.country = data['country']
@@ -760,6 +774,8 @@ def add_user(request):
             services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
 
             Members.objects.create(parent_id=placement_id.user, child_id=user)
+
+            # calculate_investment_binary_direct(request.user)
 
             content = {
                 "status": "ok",
@@ -931,7 +947,8 @@ def send_otp(request):
         mobile = request.data.get('mobile', None)
         otp_type = request.data.get('type', None)
         if mobile:
-            otp = random.randrange(lower_limit, upper_limit+1)
+            otp = random.randrange(1, 1090000+1)
+            # otp = random.randrange(1, upper_limit+1)
             services.send_sms(mobile, otp)
             otp_obj = Userotp.objects.create(otp=otp, mobile=mobile, type=otp_type, status='active')
             # profile = Profile.objects.get(mobile=mobile)
