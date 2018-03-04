@@ -38,22 +38,6 @@ $(function() {
       }
     },
 
-    // renderTree = function(treeData) {
-    //   // TODO: id = getCurrentUserId - implement a function that takes the logged in users user.id
-    //   // then use that here like `/network/init/${id}`
-    //   let oc = $("#chart-container").orgchart({
-    //     data: '/network/children/81',
-    //     //ajaxURL: ajaxURL,
-    //     //visibleLevel:4,
-    //     'collapsed': false,
-    //     zoom: false,  
-    //     pan: false,
-    //     toggleSiblingsResp: false,
-    //     nodeTemplate: nodeTemplate
-    //   });
-    // };
-    // renderTree(orgData);
-
     initOrgchart = function(nodeId, chartClass) {
       var url="";
       if(loaded == true) {
@@ -86,34 +70,32 @@ $(function() {
             }
 
             if(data.avi_id && data.className && data.className.match(/top-level/)) {
+              $("#sequence").html("root");
             } else if(data.className && data.className.match(/drill-up/)) {
                   $($node).addClass(data.avi_id)             
-                //var assoClass = data.className.match(/asso-\w+/)[0];
                 var drillUpIcon = $('<i>', {
                   'class': 'fa fa-arrow-circle-up drill-icon',
                   'click': function() {
-                    $('#chart-container').find('.orgchart:visible').addClass('hidden')
-                    $($('.top-level').closest(".orgchart")).removeClass("hidden");
-                    //$('#chart-container').find('.drill-down.' + data.avi_id).closest('.orgchart').removeClass('hidden');    
-                    // $('#chart-container').find('.drill-down').closest('.orgchart').removeClass('hidden');
-                    // $($("[id='"+data.id+"'][class='node drill-up']").closest(".orgchart")[0]).addClass("hidden")
+                    $('#chart-container').find('.orgchart:visible').remove();
+                    var reverseList = $("#sequence").html().split("-");
+                    console.log(reverseList, reverseList[reverseList.length-1])
+                    var targetChart = reverseList[reverseList.length-2]
+                    reverseList.pop();
+                    $("#sequence").html(reverseList.join("-"))
+                    $("."+targetChart).removeClass("hidden")
                   }
                 });
                 $node.append(drillUpIcon);
             } else  if(data.avi_id){
                 $($node).addClass('drill-down');
                 $($node).addClass(data.avi_id)
-                //var assoClass = data.className.match(/asso-\w+/)[0];
                 var drillDownIcon = $('<i>', {
                   'class': 'fa fa-arrow-circle-down drill-icon',
                   'click': function() {
+                    var sequenceList = $("#sequence").html();
+                    $("#sequence").html(sequenceList+"-"+data.avi_id)
                     $('#chart-container').find('.orgchart:visible').addClass('hidden');
-                    initOrgchart(data.id)
-                    // if (!$('#chart-container').find('.orgchart.' + assoClass).length) {
-                    //   initOrgchart(assoClass);
-                    // } else {
-                    //   $('#chart-container').find('.orgchart.' + assoClass).removeClass('hidden');
-                    // }
+                    initOrgchart(data.id,data.avi_id)
                   }
                 });
                 $node.append(drillDownIcon);
