@@ -52,293 +52,6 @@ $(function() {
     //     nodeTemplate: nodeTemplate
     //   });
     // };
-    // var orgData = {
-    //   "transaction": 0,
-    //   "name": "Harshul kaushik",
-    //   "relationship": "011",
-    //   "package": 0,
-    //   "image": "/static/images/node2.png",
-    //   "placement_id": null,
-    //   "id": 1,
-    //   "investment": 0,
-    //   "className": "top-level",
-    //   "avi_id": "AVI000000001",
-    //   "placement_position": null,
-    //   "sponsor_id": null,
-    //   "link": {
-    //     "href": "https://www.avicrypto.us/network#"
-    //   },
-    //   "children": [
-    //     {
-    //       "transaction": 0,
-    //       "name": "Robert John",
-    //       "relationship": "111",
-    //       "package": 5000,
-    //       "image": "/static/images/node2.png",
-    //       "placement_id": 1,
-    //       "id": 57,
-    //       "investment": 5000,
-    //       "avi_id": "AVI000000019",
-    //       "placement_position": "L",
-    //       "sponsor_id": 1,
-    //       "link": {
-    //         "href": "https://www.avicrypto.us/network#"
-    //       },
-    //       "children": [
-    //         {
-    //           "transaction": 0,
-    //           "name": "Erwin Yap",
-    //           "relationship": "111",
-    //           "package": 1000,
-    //           "image": "/static/images/node2.png",
-    //           "placement_id": 57,
-    //           "id": 80,
-    //           "investment": 1000,
-    //           "avi_id": "AVI000000042",
-    //           "placement_position": "L",
-    //           "sponsor_id": 57,
-    //           "link": {
-    //             "href": "https://www.avicrypto.us/network#"
-    //           },
-    //           "children": [
-    //             {
-    //               "transaction": 0,
-    //               "name": "Liliana Indriani Agustin",
-    //               "relationship": "111",
-    //               "package": 1000,
-    //               "image": "/static/images/node2.png",
-    //               "placement_id": 80,
-    //               "id": 81,
-    //               "investment": 1000,
-    //               "avi_id": "AVI000000043",
-    //               "placement_position": "L",
-    //               "sponsor_id": 80,
-    //               "link": {
-    //                 "href": "https://www.avicrypto.us/network#"
-    //               },
-    //               "children": [
-    //                 {
-    //                   "transaction": 0,
-    //                   "name": "Zulkarnaen last",
-    //                   "relationship": "111",
-    //                   "package": 1000,
-    //                   "image": "/static/images/node2.png",
-    //                   "placement_id": 81,
-    //                   "id": 82,
-    //                   "avi_id": "AVI000000044",
-    //                   "placement_position": "L",
-    //                   "sponsor_id": 81,
-    //                   "link": {
-    //                     "href": "https://www.avicrypto.us/network#"
-    //                   },
-    //                   "investment": 1000
-    //                 },
-    //                 {
-    //                   "transaction": 0,
-    //                   "name": "Kwan Andreas Kristian",
-    //                   "relationship": "111",
-    //                   "package": 100,
-    //                   "image": "/static/images/node2.png",
-    //                   "placement_id": 81,
-    //                   "id": 143,
-    //                   "avi_id": "AVI000000099",
-    //                   "placement_position": "R",
-    //                   "sponsor_id": 81,
-    //                   "link": {
-    //                     "href": "https://www.avicrypto.us/network#"
-    //                   },
-    //                   "investment": 100
-    //                 }
-    //               ]
-    //             },
-    //             {
-    //               "transaction": 0,
-    //               "name": "Ali  Kurniawan",
-    //               "relationship": "111",
-    //               "package": 1000,
-    //               "image": "/static/images/node2.png",
-    //               "placement_id": 80,
-    //               "id": 84,
-    //               "investment": 1000,
-    //               "avi_id": "AVI000000046",
-    //               "placement_position": "R",
-    //               "sponsor_id": 80,
-    //               "link": {
-    //                 "href": "https://www.avicrypto.us/network#"
-    //               },
-    //               "children": [
-    //                 {
-    //                   "transaction": 0,
-    //                   "name": " J. Amiruddin  M",
-    //                   "relationship": "111",
-    //                   "package": 0,
-    //                   "image": "/static/images/node2.png",
-    //                   "placement_id": 84,
-    //                   "id": 86,
-    //                   "avi_id": "AVI000000047",
-    //                   "placement_position": "L",
-    //                   "sponsor_id": 84,
-    //                   "link": {
-    //                     "href": "https://www.avicrypto.us/network#"
-    //                   },
-    //                   "investment": 0
-    //                 },
-    //                 {
-    //                   "name": "<a href= /add/user?ref=bHBieHV1N2ZFZWV&place=AVI000000001&pos=right&parent_placement_id=AVI000000046>Add New User</a>",
-    //                   "relationship": "110"
-    //                 }
-    //               ]
-    //             }
-    //           ]
-    //         },
-    //         {
-    //           "transaction": 0,
-    //           "name": "SUHERMAN last",
-    //           "relationship": "111",
-    //           "package": 1000,
-    //           "image": "/static/images/node2.png",
-    //           "placement_id": 57,
-    //           "id": 87,
-    //           "investment": 1000,
-    //           "avi_id": "AVI000000048",
-    //           "placement_position": "R",
-    //           "sponsor_id": 57,
-    //           "link": {
-    //             "href": "https://www.avicrypto.us/network#"
-    //           },
-    //           "children": [
-    //             {
-    //               "transaction": 0,
-    //               "name": "Lengkap Totok Sukmawanto",
-    //               "relationship": "111",
-    //               "package": 0,
-    //               "image": "/static/images/node2.png",
-    //               "placement_id": 87,
-    //               "id": 90,
-    //               "investment": 0,
-    //               "avi_id": "AVI000000051",
-    //               "placement_position": "L",
-    //               "sponsor_id": 87,
-    //               "link": {
-    //                 "href": "https://www.avicrypto.us/network#"
-    //               },
-    //               "children": [
-    //                 {
-    //                   "transaction": 0,
-    //                   "name": "Noppy Iskandar",
-    //                   "relationship": "110",
-    //                   "package": 1000,
-    //                   "image": "/static/images/node2.png",
-    //                   "placement_id": 90,
-    //                   "id": 129,
-    //                   "avi_id": "AVI000000085",
-    //                   "placement_position": "L",
-    //                   "sponsor_id": 90,
-    //                   "link": {
-    //                     "href": "https://www.avicrypto.us/network#"
-    //                   },
-    //                   "investment": 1000
-    //                 },
-    //                 {
-    //                   "transaction": 0,
-    //                   "name": "Erwin  Susilo",
-    //                   "relationship": "110",
-    //                   "package": 0,
-    //                   "image": "/static/images/node2.png",
-    //                   "placement_id": 90,
-    //                   "id": 130,
-    //                   "avi_id": "AVI000000086",
-    //                   "placement_position": "R",
-    //                   "sponsor_id": 90,
-    //                   "link": {
-    //                     "href": "https://www.avicrypto.us/network#"
-    //                   },
-    //                   "investment": 0
-    //                 }
-    //               ]
-    //             },
-    //             {
-    //               "transaction": 0,
-    //               "name": "Shofwan Hadi",
-    //               "relationship": "111",
-    //               "package": 1000,
-    //               "image": "/static/images/node2.png",
-    //               "placement_id": 87,
-    //               "id": 88,
-    //               "investment": 1000,
-    //               "avi_id": "AVI000000049",
-    //               "placement_position": "R",
-    //               "sponsor_id": 87,
-    //               "link": {
-    //                 "href": "https://www.avicrypto.us/network#"
-    //               },
-    //               "children": [
-    //                 {
-    //                   "transaction": 0,
-    //                   "name": "Wilda Reflita",
-    //                   "relationship": "111",
-    //                   "package": 1000,
-    //                   "image": "/static/images/node2.png",
-    //                   "placement_id": 88,
-    //                   "id": 89,
-    //                   "avi_id": "AVI000000050",
-    //                   "placement_position": "L",
-    //                   "sponsor_id": 87,
-    //                   "link": {
-    //                     "href": "https://www.avicrypto.us/network#"
-    //                   },
-    //                   "investment": 1000
-    //                 },
-    //                 {
-    //                   "transaction": 0,
-    //                   "name": "Muhammad Suryanto",
-    //                   "relationship": "111",
-    //                   "package": 1000,
-    //                   "image": "/static/images/node2.png",
-    //                   "placement_id": 88,
-    //                   "id": 121,
-    //                   "avi_id": "AVI000000077",
-    //                   "placement_position": "R",
-    //                   "sponsor_id": 88,
-    //                   "link": {
-    //                     "href": "https://www.avicrypto.us/network#"
-    //                   },
-    //                   "investment": 1000
-    //                 }
-    //               ]
-    //             }
-    //           ]
-    //         }
-    //       ]
-    //     },
-    //     {
-    //       "transaction": 0,
-    //       "name": "ASD ASD",
-    //       "relationship": "110",
-    //       "package": 0,
-    //       "image": "/static/images/node2.png",
-    //       "placement_id": 1,
-    //       "id": 115,
-    //       "investment": 0,
-    //       "avi_id": "AVI000000071",
-    //       "placement_position": "R",
-    //       "sponsor_id": null,
-    //       "link": {
-    //         "href": "https://www.avicrypto.us/network#"
-    //       },
-    //       "children": [
-    //         {
-    //           "name": "<a href= /add/user?ref=bHBieHV1N2ZFZWV&place=AVI000000001&pos=left&parent_placement_id=AVI000000071>Add New User</a>",
-    //           "relationship": "110"
-    //         },
-    //         {
-    //           "name": "<a href= /add/user?ref=bHBieHV1N2ZFZWV&place=AVI000000001&pos=right&parent_placement_id=AVI000000071>Add New User</a>",
-    //           "relationship": "110"
-    //         }
-    //       ]
-    //     }
-    //   ]
-    // }
     // renderTree(orgData);
 
     initOrgchart = function(nodeId, chartClass) {
@@ -349,7 +62,6 @@ $(function() {
         url = '/network/init';
         loaded=true;      
       }
-      console.log(nodeId)
         $('#chart-container').orgchart({
           'data' : url,
           visibleLevel:4,
@@ -361,7 +73,6 @@ $(function() {
           toggleSiblingsResp: false,
           nodeTemplate: nodeTemplate,
           'createNode': function($node, data) {
-   //         console.log(data)
             if(!data.has_pkg){
               $($node).find(".title").addClass("inactive-node-title")
               $($node).find(".content").addClass("inactive-node-border")
@@ -375,9 +86,7 @@ $(function() {
             }
 
             if(data.avi_id && data.className && data.className.match(/top-level/)) {
-              //     console.log("topppp",data.name)
             } else if(data.className && data.className.match(/drill-up/)) {
-             //   console.log("headddd",data.name) 
                   $($node).addClass(data.avi_id)             
                 //var assoClass = data.className.match(/asso-\w+/)[0];
                 var drillUpIcon = $('<i>', {
@@ -385,16 +94,13 @@ $(function() {
                   'click': function() {
                     $('#chart-container').find('.orgchart:visible').addClass('hidden')
                     $($('.top-level').closest(".orgchart")).removeClass("hidden");
-                    //console.log($('#chart-container').find('.drill-down.' + data.avi_id).closest('.orgchart'))
                     //$('#chart-container').find('.drill-down.' + data.avi_id).closest('.orgchart').removeClass('hidden');    
                     // $('#chart-container').find('.drill-down').closest('.orgchart').removeClass('hidden');
-                    // console.log($("[id='"+data.id+"'][class='node drill-up']").closest(".orgchart")[0])
                     // $($("[id='"+data.id+"'][class='node drill-up']").closest(".orgchart")[0]).addClass("hidden")
                   }
                 });
                 $node.append(drillUpIcon);
             } else  if(data.avi_id){
-               // console.log("down===",data.name)
                 $($node).addClass('drill-down');
                 $($node).addClass(data.avi_id)
                 //var assoClass = data.className.match(/asso-\w+/)[0];
