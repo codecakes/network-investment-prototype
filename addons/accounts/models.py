@@ -58,6 +58,9 @@ class Profile(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	token = models.CharField(max_length=100, default=None, null=True, blank=True)
+	otp = models.CharField(max_length=10, default=None, null=True, blank=True)
+	email_verified = models.NullBooleanField(default=True, null=True, blank=True)
+	mobile_verified = models.NullBooleanField(default=True, null=True, blank=True)
 
 	def __unicode__(self):
 		return "%s" %(self.user)

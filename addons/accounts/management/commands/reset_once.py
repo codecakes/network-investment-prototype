@@ -1,6 +1,7 @@
 # runs one time
 import datetime
 from pytz import UTC
+from avicrypto.settings import EPOCH_BEGIN
 from addons.accounts.models import User
 from addons.packages.models import User_packages
 from addons.packages.lib.payout import run_scheduler, calculate_investment, run_investment_calc, find_next_monday
@@ -36,7 +37,7 @@ def reset_these():
             pkg = User_packages.objects.filter(user = u, status='A')
             if pkg:
                 pkg = pkg[0]
-                pkg.last_payout_date = u.date_joined
+                # pkg.last_payout_date = u.date_joined
                 # pkg.binary = 0.0
                 # pkg.weekly = 0.0
                 # pkg.direct = 0.0
@@ -44,7 +45,7 @@ def reset_these():
                 # pkg.left_binary_cf = 0.0
                 # pkg.right_binary_cf = 0.0
                 # pkg.save()
-                run_investment_calc(u, pkg, pkg.last_payout_date, find_next_monday())
+                run_investment_calc(u, pkg, EPOCH_BEGIN, find_next_monday())
         except:
             pass
     # print "running"

@@ -29,18 +29,16 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import *
 from django.core.exceptions import ObjectDoesNotExist
 from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
-from addons.packages.lib.payout import (UTC, calc, calculate_investment,
-                                        find_next_monday)
+from addons.packages.lib.payout import (UTC, calc, calculate_investment, find_next_monday)
+from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
 from addons.packages.models import Packages, User_packages
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
 from avicrypto import services
-from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of,
-                      is_valid_leg, load_users)
+from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of, is_valid_leg, load_users)
 from addons.accounts.lib.blockexplorer import validate_transaction
 
 sys.path.append(settings.BASE_DIR)
-
 
 def app_404(request):
     return render(request, '404.html')
@@ -115,30 +113,16 @@ def app_login(request):
             password = str(request.POST.get('password'))
 
             if username and password:
-                if User.objects.filter(username=username).exists():
-                    if User.objects.filter(username=username, is_active=True).exists():
-                        user = authenticate(
-                            username=username, password=password)
-                        if user is not None:
-                            login(request, user)
-                            return HttpResponse(json.dumps({
-                                "status": "ok",
-                                "crypto_account": crypto_account_exists(user)
-                            }))
-                        else:
-                            return HttpResponse(json.dumps({
-                                "status": "error",
-                                "message": "Username or password is incorrect."
-                            }))
-                    else:
-                        return HttpResponse(json.dumps({
-                            "status": "error",
-                            "message": "Email address is not active."
-                        }))
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    login(request, user)
+                    return HttpResponse(json.dumps({
+                        "status": "ok"
+                    }))
                 else:
                     return HttpResponse(json.dumps({
                         "status": "error",
-                        "message": "Invalid username."
+                        "message": "Invalid Username or password."
                     }))
             else:
                 return HttpResponse(json.dumps({
@@ -151,8 +135,8 @@ def app_login(request):
 
 def app_signup(request):
     if request.method == "POST":
-        email = request.POST.get('email')
         data = request.POST
+        email = request.POST.get('email')
         referal_code = data.get('referal', None)
         sponcer_id = data.get('sponcer_id', None)
         placement_id = data.get('placement_id', None)
@@ -169,14 +153,11 @@ def app_signup(request):
 
                     if referal_code:
                         try:
-                            referal_user = Profile.objects.get(
-                                my_referal_code=referal_code)
+                            referal_user = Profile.objects.get(my_referal_code=referal_code)
                             if placement_id:
-                                placement_user_profile = Profile.objects.get(
-                                    user_auto_id=placement_id)
+                                placement_user_profile = Profile.objects.get(user_auto_id=placement_id)
                                 placement_user = placement_user_profile.user
-
-                                position = 'l' if 'L' == position else 'r'
+                                position = 'l' if 'L' == placement_position else 'r'
 
                                 if is_member_of(referal_user, placement_user):
                                     if has_child(placement_user, position):
@@ -197,8 +178,7 @@ def app_signup(request):
                             }
                             return HttpResponse(json.dumps(content))
 
-                    user = User.objects.create(
-                        username=email, email=email, first_name=first_name, last_name=last_name, is_active=False)
+                    user = User.objects.create(username=email, email=email, first_name=first_name, last_name=last_name, is_active=True)
                     user.username = user.profile.user_auto_id
                     user.set_password(str(password))
                     user.save()
@@ -249,9 +229,9 @@ def app_logout(request):
 
 def app_activate_account(request, token):
     try:
-        profile = get_object_or_404(Profile, token=token, user__is_active=False)
-        profile.user.is_active = True
-        profile.user.save()
+        profile = get_object_or_404(Profile, token=token, email_verified=False)
+        profile.email_verified = True
+        profile.save()
 
         if profile.user.has_usable_password():
             profile.token = ""
@@ -304,7 +284,7 @@ def app_forgot_password(request):
 def app_reset_password(request, token):
     if request.method == "POST":
         password = request.POST.get('password', '')
-        profile = get_object_or_404(Profile, token=token, user__is_active=True)
+        profile = get_object_or_404(Profile, token=token)
 
         profile.user.set_password(password)
         profile.token = ""
@@ -317,7 +297,7 @@ def app_reset_password(request, token):
         }
         return render(request, 'reset-password.html', content)
     else:
-        profile = get_object_or_404(Profile, token=token, user__is_active=True)
+        profile = get_object_or_404(Profile, token=token)
         return render(request, 'reset-password.html')
 
 
@@ -407,15 +387,22 @@ def home(request):
         packages = User_packages.objects.filter(user=user)
         support_tickets = SupportTicket.objects.filter(user=user)
 
+        user_direct = calc_direct(user, None, None)[0]
+        user_binary = calc_binary(user, None, None)[0][0]
+        user_weekly = calc_weekly(user, None, None)[0]
+
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
             'packages': packages,
             'support_tickets': support_tickets,
             'support_tickets_choices': SupportTicket.status_choices,
             'enable_withdraw': False,
-            'crypto_account':crypto_account_exists(request.user),
-            'package_status':has_package(request.user),
-            'wallet_type_choices': Wallet.wallet_type_choice
+            'wallet_type_choices': Wallet.wallet_type_choice,
+            'userpackages_status_choices': User_packages.status_choices,
+            "direct": user_direct,
+            "binary": user_binary,
+            "weekly": user_weekly,
+            "total": user_direct + user_binary + user_weekly
         }
 
         if 0<= is_day < 2:
@@ -425,8 +412,7 @@ def home(request):
             package for package in packages if package.status == 'A']
         if user_active_package:
             pkg = user_active_package[0]
-            dt = UTC.normalize(UTC.localize(
-                datetime.datetime.now())) - pkg.created_at
+            dt = UTC.normalize(UTC.localize(datetime.datetime.now())) - pkg.created_at
             context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
             next_payout = find_next_monday()
             context["next_payout"] = "%s-%s-%s" % (
@@ -438,9 +424,9 @@ def home(request):
             context["binary_payout"] = 0
             context["user_active_package_value"] = 0
         else:
-            context["weekly_payout"] = user_active_package[0].weekly
-            context["direct_payout"] = user_active_package[0].direct
-            context["binary_payout"] = user_active_package[0].binary
+            context["weekly_payout"] = user_weekly
+            context["direct_payout"] = user_direct
+            context["binary_payout"] = user_binary
             context["user_active_package_value"] = user_active_package[0].package.price
 
         template = loader.get_template('dashboard.html')
@@ -476,47 +462,67 @@ def profile(request):
             return HttpResponse(template.render(context, request))
 
     if request.method == 'POST':
-        first_name = request.POST.get("first_name")
-        last_name = request.POST.get("last_name")
-        country = request.POST.get("country", "US")
-        btc_address = request.POST.get("btc_address")
-        eth_address = request.POST.get("eth_address")
-        xrp_address = request.POST.get("xrp_address")
-        eth_destination_tag = request.POST.get("eth_destination_tag")
-        xrp_destination_tag = request.POST.get("xrp_destination_tag")
-        btc_destination_tag = request.POST.get("btc_destination_tag")
+        action = request.POST.get("action", "")
         user = request.user
-        user.first_name = first_name
-        user.last_name = last_name
-        user.save()
-        user.profile.country = country
-        user.profile.save()
-        try:
-            user.useraccount.btc_address = btc_address
-            user.useraccount.eth_address = eth_address
-            user.useraccount.xrp_address = xrp_address
-            user.useraccount.eth_destination_tag = eth_destination_tag
-            user.useraccount.xrp_destination_tag = xrp_destination_tag
-            user.useraccount.btc_destination_tag = btc_destination_tag
-            user.useraccount.save()
-        except ObjectDoesNotExist:
-            user_account = UserAccount.objects.create(user=user)
-            user_account.btc_address = btc_address
-            user_account.eth_address = eth_address
-            user_account.xrp_address = xrp_address
-            user_account.eth_destination_tag = destination_tag
 
-            if btc_address and not Wallet.objects.filter(user=user, wallet_type="BTC").exists():
-                Wallet.objects.create(user=user, wallet_type="BTC")
+        if action == "profile":
+            first_name = request.POST.get("first_name")
+            last_name = request.POST.get("last_name")
+            country = request.POST.get("country", "US")
+
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            user.profile.country = country
+            user.profile.save()
+
+            return HttpResponse(json.dumps({
+                "status": "ok",
+                "message": "Profile update successfully."
+            }))
+        elif action == "crypto":
+            btc_address = request.POST.get("btc_address")
+            eth_address = request.POST.get("eth_address")
+            xrp_address = request.POST.get("xrp_address")
+            xrp_destination_tag = request.POST.get("xrp_destination_tag")
             
-            if eth_address and not Wallet.objects.filter(user=user, wallet_type="ETH").exists():
-                Wallet.objects.create(user=user, wallet_type="ETH")
+            try:
+                user.useraccount.btc_address = btc_address
+                user.useraccount.eth_address = eth_address
+                user.useraccount.xrp_address = xrp_address
+                user.useraccount.xrp_destination_tag = xrp_destination_tag
+                user.useraccount.save()
+            except ObjectDoesNotExist:
+                user_account = UserAccount.objects.create(user=user)
+                user_account.btc_address = btc_address
+                user_account.eth_address = eth_address
+                user_account.xrp_address = xrp_address
+                user_account.xrp_destination_tag = xrp_destination_tag
 
-            if xrp_address and not Wallet.objects.filter(user=user, wallet_type="XRP").exists():
-                Wallet.objects.create(user=user, wallet_type="XRP")
+                if btc_address and not Wallet.objects.filter(user=user, wallet_type="BTC").exists():
+                    Wallet.objects.create(user=user, wallet_type="BTC")
+                
+                if eth_address and not Wallet.objects.filter(user=user, wallet_type="ETH").exists():
+                    Wallet.objects.create(user=user, wallet_type="ETH")
 
-            user_account.save()
-        return HttpResponse(json.dumps({"status": "success"}))
+                if xrp_address and not Wallet.objects.filter(user=user, wallet_type="XRP").exists():
+                    Wallet.objects.create(user=user, wallet_type="XRP")
+
+                user_account.save()
+
+            return HttpResponse(json.dumps({
+                "status": "ok",
+                "message": "Crypto accounts update successfully."
+            }))
+        elif action == "password":
+            password = request.POST.get("password")
+            user.set_password(password)
+            user.save()
+
+            return HttpResponse(json.dumps({
+                "status": "ok",
+                "message": "Password changed successfully."
+            }))
     else:
         return HttpResponseRedirect('/error')
 
@@ -630,13 +636,14 @@ def update_signup_user_profile(user, data):
     placement_position = data.get('placement_position', "L")
     token = get_token(user.username)
     profile.token = token
+    profile.email_verified = False
+    profile.mobile_verified = False
 
     if referal_code:
         sponser_user = Profile.objects.get(my_referal_code=referal_code)
 
         if placement_id:
-            profile.placement_id = Profile.objects.get(
-                user_auto_id=placement_id).user
+            profile.placement_id = Profile.objects.get(user_auto_id=placement_id).user
         else:
             placement_users = find_min_max(sponser_user.user)
 
@@ -647,7 +654,7 @@ def update_signup_user_profile(user, data):
 
         profile.placement_position = placement_position
         profile.referal_code = referal_code
-        profile.sponcer_id = sponser_user.user
+        profile.sponser_id = sponser_user.user
         Members.objects.create(parent_id=profile.placement_id, child_id=user)
     profile.save()
 
@@ -683,7 +690,7 @@ def update_user_profile(user, data):
 
         profile.placement_position = placement_position
         profile.referal_code = referal_code
-        profile.sponcer_id = sponser_user.user
+        profile.sponser_id = sponser_user.user
         Members.objects.create(parent_id=profile.placement_id, child_id=user)
 
     profile.save()
@@ -694,17 +701,12 @@ def update_user_profile(user, data):
 @login_required(login_url="/login")
 @csrf_exempt
 def add_user(request):
-
     if request.method == 'GET':
         user = request.user
-        # referal = request.GET.get('ref')
-        # sponser_id = Profile.objects.filter(my_referal_code=referal)
-        # sponser_id = sponser_id[0].user_auto_id
         sponser_id = user.profile.user_auto_id
         pos = request.GET.get('pos', "left")
         placement_id = request.GET.get('parent_placement_id')
 
-        # 'referal': referal,
         context = {
             'sponser_id': sponser_id,
             'placement_id': placement_id,
@@ -721,16 +723,10 @@ def add_user(request):
     if request.method == 'POST':
         data = request.POST
         email = data['email']
+        content = {}
 
         if not User.objects.filter(email=email).exists():
             placement_id = Profile.objects.get(user_auto_id=data['placement_id'])
-
-            # if placement_id.user.is_active == False:
-            #     content = {
-            #         "status": "error",
-            #         "message": "placement user is not active",
-            #     }
-            #     return HttpResponse(json.dumps(content))
 
             user = User.objects.create(email=email, username=email)
             user.first_name = data['first_name']
@@ -741,15 +737,18 @@ def add_user(request):
             user.save()
 
             profile = Profile.objects.get(user=user)
-            sponser_id = Profile.objects.get(user_auto_id=data['sponser_id'])
+            sponser_id = Profile.objects.get(user=request.user)
             
             # check user active or not 
             profile.sponser_id = sponser_id.user
+            profile.referal_code = sponser_id.my_referal_code
             profile.placement_id = placement_id.user
             profile.mobile = data['mobile']
             profile.country = data['country']
             token = get_token(user.username)
             profile.token = token
+            profile.email_verified = False
+            profile.mobile_verified = False
 
             if data['placement'] == 'left':
                 profile.placement_position = 'L'
@@ -757,9 +756,6 @@ def add_user(request):
                 profile.placement_position = 'R'
 
             profile.save()
-
-            # body = "Create password for your account: http://www.avicrypto.us/reset-password/" + profile.token
-            # services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
 
             email_data = {
                 "user": user,
@@ -769,10 +765,12 @@ def add_user(request):
                 "token": token
             }
             body = render_to_string('mail/network_user_welcome.html', email_data)
-            services.send_email_mailgun(
-                'Welcome to Avicrypto', body, email, from_email="postmaster")
+            services.send_email_mailgun('Welcome to Avicrypto', body, email, from_email="postmaster")
 
             Members.objects.create(parent_id=placement_id.user, child_id=user)
+
+            # calculate_investment_binary_direct(request.user)
+
             content = {
                 "status": "ok",
                 "message": "Registration complete.",
@@ -785,18 +783,6 @@ def add_user(request):
 
         return HttpResponse(json.dumps(content))
 
-def crypto_account_exists(user):
-    try:
-        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
-            return True
-        else:
-            return  False
-    except ObjectDoesNotExist:
-        user_account = UserAccount.objects.create(user=user)
-        if user and (user.useraccount.btc_address or user.useraccount.eth_address or (user.useraccount.xrp_address and user.useraccount.eth_destination_tag)):
-            return True
-        else:
-            return False
 
 @login_required(login_url="/login")
 def validate_user_transaction(request):
@@ -832,8 +818,8 @@ def validate_user_transaction(request):
                 }))
 
 def has_package(user):    
-    pkg = User_packages.objects.filter(status='A', user = user)
-    return True if pkg else False
+    return User_packages.objects.filter(status='A', user=user).exists()
+
 
 @login_required(login_url="/login")
 def withdraw(request):

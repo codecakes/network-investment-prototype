@@ -63,11 +63,11 @@
             dataType: "json",
             type: "POST",
             error: function (res) {
-                toastr.error("Error in Mail Sent. Please try after some time.", "Error")
+                toastr.error("Error in Mail Sent. Please try after some time.", "Error", toastr_options)
             },
             success: function (data) {
                 if (data.status == 'ok') {
-                    toastr.success(data.message, "Success")
+                    toastr.success(data.message, "Success", toastr_options)
                 }
             }
         });
