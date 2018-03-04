@@ -57,7 +57,7 @@ $(function() {
           toggleSiblingsResp: false,
           nodeTemplate: nodeTemplate,
           'createNode': function($node, data) {
-            if(!data.has_pkg){
+            if(!data.package){
               $($node).find(".title").addClass("inactive-node-title")
               $($node).find(".content").addClass("inactive-node-border")
               $($node).addClass('inactive-node')
@@ -78,7 +78,6 @@ $(function() {
                   'click': function() {
                     $('#chart-container').find('.orgchart:visible').remove();
                     var reverseList = $("#sequence").html().split("-");
-                    console.log(reverseList, reverseList[reverseList.length-1])
                     var targetChart = reverseList[reverseList.length-2]
                     reverseList.pop();
                     $("#sequence").html(reverseList.join("-"))
