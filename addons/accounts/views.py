@@ -28,7 +28,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import *
 from django.core.exceptions import ObjectDoesNotExist
-from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
+from addons.accounts.models import Members, Profile, SupportTicket, UserAccount, Userotp
 from addons.packages.lib.payout import (UTC, calc, calculate_investment,
                                         find_next_monday)
 from addons.packages.models import Packages, User_packages
@@ -928,11 +928,12 @@ def withdraw(request):
 @csrf_exempt
 def send_otp(request):
     if request.method == 'POST':
-        import pdb; pdb.set_trace()
         mobile = request.data.get('mobile', None)
+        otp_type = request.data.get('type', None)
         if mobile:
             otp = random.randrange(lower_limit, upper_limit+1)
             services.send_sms(mobile, otp)
+            otp_obj = Userotp.objects.create(otp=otp, mobile=mobile, type=otp_type, status='active')
             # profile = Profile.objects.get(mobile=mobile)
             # profile.otp=otp
             # profile.mobile_verified = False
@@ -945,13 +946,18 @@ def verify_otp(request):
     if request.method == 'POST':
         mobile = request.data.get('mobile', None)
         otp = request.data.get('otp', None)
-        if mobile and otp:
+        otp_type = request.data.get('type', None)
+        if mobile and otp and otp_type:
             try:
-                user_profile = Profile.objects.get(mobile=mobile)
-                if otp == user_profile.otp:
-                    return HttpResponse({'message': 'Mobile successfully varify'})
-            except User.DoesNotExist:
-                return HttpResponse({'message': 'Invalid OTP'})
-            return HttpResponse('Success')
-        else:
-            return HttpResponse('Invalid otp or mobile number')
+                otp_obj = Userotp.objects.get(otp=otp, status='active', type=otp_type, mobile=mobile)
+                otp_obj.status='expire'
+                otp_obj.save()
+                if otp_type == 'mobile':
+                    profile = Profile.objects.get(mobile=mobile)
+                    profile.mobile_verified = True
+                    profile.save()
+                    return HttpResponse({'message': 'Mobile successfully varify', status:'success'})
+                return HttpResponse({'message': 'OTP successfully varify', status:'success'})
+            except Userotp.DoesNotExist:
+                return  HttpResponse({'message': 'Invalid OTP', status:'error'})
+        return  HttpResponse({'message': 'Invalid OTP', status:'error'})

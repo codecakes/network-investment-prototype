@@ -120,3 +120,21 @@ class UserAccount(models.Model):
 	xrp_destination_tag = models.CharField(max_length=100, default=None, null=True, blank=True)
 	btc_destination_tag = models.CharField(max_length=100, default=None, null=True, blank=True)
 	created_at = models.DateTimeField(auto_now_add=True)
+
+class Userotp(models.Model):
+	otp_type = (
+		('login', 'login'),
+		('signup', 'signup'),
+		('mobile', 'mobile'),
+		('withdraw', 'withdraw'),
+		('buy', 'buy'),
+	)
+	otp_status = (
+		('active', 'active'),
+		('expire', 'expire')
+	)
+	otp = models.CharField(max_length=6, default=None, null=True, blank=True)
+	type = models.CharField(max_length=10, default=None, null=True, blank=True, choices=otp_type)
+	time = models.DateTimeField(auto_now_add=True)
+	status = models.CharField(max_length=10, default=None, null=True, blank=True, choices=otp_status)
+	mobile = models.CharField(max_length=15, blank=True)
