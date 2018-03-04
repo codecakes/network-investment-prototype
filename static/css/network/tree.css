@@ -47,3 +47,26 @@
 .orgchart .node:hover .drill-icon {
   opacity: 1;
 }
+
+.inactive-node-title{
+  background-color: #7d7474 !important;
+}
+.inactive-node-border{
+  border-color: #7d7474 !important;
+}
+
+.inactive-node:hover{
+  background-color: #7d7474 !important;
+}
+
+
+.nouser-node-title{
+  background-color: #3BAFDA !important;
+}
+.nouser-node-border{
+  border-color: #3BAFDA !important;
+}
+
+.nouser-node:hover{
+  background-color: #3BAFDA !important;
+}

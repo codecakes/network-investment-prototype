@@ -51,7 +51,7 @@
 }
 .orgchart .verticalNodes>td::before {
   content: '';
-  border: 1px solid #3BAFDA!important;
+  border: 1px solid #7b5fea!important;
 }
 .orgchart .verticalNodes>td>ul>li:first-child::before {
   box-sizing: border-box;
@@ -69,7 +69,7 @@
   content: '';
   position: absolute;
   left: -6px;
-  border-color: #3BAFDA!important;
+  border-color: #7b5fea!important;
   border-style: solid;
   border-width: 0 0 2px 2px;
 }
@@ -126,23 +126,23 @@
 }
 
 .orgchart .lines .topLine {
-  border-top: 2px solid #3BAFDA!important;
+  border-top: 2px solid #7b5fea;
 }
 
 .orgchart .lines .rightLine {
-  border-right: 1px solid #3BAFDA!important;
+  border-right: 1px solid #7b5fea;
   float: none;
   border-radius: 0;
 }
 
 .orgchart .lines .leftLine {
-  border-left: 1px solid #3BAFDA!important;
+  border-left: 1px solid #7b5fea;
   float: none;
   border-radius: 0;
 }
 
 .orgchart .lines .downLine {
-  background-color: #3BAFDA!important;
+  background-color: #7b5fea;
   margin: 0 auto;
   height: 20px;
   width: 2px;
@@ -176,7 +176,7 @@
 }
 
 .orgchart .node:hover {
-  background-color: #3BAFDA;
+  background-color: #7b5fea;
   transition: .5s;
   cursor: default;
   z-index: 20;
@@ -210,7 +210,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background-color: #3BAFDA!important;
+  background-color: #7b5fea;
   color: #fff;
   border-radius: 4px 4px 0 0; 
 }
@@ -244,7 +244,7 @@
   height: 20px;
   font-size: 11px;
   line-height: 18px;
-  border: 1px solid #3BAFDA!important;
+  border: 1px solid #7b5fea;
   border-radius: 0 0 4px 4px;
   text-align: center;
   background-color: #fff;
