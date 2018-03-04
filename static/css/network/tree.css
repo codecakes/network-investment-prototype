@@ -1,3 +1,7 @@
+.app-content.container {
+  width: 100% !important;
+}
+
 #chart-container {
   position: relative;
   display: inline-block;
@@ -5,7 +9,6 @@
   left: 10px;
   height: 100%;
   width: 100%;
-  /*border: 1px dashed grey;*/
   border-radius: 2px;
   overflow: auto;
   text-align: center;
@@ -15,6 +18,11 @@
   background: #fff;
   width: 100%;
   height: 100%;
+  padding: 0;
+}
+
+.orgchart>table:first-child {
+  margin: 5px auto 0px auto;
 }
 
 .orgchart .node .content {
