@@ -22,8 +22,7 @@ $(function() {
         </div>
       `;
     } else {
-      return `
-      <span>No User</span>
+      return ` 
       <div class="title">${data.name}</div>
     `;
     }
@@ -342,7 +341,7 @@ $(function() {
     // }
     // renderTree(orgData);
 
-    initOrgchart = function(nodeId) {
+    initOrgchart = function(nodeId, chartClass) {
       var url="";
       if(loaded == true) {
         url = '/network/children/'+nodeId;
@@ -355,39 +354,65 @@ $(function() {
           'data' : url,
           visibleLevel:4,
           'collapsed': false,
-          zoom: false,  
+          zoom: false,
+          depth:4,
+          chartClass:chartClass||"root",  
           pan: false,
           toggleSiblingsResp: false,
           nodeTemplate: nodeTemplate,
           'createNode': function($node, data) {
-            //console.log($node, data)
-            //if ($node.is('.drill-down')) {
-              //var assoClass = data.className.match(/asso-\w+/)[0];
-              var drillDownIcon = $('<i>', {
-                'class': 'fa fa-arrow-circle-down drill-icon',
-                'click': function() {
-                  $('#chart-container').find('.orgchart:visible').addClass('hidden');
-                  initOrgchart(data.id)
-                  // if (!$('#chart-container').find('.orgchart.' + assoClass).length) {
-                  //   initOrgchart(assoClass);
-                  // } else {
-                  //   $('#chart-container').find('.orgchart.' + assoClass).removeClass('hidden');
-                  // }
-                }
-              });
-              $node.append(drillDownIcon);
-            // } else if ($node.is('.drill-up')) {
-            //   var assoClass = data.className.match(/asso-\w+/)[0];
-            //   var drillUpIcon = $('<i>', {
-            //     'class': 'fa fa-arrow-circle-up drill-icon',
-            //     'click': function() {
-            //       $('#chart-container').find('.orgchart:visible').addClass('hidden').end()
-            //         .find('.drill-down.' + assoClass).closest('.orgchart').removeClass('hidden');
-            //     }
-            //   });
-            //   $node.append(drillUpIcon);
-            // }
-          }
+   //         console.log(data)
+            if(!data.has_pkg){
+              $($node).find(".title").addClass("inactive-node-title")
+              $($node).find(".content").addClass("inactive-node-border")
+              $($node).addClass('inactive-node')
+            }
+
+            if(!data.avi_id){
+              $($node).find(".title").addClass("nouser-node-title")
+              $($node).find(".content").addClass("nouser-node-border")
+              $($node).addClass('nouser-node')
+            }
+
+            if(data.avi_id && data.className && data.className.match(/top-level/)) {
+              //     console.log("topppp",data.name)
+            } else if(data.className && data.className.match(/drill-up/)) {
+             //   console.log("headddd",data.name) 
+                  $($node).addClass(data.avi_id)             
+                //var assoClass = data.className.match(/asso-\w+/)[0];
+                var drillUpIcon = $('<i>', {
+                  'class': 'fa fa-arrow-circle-up drill-icon',
+                  'click': function() {
+                    $('#chart-container').find('.orgchart:visible').addClass('hidden')
+                    $($('.top-level').closest(".orgchart")).removeClass("hidden");
+                    //console.log($('#chart-container').find('.drill-down.' + data.avi_id).closest('.orgchart'))
+                    //$('#chart-container').find('.drill-down.' + data.avi_id).closest('.orgchart').removeClass('hidden');    
+                    // $('#chart-container').find('.drill-down').closest('.orgchart').removeClass('hidden');
+                    // console.log($("[id='"+data.id+"'][class='node drill-up']").closest(".orgchart")[0])
+                    // $($("[id='"+data.id+"'][class='node drill-up']").closest(".orgchart")[0]).addClass("hidden")
+                  }
+                });
+                $node.append(drillUpIcon);
+            } else  if(data.avi_id){
+               // console.log("down===",data.name)
+                $($node).addClass('drill-down');
+                $($node).addClass(data.avi_id)
+                //var assoClass = data.className.match(/asso-\w+/)[0];
+                var drillDownIcon = $('<i>', {
+                  'class': 'fa fa-arrow-circle-down drill-icon',
+                  'click': function() {
+                    $('#chart-container').find('.orgchart:visible').addClass('hidden');
+                    initOrgchart(data.id)
+                    // if (!$('#chart-container').find('.orgchart.' + assoClass).length) {
+                    //   initOrgchart(assoClass);
+                    // } else {
+                    //   $('#chart-container').find('.orgchart.' + assoClass).removeClass('hidden');
+                    // }
+                  }
+                });
+                $node.append(drillDownIcon);
+              }
+            }
         });
       }
 

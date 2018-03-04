@@ -734,6 +734,7 @@
     },
     // load new nodes by ajax
     loadNodes: function (rel, url, $edge) {
+      console.log(rel,url,$edge)
       var that = this;
       var opts = this.options;
       $.ajax({ 'url': url, 'dataType': 'json' })
