@@ -53,7 +53,7 @@ def foo(user, dt):
             pkg.direct = direct
             pkg.weekly = weekly
             pkg.total_payout += binary + direct + weekly
-            pkg.last_payout_date = find_next_monday()
+            pkg.last_payout_date = dt
             pkg.save()
             print "pkg.weekly is %s and weekly is %s" %(pkg.weekly, weekly)
             # pkg.total_payout = pkg.total_payout - pkg.weekly + weekly
