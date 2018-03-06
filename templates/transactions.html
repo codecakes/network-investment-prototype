@@ -15,6 +15,7 @@
                             <thead>
                                 <tr>
                                     <th>Wallet Id</th>
+                                    <th>Receiver Wallet Address</th>
                                     <th>Type</th>
                                     <th>Wallet Amount</th>
                                 </tr>
@@ -23,6 +24,7 @@
                                 {% for wallet in wallets %}
                                     <tr>
                                         <td>{{ wallet.uuid }}</td>
+                                        <td>{{ wallet.description }}</td>
                                         <td>{{ wallet.wallet_type }}</td>
                                         <td>${{ wallet.amount }}</td>
                                     </tr>
