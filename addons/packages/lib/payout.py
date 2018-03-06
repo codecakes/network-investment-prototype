@@ -107,6 +107,8 @@ def is_valid_date(func):
                     #print "in if is valid_date  "
                     #print "func name is {}".format(func.__name__)
                     return func(user, last_date, next_date)
+                elif func.__name__ == "get_left_right_agg":
+                    return (0.0, 0.0)
                 # elif doj == next_date:
                 #     return 0.0
                 # else:
@@ -127,6 +129,7 @@ def is_eligible(func):
         """
         pkg = get_package(user)
         if pkg:
+            # print "calling %s with attr: %s, %s, %s" %(func.__name__, user.username, last_date, next_date)
             return func(user, last_date, next_date)
         else:
             return ((0.0, 0.0, 0.0), 'end') if func.__name__ == 'calc_binary' else (0.0, 'end')
@@ -166,7 +169,10 @@ def calc_binary(user, last_date, next_date):
         binary_payout = pkg.package.binary_payout/100.0
         # finds leg with minimium total package prices
         # leg = find_min_leg(user)
-        left_sum, right_sum = get_left_right_agg(user, last_date, next_date)
+        print "attrs: user {}\n last_date {}\n next_date {}\n".format(user.username, last_date, next_date)
+        res = get_left_right_agg(user, last_date, next_date)
+        print "returned res is {}".format(res)
+        left_sum, right_sum = res
         left_sum += pkg.left_binary_cf
         right_sum += pkg.right_binary_cf
         l_cf, r_cf = calc_cf(left_sum, right_sum)
@@ -180,23 +186,23 @@ def calc_binary(user, last_date, next_date):
 def calc_weekly(user, last_date, next_date):
     from math import ceil, floor
     # calculate number of weeks passed since last_date before next_date
-    print "for user %s" %(user.username)
+    # print "for user %s" %(user.username)
     pkg = get_package(user)
     user_doj = pkg.created_at.date()
     # user_doj = user.date_joined.date()
     # user_doj = date(user_doj.year, user_doj.month, user_doj.day)
-    # old_date = greater_date(user_doj, date(
-    #     last_date.year, last_date.month, last_date.day))
-    old_date = user_doj  #greater_date(user_doj, last_date.date())
+    old_date = greater_date(user_doj, date(last_date.year, last_date.month, last_date.day))
     new_date = next_date.date()
-    # new_date = date(user_doj.year, user_doj.month, user_doj.day)
-    delta = new_date - old_date
-    num_weeks = floor(delta.days/7.0)
-    # print "old date is {}, next_date is {}".format(old_date, next_date.date())
-    # print "delta is %s" %delta
-    print "num of week: {}, old date is {}. new date is {}. difference in num weeks: {}".format(num_weeks, old_date, new_date, num_weeks)
-    pkg = get_package(user)
-    return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct')
+    if old_date < new_date:        
+        # new_date = date(user_doj.year, user_doj.month, user_doj.day)
+        delta = new_date - old_date
+        num_weeks = floor(delta.days/7.0)
+        # print "old date is {}, next_date is {}".format(old_date, next_date.date())
+        # print "delta is %s" %delta
+        # print "num of week: {}, old date is {}. new date is {}. difference in num weeks: {}".format(num_weeks, old_date, new_date, num_weeks)
+        pkg = get_package(user)
+        return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct')
+    return (0.0, 'direct')
 
 
 def calc_leg(user, last_date, next_date, leg='l'):
@@ -261,7 +267,7 @@ INVESTMENT_TYPE = {
 
 def calc(user, last_date, investment_type):
     """
-    investment_type: can be direct, binary, weekly payouts
+    investment_tytepe: can be direct, binary, weekly payouts
     Then set last_date = next_date
     """
     next_date = find_next_monday()
@@ -327,7 +333,7 @@ def get_left_right_agg(user, last_date, next_date):
     left_user = get_left(user)
     right_user = get_right(user)
 #print "left user {} and right users {}".format(left_user.username, right_user.username)
-    return (calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date))
+    return [calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date)]
 
 
 @is_valid_date
@@ -339,8 +345,7 @@ def calc_aggregate_left(user, last_date, next_date):
         if pkg:
             return pkg.package.price + calc_aggregate_left(left_user, last_date, next_date) + calc_aggregate_right(left_user, last_date, next_date)
         return 0.0
-    else:
-        return 0.0
+    return 0.0
 
 
 @is_valid_date
@@ -352,11 +357,10 @@ def calc_aggregate_right(user, last_date, next_date):
         if pkg:
             return pkg.package.price + calc_aggregate_left(right_user, last_date, next_date) + calc_aggregate_right(right_user, last_date, next_date)
         return 0.0
-    else:
-        return 0.0
+    return 0.0
 
 
-def find_min_leg(user):
+def find_min_leg(user, last_date, next_date):
     """Finds minimum of the two legs of `user` by aggregating their total package prices"""
     left, right = get_left_right_agg(user)
     return 'l' if left < right else 'r'

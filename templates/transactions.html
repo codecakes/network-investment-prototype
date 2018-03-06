@@ -24,7 +24,7 @@
                                     <tr>
                                         <td>{{ wallet.uuid }}</td>
                                         <td>{{ wallet.wallet_type }}</td>
-                                        <td>{{ wallet.amount }}</td>
+                                        <td>${{ wallet.amount }}</td>
                                     </tr>
                                 {% empty %}
                                     <tr>
@@ -72,7 +72,7 @@
                                                 {{ transaction.sender_wallet.owner.username }}
                                             {% endif %}
                                         </td>
-                                        <td>{{ transaction.amount }}</td>
+                                        <td>${{ transaction.amount }}</td>
                                         <td>{{ transaction.reciever_wallet.wallet_type }}</td>
                                         <td>
                                             {% for key,value in transaction_status_choices  %}
@@ -118,7 +118,7 @@
                                 {% for package in packages %}
                                     <tr>
                                         <td>{{package.package.package_name}}</td>
-                                        <td>{{package.package.price}}</td>
+                                        <td>${{package.package.price}}</td>
                                         <td>
                                             {% for key,value in userpackage_status_choices  %}
                                                 {% if key == package.status %}
