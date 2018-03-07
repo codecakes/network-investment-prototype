@@ -283,6 +283,7 @@ def get_user_json(user, profile):
     # except User_packages.DoesNotExist:
     #    package = 0
 
+
     user_investment = User_packages.objects.filter(user=user).annotate(investment=Sum('package__price')).values()
     investment = user_investment[0]['investment'] if user_investment else 0
 
