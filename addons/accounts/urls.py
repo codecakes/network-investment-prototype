@@ -44,7 +44,7 @@ urlpatterns = [
     url(r'^support$', views.support, name='support'),
     url(r'^uploads/simple/$', views.simple_upload, name='simple_upload'),
     url(r'^uploads/form/$', views.model_form_upload, name='model_form_upload'),
-    url(r'^add/user/', views.add_user, name='profile'),
+    url(r'^add/user/', views.add_user, name='add_user'),
     url(r'^not-active', views.notactive, name="notactive"),
     url(r'^withdraw$', views.withdraw, name="withdraw"),
 

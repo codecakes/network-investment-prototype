@@ -8,15 +8,10 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - pip install -U pipenv
           - pip install -r requirements.txt
-          - python manage.py migrate --noinput
-          - python manage.py migrate --noinput
-          - python manage.py makemigrations accounts
-          - python manage.py makemigrations wallet
-          - python manage.py makemigrations transactions
-          - python manage.py makemigrations packages
-          - python manage.py migrate
           - mkdir -p staticfiles && mkdir -p media
           - python manage.py collectstatic --noinput
+          - python manage.py makemigrations
+          - python manage.py migrate
           - pwd_dir=$(pwd)
           - cd .. && git clone git@github.com:avicrypto-us/avi.github.io.git
           - cd avi.github.io && cp -R $pwd_dir/staticfiles ./

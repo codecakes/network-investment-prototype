@@ -19,7 +19,7 @@ from . import views
 # from views import ResetPasswordRequestView
 
 urlpatterns = [
-    url(r'^add/$', views.PackagesCreate, name='packages_create'),
+    url(r'^add/$', views.PackagesCreate, name='packages_add'),
     url(r'^list/$', views.PackagesList.as_view(), name='packages_list'),
     url(r'^business/$', views.PackagesBList.as_view(), name='packages_list'),
 ]

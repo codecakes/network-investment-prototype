@@ -2,9 +2,9 @@
 
 
 {% if user.is_authenticated %}
-    <div class="alert alert-info mb-0" style="text-align: center;" role="alert">
+    <!--<div class="alert alert-info mb-0" style="text-align: center;" role="alert">
         <strong>Today's payout will be released by the end of the day. Apologise for inconvenience.</strong>
-    </div>
+    </div>-->
     <!-- navbar-fixed-top-->
     <nav class="header-navbar navbar navbar-with-menu undefined navbar-light navbar-border navbar-brand-center">
         <div class="navbar-wrapper">
@@ -42,6 +42,7 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav float-xs-right">
+                            {% include 'notification.html' %}
                         <li class="dropdown dropdown-user nav-item">
                             <a href="#" data-toggle="dropdown" class="dropdown-toggle nav-link dropdown-user-link" style="margin-top: 8px;">
                                 <!-- <span class="avatar avatar-online">
@@ -85,7 +86,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="/package/add" class="nav-link">
-                        <i class="icon-layout"></i>
+                        <i class="icon-cube"></i>
                         <span data-i18n="nav.layouts.temp">Fixed Deposit Plan</span>
                     </a>
                 </li>

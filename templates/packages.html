@@ -9,7 +9,7 @@
         </div>
 
         {% for package in packages %}
-            {% ifnotequal package.package_name 'USD 500,00,000' %}
+            {% if package.package_name != 'USD 500,00,000' %}
                 <div class="col-xl-4 col-md-6 col-xs-12">
                     <div class="card">
                         <div class="text-xs-center">
@@ -56,7 +56,7 @@
                         </div>
                     </div>
                 </div>
-            {% endifnotequal %}
+            {% endif %}
         {% endfor %}
             <div id="subscribeModal" class="modal fade">
                 <div class="modal-dialog">
@@ -281,38 +281,9 @@
         success: function(data) {
             data = JSON.parse(data)
             if(data.status == "error") {
-            toastr.warning(data.message, "Error");
+            toastr.warning(data.message, "Error", toastr_options);
             } else {
-            toastr.success(data.message, "Success");
-            }
-        }
-        });
-    })
-
-    function getFormData($form) {
-        var unindexed_array = $form.serializeArray();
-        var indexed_array = {};
-
-        $.map(unindexed_array, function(n, i) {
-        indexed_array[n["name"]] = n["value"];
-        });
-
-        return indexed_array;
-    }
-
-    $("#purchasePackageForm").submit(function(event){
-        event.preventDefault();
-        var data = getFormData($(this));
-        $.ajax({
-        type: "POST",
-        url: "/validate-user-transaction",
-        data: data,
-        success: function(data) {
-            data = JSON.parse(data)
-            if(data.status == "error") {
-            toastr.warning(data.message, "Error");
-            } else {
-            toastr.success(data.message, "Success");
+            toastr.success(data.message, "Success", toastr_options);
             }
         }
         });

@@ -8,6 +8,8 @@ from datetime import datetime, timedelta, date
 from functools import wraps
 from avicrypto.lib.dsm import StateMachine
 
+from django.utils import timezone
+
 UTC = pytz.UTC
 
 START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
@@ -60,6 +62,7 @@ def get_direct_pair(user, last_date, next_date):
     # filter paying sponsored members
     filtered_members = filter_by_sponsor(
         sponsor_id, last_date, next_date, members)
+    print "filtered_members", filtered_members
     # filter only left `leg` members
     # left_members = filter(
     #     lambda m: filter_by_leg_user(m, 'l'), filtered_members)
@@ -107,8 +110,6 @@ def is_valid_date(func):
                     #print "in if is valid_date  "
                     #print "func name is {}".format(func.__name__)
                     return func(user, last_date, next_date)
-                elif func.__name__ == "get_left_right_agg":
-                    return (0.0, 0.0)
                 # elif doj == next_date:
                 #     return 0.0
                 # else:
@@ -129,7 +130,6 @@ def is_eligible(func):
         """
         pkg = get_package(user)
         if pkg:
-            # print "calling %s with attr: %s, %s, %s" %(func.__name__, user.username, last_date, next_date)
             return func(user, last_date, next_date)
         else:
             return ((0.0, 0.0, 0.0), 'end') if func.__name__ == 'calc_binary' else (0.0, 'end')
@@ -164,15 +164,13 @@ def calc_binary(user, last_date, next_date):
     """calculate the binary on minimum of two legs"""
     # calculate if binary has atleast one direct pair
     pairs = get_direct_pair(user, last_date, next_date)
+    print "pairs", pairs
     if pairs:
         pkg = get_package(user)
         binary_payout = pkg.package.binary_payout/100.0
         # finds leg with minimium total package prices
         # leg = find_min_leg(user)
-        print "attrs: user {}\n last_date {}\n next_date {}\n".format(user.username, last_date, next_date)
-        res = get_left_right_agg(user, last_date, next_date)
-        print "returned res is {}".format(res)
-        left_sum, right_sum = res
+        left_sum, right_sum = get_left_right_agg(user, last_date, next_date)
         left_sum += pkg.left_binary_cf
         right_sum += pkg.right_binary_cf
         l_cf, r_cf = calc_cf(left_sum, right_sum)
@@ -186,23 +184,23 @@ def calc_binary(user, last_date, next_date):
 def calc_weekly(user, last_date, next_date):
     from math import ceil, floor
     # calculate number of weeks passed since last_date before next_date
-    # print "for user %s" %(user.username)
+    print "for user %s" %(user.username)
     pkg = get_package(user)
     user_doj = pkg.created_at.date()
     # user_doj = user.date_joined.date()
     # user_doj = date(user_doj.year, user_doj.month, user_doj.day)
-    old_date = greater_date(user_doj, date(last_date.year, last_date.month, last_date.day))
-    new_date = next_date.date()
-    if old_date < new_date:        
-        # new_date = date(user_doj.year, user_doj.month, user_doj.day)
-        delta = new_date - old_date
-        num_weeks = floor(delta.days/7.0)
-        # print "old date is {}, next_date is {}".format(old_date, next_date.date())
-        # print "delta is %s" %delta
-        # print "num of week: {}, old date is {}. new date is {}. difference in num weeks: {}".format(num_weeks, old_date, new_date, num_weeks)
-        pkg = get_package(user)
-        return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct')
-    return (0.0, 'direct')
+    # old_date = greater_date(user_doj, date(
+    #     last_date.year, last_date.month, last_date.day))
+    old_date = user_doj  #greater_date(user_doj, last_date.date())
+    new_date = timezone.now().date() #next_date.date()
+    # new_date = date(user_doj.year, user_doj.month, user_doj.day)
+    delta = new_date - old_date
+    num_weeks = floor(delta.days/7.0)
+    # print "old date is {}, next_date is {}".format(old_date, next_date.date())
+    # print "delta is %s" %delta
+    print "num of week: {}, old date is {}. new date is {}. difference in num weeks: {}".format(num_weeks, old_date, new_date, num_weeks)
+    pkg = get_package(user)
+    return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct')
 
 
 def calc_leg(user, last_date, next_date, leg='l'):
@@ -267,7 +265,7 @@ INVESTMENT_TYPE = {
 
 def calc(user, last_date, investment_type):
     """
-    investment_tytepe: can be direct, binary, weekly payouts
+    investment_type: can be direct, binary, weekly payouts
     Then set last_date = next_date
     """
     next_date = find_next_monday()
@@ -320,6 +318,40 @@ def calculate_investment(user, **kw):
             #print "calculating for ", user
             run_investment_calc(user, pkg, last_date, next_payout)
 
+INVESTMENT_TYPE = {
+    'direct': calc_direct,
+    'binary': calc_binary,
+}
+
+def calculate_investment_binary_direct(user, **kw):
+    """Calculates all investment schemes of the user"""
+    packages = User_packages.objects.filter(user=user, status='A')
+    if packages:
+        pkg = User_packages.objects.get(user=user, status='A')
+        last_date = START_TIME
+        # today = UTC.normalize(UTC.localize(datetime.utcnow()))
+        next_payout = UTC.normalize(UTC.localize(datetime.utcnow()))
+        run_investment_calc_binary_direct(user, pkg, last_date, next_payout)
+
+def run_investment_calc_binary_direct(user, pkg, last_date, next_payout):
+    state_m = StateMachine(user)
+    state_m.add_state('direct', INVESTMENT_TYPE, end_state='binary')
+    state_m.add_state('binary', INVESTMENT_TYPE, end_state='end')
+    state_m.set_start('direct')
+    state_m.run(last_date, next_payout)
+    state_m.set_start('binary')
+    state_m.run(last_date, next_payout)
+
+    binary, left_binary_cf, right_binary_cf = state_m.results['binary']
+    direct = state_m.results['direct']
+
+    pkg.binary = binary
+    pkg.left_binary_cf = left_binary_cf
+    pkg.right_binary_cf = right_binary_cf
+    pkg.direct = direct
+    pkg.total_payout = binary + direct + pkg.weekly
+    pkg.last_direct_binary_date = next_payout
+    pkg.save()
 
 def run_scheduler(**kw):
     users = User.objects.all()
@@ -327,16 +359,14 @@ def run_scheduler(**kw):
                    lambda user: calculate_investment(user, **kw))
 
 
-@is_valid_date
 def get_left_right_agg(user, last_date, next_date):
     """Returns aggregate package of both legs"""
     left_user = get_left(user)
     right_user = get_right(user)
 #print "left user {} and right users {}".format(left_user.username, right_user.username)
-    return [calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date)]
+    return (calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date))
 
 
-@is_valid_date
 def calc_aggregate_left(user, last_date, next_date):
     """Find the aggregate sum of all packages in left leg"""
     if user:
@@ -345,10 +375,10 @@ def calc_aggregate_left(user, last_date, next_date):
         if pkg:
             return pkg.package.price + calc_aggregate_left(left_user, last_date, next_date) + calc_aggregate_right(left_user, last_date, next_date)
         return 0.0
-    return 0.0
+    else:
+        return 0.0
 
 
-@is_valid_date
 def calc_aggregate_right(user, last_date, next_date):
     """Find the aggregate sum of all packages in right leg"""
     if user:
@@ -357,10 +387,11 @@ def calc_aggregate_right(user, last_date, next_date):
         if pkg:
             return pkg.package.price + calc_aggregate_left(right_user, last_date, next_date) + calc_aggregate_right(right_user, last_date, next_date)
         return 0.0
-    return 0.0
+    else:
+        return 0.0
 
 
-def find_min_leg(user, last_date, next_date):
+def find_min_leg(user):
     """Finds minimum of the two legs of `user` by aggregating their total package prices"""
     left, right = get_left_right_agg(user)
     return 'l' if left < right else 'r'
@@ -396,7 +427,10 @@ def valid_payout_user(sponsor_id, member, last_date, next_date):
     # print "member is ", member.child_id.username
     # print "member.child_id.profile.sponser_id ", member.child_id.profile.sponser_id
     try:
-        return (last_date <= doj < next_date) and (member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id) and pkg
+        print "valid_payout_user", member.child_id.profile.sponser_id
+        print member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id
+
+        return (member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id) and pkg
     except:
         return False
 
