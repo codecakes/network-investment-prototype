@@ -12,11 +12,11 @@ $(function() {
   var loaded = false
   var nodeTemplate = function(data) {
     if(data.id) {
+      /*<p class="m-0">Package: ${data.package}</p>*/
       return `
         <span>${data.avi_id}</span>
         <div class="title">${data.name}</div>
         <div class="content">
-        <p class="m-0">Package: ${data.package}</p>
         <p class="m-0">Invest: ${data.investment}</p>
         <p class="m-0">Trans.: ${data.transaction}</p>
         </div>
@@ -57,7 +57,7 @@ $(function() {
           toggleSiblingsResp: false,
           nodeTemplate: nodeTemplate,
           'createNode': function($node, data) {
-            if(!data.package){
+            if(!data.investment){
               $($node).find(".title").addClass("inactive-node-title")
               $($node).find(".content").addClass("inactive-node-border")
               $($node).addClass('inactive-node')
