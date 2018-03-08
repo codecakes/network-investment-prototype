@@ -15,7 +15,7 @@ import pytz
 import calendar
 from datetime import datetime, timedelta
 from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer, get_left, get_right
-from addons.packages.lib.payout import calc, calc_weekly, calc_leg, START_TIME, get_direct_pair, get_user_from_member, get_active_mem_price, filter_by_sponsor, find_next_monday, valid_payout_user, filter_by_leg_user, run_investment_calc
+from addons.packages.lib.payout import get_package, calc, calc_weekly, calc_leg, START_TIME, get_direct_pair, get_user_from_member, get_active_mem_price, filter_by_sponsor, find_next_monday, valid_payout_user, filter_by_leg_user, run_investment_calc
 from addons.accounts.lib.blockexplorer import validate, is_valid_xrp_paid, is_valid_btc_paid, get_btc, get_xrp
 
 # TODO: Do it in time
@@ -159,14 +159,18 @@ class CreateUserTest(TestCase):
         tz = lambda r: (self.UTC.localize(r))
         
         self.packageA = Packages.objects.create(package_name="USD 5000", package_code="usd5000", payout="7.5", directout=3.5, binary_payout=6, capping=5000, no_payout=35, loyality=5, roi=2450, price=5000)
-        self.userA = User.objects.create_user(username='userA', password='12345', date_joined=tz(datetime(2018, 1, 03, 00, 8, 7, 127325)))
-        User_packages.objects.create(user=self.userA, package=self.packageA, status="A", created_at=(datetime(2018, 1, 03, 00, 8, 7, 127325, tzinfo=pytz.UTC)), last_payout_date=(datetime(2018, 1, 03, 00, 8, 7, 127325, tzinfo=pytz.UTC)), duration=1)
+        self.userA = User.objects.create_user(username='userA', password='12345', date_joined=tz(datetime(2018, 01, 03, 00, 8, 7)))
+        self.UserpackagesA = User_packages.objects.create(user=self.userA, package=self.packageA, status="A", created_at=(datetime(2018, 02, 03, 00, 8, 7, 127325, tzinfo=pytz.UTC)), last_payout_date=(datetime(2018, 02, 03, 00, 8, 7, 127325, tzinfo=pytz.UTC)), duration=1)
+        self.UserpackagesA.created_at = datetime(2018, 02, 03, 00, 8, 7, 127325, tzinfo=pytz.UTC)
+        self.UserpackagesA.save(update_fields=['created_at'])
         
 
         self.package = Packages.objects.create(package_name="USD 1000", package_code="usd1000", payout="7", directout=3.5, binary_payout=6, capping=1000, no_payout=35, loyality=5, roi=2450, price=1000)
 
         self.user1 = User.objects.create_user(username='user1', password='12345', date_joined=tz(datetime(2018, 2, 11, 20, 8, 7, 127325)))
-        User_packages.objects.create(user=self.user1, package=self.package, status="A", created_at=(datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC)), last_payout_date=(datetime(2018, 2, 12, 20, 8, 7, 127325, tzinfo=pytz.UTC)), duration=1)
+        self.pkg1 = User_packages.objects.create(user=self.user1, package=self.package, status="A", created_at=(datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC)), last_payout_date=(datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC)), duration=1)
+        self.pkg1.created_at = datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC)
+        self.pkg1.save(update_fields=['created_at'])
 
         self.user2 = User.objects.create_user(username='self.user2', password='12345', date_joined=datetime(2018, 2, 11, 20, 8, 7, 127325, tzinfo=pytz.UTC))
         self.user2.profile.sponser_id = self.user1
@@ -225,14 +229,31 @@ class CreateUserTest(TestCase):
     
     
     ########### CALCULATE WEEKLY #############
+    def test_date_cmp(self):
+        next_date = self.UTC.normalize(self.UTC.localize(datetime(2018, 02, 26)))
+        self.assertLess(self.userA.date_joined, next_date, "User DOJ should be less than next_date")
+    
+    def test_date(self):
+        pkg = get_package(self.userA)
+        pkg_tm = self.UTC.normalize(pkg.created_at)
+        dt = datetime(2018, 02, 03, 00, 8, 7, 127325, tzinfo=pytz.UTC)
+        self.assertEqual(pkg_tm.isoformat(), dt.isoformat(), "Should be equal but is {} and {}".format(pkg_tm, dt))
+    
+    def test_pkg_less(self):
+        pkg = get_package(self.userA)
+        pkg_tm = self.UTC.normalize(pkg.created_at)
+        next_date = self.UTC.normalize(self.UTC.localize(datetime(2018, 02, 26)))
+        self.assertLess(pkg_tm.date(), next_date.date(), "Pkg creation should be < next_date but are {} and {}".format(pkg_tm.date(), next_date.date()))
+
     def test_weekly(self):
         next_date = self.UTC.normalize(self.UTC.localize(datetime(2018, 02, 26, 00, 00, 00, 00)))
         res, _ = calc_weekly(self.userA, self.userA.date_joined, next_date)
-        self.assertEqual(res, 3000, "should be 3000 but is %s" %res)
+        self.assertEqual(res, 1125, "should be 1125 but is %s" %res)
 
     def test_calc_weekly(self):
-        res, _ = calc(self.user1, self.user1.date_joined, 'weekly')
-        self.assertEqual(res, 210, "should've been 140 but is %s" %res)
+        print "self.pkg1.created_at is ", self.pkg1.created_at
+        res, _ = calc(self.user1, self.pkg1.created_at, 'weekly')
+        self.assertEqual(res, 280, "should've been 280 but is %s" %res)
     
     
     def test_all_members_traversed(self):
@@ -248,7 +269,7 @@ class CreateUserTest(TestCase):
     def test_tot_package_sum(self):
         "find total package sum of all users"
         res = sum(map(lambda u: get_active_mem_price(u), User.objects.all()))
-        self.assertEqual(res, 7000, "total package sum should be 7000 but is %s" %res)
+        self.assertEqual(res, 12000, "total package sum should be 12000 but is %s" %res)
     
     def test_valid_payout_user(self):
         "validate if a user has last_date <= doj < next_date is s.t."
@@ -257,12 +278,6 @@ class CreateUserTest(TestCase):
         next_date =  self.next_date
         members = Members.objects.filter(parent_id=self.user1)
         bl = valid_payout_user(sponsor_id, members[0], last_date, next_date)
-        # doj = self.UTC.normalize(members[0].child_id.date_joined)
-        # bl = last_date <= doj < next_date
-        # print "user: {} | parent: {} | child: {} | child's sponsor: {}".format(self.user1.profile.user_auto_id, members[0].parent_id.profile.user_auto_id, members[0].child_id.profile.user_auto_id, members[0].child_id.profile.sponser_id)
-        # bl = members[0].child_id.profile.sponser_id.profile.user_auto_id == sponsor_id
-        # print "last date: {}, doj: {}, next_date: {}".format(last_date, doj, next_date)
-        # self.assertEqual(sponsor_id, members[0].child_id.profile.sponser_id.profile.user_auto_id)
         self.assertTrue(bl, "should be True but is %s" %bl)
         
     
@@ -318,18 +333,16 @@ class CreateUserTest(TestCase):
         res = get_direct_pair(self.user1, self.user1.date_joined, self.next_date)
         self.assertTrue(res, "Is %s" %res)
 
-    def test_run_investment_calc(self):
-        pkg = User_packages.objects.filter(user = self.user1, status='A')
-        pkg = pkg[0]
-        run_investment_calc(self.user1, pkg, self.user1.date_joined, self.next_date)
-        pkg = User_packages.objects.filter(user = self.user1, status='A')
-        pkg = pkg[0]
-        print [pkg.binary, pkg.direct, pkg.weekly]
-        self.assertListEqual([pkg.binary, pkg.direct, pkg.weekly], [180, 210, 140], "Failed. value is {}".format([pkg.binary, pkg.direct, pkg.weekly]))
-
     def test_calc_binary(self):
         res, _ = calc(self.user1, self.user1.date_joined, 'binary')
         # print res
         self.assertEqual(res[0], 180, "Should be 180 but is %s" %res[0])
 
-    
+    def test_run_investment_calc(self):
+        pkg = get_package(self.user1)
+        next_date = self.UTC.normalize(self.UTC.localize(datetime(2018, 03, 05)))
+        print "pkg.created_at {} pkg.last_payout_date {}".format(pkg.created_at, pkg.last_payout_date)
+        run_investment_calc(self.user1, pkg, pkg.created_at, next_date)
+        pkg = get_package(self.user1)
+        print [pkg.binary, pkg.direct, pkg.weekly]
+        self.assertListEqual([pkg.binary, pkg.direct, pkg.weekly], [180, 210, 140], "Failed. value is {}".format([pkg.binary, pkg.direct, pkg.weekly]))

@@ -15,6 +15,7 @@
                             <thead>
                                 <tr>
                                     <th>Wallet Id</th>
+                                    <th>Receiver Wallet Address</th>
                                     <th>Type</th>
                                     <th>Wallet Amount</th>
                                 </tr>
@@ -23,8 +24,9 @@
                                 {% for wallet in wallets %}
                                     <tr>
                                         <td>{{ wallet.uuid }}</td>
+                                        <td>{{ wallet.description }}</td>
                                         <td>{{ wallet.wallet_type }}</td>
-                                        <td>{{ wallet.amount }}</td>
+                                        <td>${{ wallet.amount }}</td>
                                     </tr>
                                 {% empty %}
                                     <tr>
@@ -72,12 +74,16 @@
                                                 {{ transaction.sender_wallet.owner.username }}
                                             {% endif %}
                                         </td>
-                                        <td>{{ transaction.amount }}</td>
+                                        <td>${{ transaction.amount }}</td>
                                         <td>{{ transaction.reciever_wallet.wallet_type }}</td>
                                         <td>
                                             {% for key,value in transaction_status_choices  %}
                                                 {% if key == transaction.status %}
-                                                    {{value}}
+                                                    {% if transaction.status == 'C' %}
+                                                        Paid
+                                                    {% else %}
+                                                        {{value}}
+                                                    {% endif %}    
                                                 {% endif %}
                                             {% endfor %}
                                         </td>
@@ -118,7 +124,7 @@
                                 {% for package in packages %}
                                     <tr>
                                         <td>{{package.package.package_name}}</td>
-                                        <td>{{package.package.price}}</td>
+                                        <td>${{package.package.price}}</td>
                                         <td>
                                             {% for key,value in userpackage_status_choices  %}
                                                 {% if key == package.status %}

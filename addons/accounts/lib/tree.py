@@ -277,11 +277,12 @@ def get_relationship(user):
 
 
 def get_user_json(user, profile):
-    try:
-        user_package = User_packages.objects.get(user=user, status="A")
-        package = user_package.package.price
-    except User_packages.DoesNotExist:
-        package = 0
+    # try:
+    #    user_package = User_packages.objects.get(user=user, status="A")
+    #    package = user_package.package.price
+    # except User_packages.DoesNotExist:
+    #    package = 0
+
 
     user_investment = User_packages.objects.filter(user=user).annotate(investment=Sum('package__price')).values()
     investment = user_investment[0]['investment'] if user_investment else 0
@@ -295,7 +296,7 @@ def get_user_json(user, profile):
                 placement_id=None if profile.placement_id is None else profile.placement_id.id,
                 placement_position=profile.placement_position, image=ICON,
                 link=dict(href=urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"),
-                package=package,
+                # package=package,
                 investment=investment,
                 transaction=tot_txn_vol(user))
 
