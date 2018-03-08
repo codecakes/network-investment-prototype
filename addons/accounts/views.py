@@ -28,15 +28,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import *
 from django.core.exceptions import ObjectDoesNotExist
-<<<<<<< HEAD
 from addons.accounts.models import Members, Profile, SupportTicket, UserAccount, Userotp
 from addons.packages.lib.payout import (UTC, calc, calculate_investment,
                                         find_next_monday)
-=======
 from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
 from addons.packages.lib.payout import (UTC, calc, calculate_investment, find_next_monday)
 from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
->>>>>>> 9481ac06881e9c8ff6c4d9e142aec882278d4e58
 from addons.packages.models import Packages, User_packages
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
@@ -122,6 +119,7 @@ def app_login(request):
                 user = authenticate(username=username, password=password)
                 if user is not None:
                     login(request, user)
+                    # send_otp(request)
                     return HttpResponse(json.dumps({
                         "status": "ok"
                     }))
