@@ -50,6 +50,9 @@ urlpatterns = [
 
     # url(r'^add/user/(?P<id>[a-zA-Z0-9]{0,30})/$',views.add_user, name='add_user'),
     url(r'^404', views.app_404, name='app_404'),
+    # otp uri and views
+    url(r'^send', views.send_otp, name='send_otp'),
+    url(r'^varify', views.verify_otp, name='verify_otp'),
 ]
 
 handler404 = 'views.app_404'
