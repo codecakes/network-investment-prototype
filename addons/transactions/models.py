@@ -18,7 +18,9 @@ class Transactions(models.Model):
 		('P', 'Pending'),
 		('C', 'Confirmed'),
 		('processing', 'Processing'),
-		('paid', 'Paid')
+		('paid', 'Paid'),
+		('cancel', 'Canceled'),
+		('fail', 'Failed')
 	)
 	status = models.CharField(max_length=50, choices=status_choices, null=True, blank=True, default="P")
 
