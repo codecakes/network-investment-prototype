@@ -168,21 +168,19 @@ def calc_binary(user, last_date, next_date):
     """calculate the binary on minimum of two legs"""
     # calculate if binary has atleast one direct pair
     pairs = get_direct_pair(user, last_date, next_date)
+    pkg = get_package(user)
     if pairs:
-        pkg = get_package(user)
-        binary_payout = pkg.package.binary_payout/100.0
-        # finds leg with minimium total package prices
-        # leg = find_min_leg(user)
-        # print "attrs: user {}\n last_date {}\n next_date {}\n".format(user.username, last_date, next_date)
-        res = get_left_right_agg(user, last_date, next_date)
-        # print "returned res is {}".format(res)
-        left_sum, right_sum = res
-        left_sum += pkg.left_binary_cf
-        right_sum += pkg.right_binary_cf
-        l_cf, r_cf = calc_cf(left_sum, right_sum)
-        # TODO: add 'loyalty' when implemented
-        return ((min(left_sum, right_sum) * binary_payout, l_cf, r_cf), 'end')
-    return ((0.0, 0.0, 0.0), 'end')
+        pkg.binary_enable = True
+    
+    binary_payout = pkg.package.binary_payout/100.0
+    # finds leg with minimium total package prices
+    res = get_left_right_agg(user, last_date, next_date)
+    left_sum, right_sum = res
+    left_sum += pkg.left_binary_cf
+    right_sum += pkg.right_binary_cf
+    l_cf, r_cf = calc_cf(left_sum, right_sum)
+    return ((min(left_sum, right_sum) * binary_payout, l_cf, r_cf), 'end')
+    # return ((0.0, 0.0, 0.0), 'end')
 
 
 ################# DAILY CALCULATION #######################
@@ -319,10 +317,7 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     state_m.add_state('weekly', INVESTMENT_TYPE, end_state='direct')
     state_m.add_state('direct', INVESTMENT_TYPE, end_state='binary')
     state_m.add_state('binary', INVESTMENT_TYPE, end_state='end')
-    # state_m.add_state('loyalty', INVESTMENT_TYPE, end_state='loyalty_booter')
-    # state_m.add_state('loyalty_booter', INVESTMENT_TYPE, end_state='loyalty_booter_super')
-    # state_m.add_state('loyalty_booter_super', INVESTMENT_TYPE, end_state='end')
-    # print "end states:", state_m.end_states
+    
     state_m.set_start('weekly')
     state_m.run(last_date, next_payout)
     state_m.set_start('direct')

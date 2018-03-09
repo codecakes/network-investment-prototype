@@ -4,7 +4,7 @@ from pytz import UTC
 from avicrypto.settings import EPOCH_BEGIN
 from addons.accounts.models import User
 from addons.packages.models import User_packages
-from addons.packages.lib.payout import run_scheduler, calculate_investment, run_investment_calc, find_next_monday
+from addons.packages.lib.payout import  get_package, run_scheduler, calculate_investment, run_investment_calc, find_next_monday
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -34,9 +34,8 @@ def reset_these():
     for u in users:
         try:
             profile = u.profile
-            pkg = User_packages.objects.filter(user = u, status='A')
+            pkg = get_package(u)
             if pkg:
-                pkg = pkg[0]
                 # pkg.last_payout_date = u.date_joined
                 # pkg.binary = 0.0
                 # pkg.weekly = 0.0
@@ -45,7 +44,8 @@ def reset_these():
                 # pkg.left_binary_cf = 0.0
                 # pkg.right_binary_cf = 0.0
                 # pkg.save()
-                run_investment_calc(u, pkg, EPOCH_BEGIN, find_next_monday())
+                today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+                run_investment_calc(u, pkg, EPOCH_BEGIN, today)
         except:
             pass
     # print "running"
