@@ -23,7 +23,7 @@ class Transactions(models.Model):
 	type_choices = (
 		('W', 'Withdraw'),
 		('P', 'Add Package'),
-		('U', 'User to User'),
+		('U', 'User to User')
 	)
 	tx_type = models.CharField(max_length=50, choices=type_choices, null=True, blank=True, default="W")
 	created_at = models.DateTimeField(auto_now_add=True)

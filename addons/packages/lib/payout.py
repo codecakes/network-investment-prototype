@@ -1,12 +1,16 @@
 from addons.accounts.models import User, Members, Profile
 from addons.packages.models import Packages, User_packages
+from addons.transactions.models import Transactions
+from addons.wallet.models import Wallet
 from addons.accounts.lib.tree import load_users, find_min_max, is_member_of, is_parent_of, is_valid_leg, has_child, LEG, divide_conquer, get_left, get_right
 from django.conf import settings
+from django.db.models import Count, Min, Sum, Avg
 import pytz
 import calendar
 from datetime import datetime, timedelta, date
 from functools import wraps
 from avicrypto.lib.dsm import StateMachine
+
 
 UTC = pytz.UTC
 
@@ -181,6 +185,20 @@ def calc_binary(user, last_date, next_date):
     return ((0.0, 0.0, 0.0), 'end')
 
 
+################# DAILY CALCULATION #######################
+@is_eligible
+def calc_daily(user, last_date, next_date):
+    from math import ceil, floor
+    pkg = get_package(user)
+    active_date = pkg.created_at.date()
+    last_dt = greater_date(active_date, date(last_date.year, last_date.month, last_date.day))
+    new_date = next_date.date()
+    if last_dt < new_date:
+        delta = new_date - last_dt
+        days = floor(delta.days)
+        return ((pkg.package.payout/100.) * pkg.package.price * days, 'direct')
+    return (0.0, 'direct')
+
 # ################# Weekly sum calculation #######################
 @is_eligible
 def calc_weekly(user, last_date, next_date):
@@ -262,6 +280,7 @@ INVESTMENT_TYPE = {
     'direct': calc_direct,
     'binary': calc_binary,
     'weekly': calc_weekly,
+    'daily': calc_daily
 }
 
 
@@ -272,6 +291,27 @@ def calc(user, last_date, investment_type):
     """
     next_date = find_next_monday()
     return INVESTMENT_TYPE[investment_type](user, last_date, next_date)
+
+
+def calc_txns(start_dt, end_dt, **kw):
+    """
+    Calculates total payout between date ranges
+    """
+    return Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_ROI_wallet'], tx_type="roi", status='C', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    + Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_DR_wallet'], tx_type="direct", status='C', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    + Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_BN_wallet'], tx_type="binary", status='C', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    # deduct withdrawals from all wallet types
+    - Transactions.objects.filter(sender_wallet=kw['user_btc'], reciever_wallet=kw['avicrypto_btc'], tx_type="W", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    - Transactions.objects.filter(sender_wallet=kw['user_xrp'], reciever_wallet =kw['avicrypto_xrp'], tx_type="W", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    - Transactions.objects.filter(sender_wallet=kw['user_eth'], reciever_wallet =kw['avicrypto_eth'], tx_type="W", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    # deduct user to user transfer from all wallet types
+    - Transactions.objects.filter(sender_wallet=kw['user_btc'], tx_type="U", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    - Transactions.objects.filter(sender_wallet=kw['user_xrp'], tx_type="U", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    - Transactions.objects.filter(sender_wallet=kw['user_eth'], tx_type="U", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    # deduct topup from all wallet types
+    - Transactions.objects.filter(sender_wallet=kw['user_btc'], tx_type="topup", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    - Transactions.objects.filter(sender_wallet=kw['user_xrp'], tx_type="topup", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    - Transactions.objects.filter(sender_wallet=kw['user_eth'], tx_type="topup", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
 
 
 def run_investment_calc(user, pkg, last_date, next_payout):
@@ -295,13 +335,61 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     direct = state_m.results['direct']
     weekly = state_m.results['weekly']
 
+    
+    # get user and avicrypto wallets
+    user_btc = Wallet.objects.filter(owner = user, wallet_type = 'BTC')
+    user_eth = Wallet.objects.filter(owner = user, wallet_type = 'ETH')
+    user_xrp = Wallet.objects.filter(owner = user, wallet_type = 'XRP')
+
+    user_ROI_wallet = Wallet.objects.filter(owner = user, wallet_type = 'ROI')
+    user_ROI_wallet = user_ROI_wallet[0] if user_ROI_wallet else Wallet.objects.create(owner = user, wallet_type = 'ROI')
+
+    user_DR_wallet = Wallet.objects.filter(owner = user, wallet_type = 'DR')
+    user_DR_wallet = user_DR_wallet[0] if user_DR_wallet else Wallet.objects.create(owner = user, wallet_type = 'DR')
+
+    user_BN_wallet = Wallet.objects.filter(owner = user, wallet_type = 'BN')
+    user_BN_wallet = user_BN_wallet[0] if user_BN_wallet else Wallet.objects.create(owner = user, wallet_type = 'BN')
+
+    avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
+    avicrypto_wallet = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'AW')
+    avicrypto_wallet =  avicrypto_wallet[0] if avicrypto_wallet else Wallet.objects.create(owner = avicrypto_user, wallet_type = 'AW')
+    
+    avicrypto_btc = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'BTC')
+    avicrypto_eth = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'ETH')
+    avicrypto_xrp = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'XRP')
+
+    # set current pkg calculations and carry forwards
     pkg.binary = binary
     pkg.left_binary_cf = left_binary_cf
     pkg.right_binary_cf = right_binary_cf
     pkg.direct = direct
     pkg.weekly = weekly
-    pkg.total_payout = binary + direct + weekly
-    pkg.last_payout_date = next_payout
+
+    # Add Transactions
+    # Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_ROI_wallet, amount, tx_type="roi", status="P/C/processing/paid")
+    bn_status = 'C' if pkg.binary_enable else 'P'
+    today = UTC.normalize(UTC.localize(datetime.utcnow()))
+    
+    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_ROI_wallet, weekly, tx_type="roi", status="C")
+    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_DR_wallet, direct, tx_type="direct", status="C")
+    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_BN_wallet, binary, tx_type="binary", status=bn_status)
+        
+    # sum the total transactions for this user since epoch
+    kw = dict(
+        avicrypto_wallet=avicrypto_wallet,
+        user_ROI_wallet=user_ROI_wallet,
+        user_DR_wallet=user_DR_wallet,
+        user_BN_wallet=user_BN_wallet,
+        user_btc=user_btc,
+        user_xrp=user_xrp,
+        user_eth=user_eth,
+        avicrypto_btc=avicrypto_btc,
+        avicrypto_xrp=avicrypto_xrp,
+        avicrypto_eth=avicrypto_eth
+    )
+    
+    pkg.total_payout = calc_txns(EPOCH_BEGIN , today, **kw)
+    pkg.last_payout_date = today
     pkg.save()
 
 

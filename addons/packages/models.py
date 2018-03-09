@@ -53,6 +53,7 @@ class User_packages(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     last_payout_date = models.DateTimeField(default=settings.EPOCH_BEGIN)
     binary = models.FloatField(null=True, blank=True, default=0.0)
+    daily = models.FloatField(null=True, blank=True, default=0.0)
     weekly = models.FloatField(null=True, blank=True, default=0.0)
     direct = models.FloatField(null=True, blank=True, default=0.0)
     total_payout = models.FloatField(null=True, blank=True, default=0.0)
@@ -60,6 +61,10 @@ class User_packages(models.Model):
     right_binary_cf = models.FloatField(null=True, blank=True, default=0.0)
     paid_txn_id = models.CharField(max_length=100, null=True, blank=True)
     paid_cur = models.CharField(max_length=50, choices=cur_choice, null=True)
+    # if criterion reached, enable binary
+    binary_enable = models.NullBooleanField(default=False, null=True, blank=True)
+    
+
 
     def save(self, *args, **kwargs):
 		if not self.pk:
