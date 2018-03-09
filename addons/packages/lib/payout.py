@@ -370,9 +370,9 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     bn_status = 'C' if pkg.binary_enable else 'P'
     today = UTC.normalize(UTC.localize(datetime.utcnow()))
     
-    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_ROI_wallet, weekly, tx_type="roi", status="C")
-    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_DR_wallet, direct, tx_type="direct", status="C")
-    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_BN_wallet, binary, tx_type="binary", status=bn_status)
+    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_ROI_wallet, amount = weekly, tx_type="roi", status="C")
+    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_DR_wallet, amount = direct, tx_type="direct", status="C")
+    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_BN_wallet, amount = binary, tx_type="binary", status=bn_status)
         
     # sum the total transactions for this user since epoch
     kw = dict(
