@@ -17,13 +17,21 @@ class Transactions(models.Model):
 	status_choices = (
 		('P', 'Pending'),
 		('C', 'Confirmed'),
+		('processing', 'Processing'),
+		('paid', 'Paid'),
+		('cancel', 'Canceled'),
+		('fail', 'Failed')
 	)
 	status = models.CharField(max_length=50, choices=status_choices, null=True, blank=True, default="P")
 
 	type_choices = (
 		('W', 'Withdraw'),
 		('P', 'Add Package'),
-		('U', 'User to User')
+		('U', 'User to User'),
+		('topup', 'Top-up'),
+		('roi', 'ROI'),
+		('binary', 'Binary'),
+		('direct', 'Direct'),
 	)
 	tx_type = models.CharField(max_length=50, choices=type_choices, null=True, blank=True, default="W")
 	created_at = models.DateTimeField(auto_now_add=True)
