@@ -8,7 +8,8 @@ from addons.packages.lib.payout import  get_package, run_scheduler, calculate_in
 
 from django.core.management.base import BaseCommand, CommandError
 
-def reset_these():    
+def reset_these():
+    # import pdb
     # for email in ["robertjohnlie@gmail.com", "erwinyap.btc@gmail.com", "lilibest.btc@gmail.com",
     #     "zoulbizz@gmail.com", "andrisaputra148@gmail.com", "masta2803@gmail.com", 
     #     "amirryand8@gmail.com", "suherman6224@gmail.com", "cryptomujur@gmail.com",
@@ -33,20 +34,27 @@ def reset_these():
     users = User.objects.all()
     for u in users:
         try:
+            u.set_password('avi1234')
+            u.save()
             profile = u.profile
             pkg = get_package(u)
             if pkg:
-                # pkg.last_payout_date = u.date_joined
-                # pkg.binary = 0.0
-                # pkg.weekly = 0.0
-                # pkg.direct = 0.0
+                print "has pkg"
+                pkg.last_payout_date = EPOCH_BEGIN
+                pkg.binary = 0.0
+                pkg.weekly = 0.0
+                pkg.direct = 0.0
                 # pkg.total_payout += pkg.weekly
-                # pkg.left_binary_cf = 0.0
-                # pkg.right_binary_cf = 0.0
-                # pkg.save()
+                pkg.left_binary_cf = 0.0
+                pkg.right_binary_cf = 0.0
+                pkg.save()
                 today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+                # pdb.set_trace()
                 run_investment_calc(u, pkg, EPOCH_BEGIN, today)
+                print "called"
         except:
+            print "Profile Doesn't Exist", u.username
+            # raise Exception(u.username)
             pass
     # print "running"
     # # print run_scheduler()

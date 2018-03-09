@@ -291,33 +291,51 @@ def calc(user, last_date, investment_type):
     return INVESTMENT_TYPE[investment_type](user, last_date, next_date)
 
 
+def calc_txns_reducer(txn_obj):
+    # import pdb
+    # pdb.set_trace()
+    if type(txn_obj) == float:
+        return txn_obj
+    if txn_obj:
+        if txn_obj[0]:
+            return txn_obj[0].data_sum
+    # if txn_obj.values():
+    #     if txn_obj.values()[0]['data_sum']:
+    #         return txn_obj.values()[0]['data_sum']
+    return 0.0
 def calc_txns(start_dt, end_dt, **kw):
     """
     Calculates total payout between date ranges
     """
-    return Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_ROI_wallet'], tx_type="roi", status='C', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    + Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_DR_wallet'], tx_type="direct", status='C', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    + Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_BN_wallet'], tx_type="binary", status='C', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    # deduct withdrawals from all wallet types
-    - Transactions.objects.filter(sender_wallet=kw['user_btc'], reciever_wallet=kw['avicrypto_btc'], tx_type="W", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    - Transactions.objects.filter(sender_wallet=kw['user_xrp'], reciever_wallet =kw['avicrypto_xrp'], tx_type="W", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    - Transactions.objects.filter(sender_wallet=kw['user_eth'], reciever_wallet =kw['avicrypto_eth'], tx_type="W", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    # deduct user to user transfer from all wallet types
-    - Transactions.objects.filter(sender_wallet=kw['user_btc'], tx_type="U", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    - Transactions.objects.filter(sender_wallet=kw['user_xrp'], tx_type="U", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    - Transactions.objects.filter(sender_wallet=kw['user_eth'], tx_type="U", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    # deduct topup from all wallet types
-    - Transactions.objects.filter(sender_wallet=kw['user_btc'], tx_type="topup", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    - Transactions.objects.filter(sender_wallet=kw['user_xrp'], tx_type="topup", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
-    - Transactions.objects.filter(sender_wallet=kw['user_eth'], tx_type="topup", status='paid', datetime__range=(start_dt, end_dt)).values('datetime').annotate(data_sum=Sum('data'))
+    sum_txns = [
+        Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_ROI_wallet'], tx_type="roi", status='C', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_DR_wallet'], tx_type="direct", status='C', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_BN_wallet'], tx_type="binary", status='C', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
+        ]
+    
+    diff_txns = [
+        # deduct withdrawals from all wallet types
+        Transactions.objects.filter(sender_wallet=kw['user_btc'], reciever_wallet=kw['avicrypto_btc'], tx_type="W", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        Transactions.objects.filter(sender_wallet=kw['user_xrp'], reciever_wallet =kw['avicrypto_xrp'], tx_type="W", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        Transactions.objects.filter(sender_wallet=kw['user_eth'], reciever_wallet =kw['avicrypto_eth'], tx_type="W", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        # deduct user to user transfer from all wallet types
+        Transactions.objects.filter(sender_wallet=kw['user_btc'], tx_type="U", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        Transactions.objects.filter(sender_wallet=kw['user_xrp'], tx_type="U", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        Transactions.objects.filter(sender_wallet=kw['user_eth'], tx_type="U", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        # deduct topup from all wallet types
+        Transactions.objects.filter(sender_wallet=kw['user_btc'], tx_type="topup", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        Transactions.objects.filter(sender_wallet=kw['user_xrp'], tx_type="topup", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
+        Transactions.objects.filter(sender_wallet=kw['user_eth'], tx_type="topup", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
+    ]
 
+    return reduce(lambda x, y: calc_txns_reducer(x) + calc_txns_reducer(y), sum_txns) - reduce(lambda x, y: calc_txns_reducer(x) + calc_txns_reducer(y),  diff_txns)
 
 def run_investment_calc(user, pkg, last_date, next_payout):
     state_m = StateMachine(user)
     state_m.add_state('weekly', INVESTMENT_TYPE, end_state='direct')
     state_m.add_state('direct', INVESTMENT_TYPE, end_state='binary')
     state_m.add_state('binary', INVESTMENT_TYPE, end_state='end')
-    
+
     state_m.set_start('weekly')
     state_m.run(last_date, next_payout)
     state_m.set_start('direct')
@@ -335,7 +353,7 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     user_btc = Wallet.objects.filter(owner = user, wallet_type = 'BTC')
     user_eth = Wallet.objects.filter(owner = user, wallet_type = 'ETH')
     user_xrp = Wallet.objects.filter(owner = user, wallet_type = 'XRP')
-
+    import pdb
     user_ROI_wallet = Wallet.objects.filter(owner = user, wallet_type = 'ROI')
     user_ROI_wallet = user_ROI_wallet[0] if user_ROI_wallet else Wallet.objects.create(owner = user, wallet_type = 'ROI')
 
@@ -384,6 +402,10 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     )
     
     pkg.total_payout = calc_txns(EPOCH_BEGIN , today, **kw)
+    print "calculated investment"
+    # pdb.set_trace()
+    # print res
+    pkg.total_payout = res
     pkg.last_payout_date = today
     pkg.save()
 
