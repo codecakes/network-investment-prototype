@@ -173,9 +173,9 @@ def calc_binary(user, last_date, next_date):
         binary_payout = pkg.package.binary_payout/100.0
         # finds leg with minimium total package prices
         # leg = find_min_leg(user)
-        print "attrs: user {}\n last_date {}\n next_date {}\n".format(user.username, last_date, next_date)
+        # print "attrs: user {}\n last_date {}\n next_date {}\n".format(user.username, last_date, next_date)
         res = get_left_right_agg(user, last_date, next_date)
-        print "returned res is {}".format(res)
+        # print "returned res is {}".format(res)
         left_sum, right_sum = res
         left_sum += pkg.left_binary_cf
         right_sum += pkg.right_binary_cf
@@ -415,7 +415,8 @@ def run_scheduler(**kw):
                    lambda user: calculate_investment(user, **kw))
 
 
-@is_valid_date
+# @is_valid_date
+@is_eligible
 def get_left_right_agg(user, last_date, next_date):
     """Returns aggregate package of both legs"""
     left_user = get_left(user)
