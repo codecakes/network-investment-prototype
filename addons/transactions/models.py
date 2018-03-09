@@ -25,6 +25,7 @@ class Transactions(models.Model):
 	type_choices = (
 		('W', 'Withdraw'),
 		('P', 'Add Package'),
+		('U', 'User to User'),
 		('roi', 'ROI'),
 		('binary', 'Binary'),
 		('direct', 'Directr'),
