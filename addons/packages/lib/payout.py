@@ -14,7 +14,7 @@ from avicrypto.lib.dsm import StateMachine
 
 UTC = pytz.UTC
 
-START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
+EPOCH_BEGIN = START_TIME = getattr(settings, 'EPOCH_BEGIN', UTC.normalize(
     UTC.localize(datetime(2017, 12, 1, 00, 00, 00))))
 
 # TODO: Lotsa caching decorators
