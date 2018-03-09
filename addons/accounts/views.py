@@ -114,7 +114,6 @@ def app_login(request):
         if request.method == 'POST':
             username = str(request.POST.get('username'))
             password = str(request.POST.get('password'))
-
             if username and password:
                 user = authenticate(username=username, password=password)
                 if user is not None:
@@ -971,6 +970,8 @@ def verify_otp(request):
                     profile = Profile.objects.get(mobile=mobile)
                     profile.mobile_verified = True
                     profile.save()
+                elif otp_type == 'login':
+                    pass
                     return HttpResponse({'message': 'Mobile successfully varify', status:'success'})
                 return HttpResponse({'message': 'OTP successfully varify', status:'success'})
             except Userotp.DoesNotExist:
