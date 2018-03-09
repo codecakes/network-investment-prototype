@@ -26,6 +26,7 @@ class Transactions(models.Model):
 		('W', 'Withdraw'),
 		('P', 'Add Package'),
 		('U', 'User to User'),
+		('topup', 'Top-up'),
 		('roi', 'ROI'),
 		('binary', 'Binary'),
 		('direct', 'Directr'),
