@@ -330,7 +330,7 @@ def calc_txns(start_dt, end_dt, **kw):
 
     return reduce(lambda x, y: calc_txns_reducer(x) + calc_txns_reducer(y), sum_txns) - reduce(lambda x, y: calc_txns_reducer(x) + calc_txns_reducer(y),  diff_txns)
 
-def run_investment_calc(user, pkg, last_date, next_payout):
+def run_investment_calc(user, pkg, last_date, next_payout, **admin_param):
     state_m = StateMachine(user)
     state_m.add_state('weekly', INVESTMENT_TYPE, end_state='direct')
     state_m.add_state('direct', INVESTMENT_TYPE, end_state='binary')
@@ -353,7 +353,7 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     user_btc = Wallet.objects.filter(owner = user, wallet_type = 'BTC')
     user_eth = Wallet.objects.filter(owner = user, wallet_type = 'ETH')
     user_xrp = Wallet.objects.filter(owner = user, wallet_type = 'XRP')
-    import pdb
+
     user_ROI_wallet = Wallet.objects.filter(owner = user, wallet_type = 'ROI')
     user_ROI_wallet = user_ROI_wallet[0] if user_ROI_wallet else Wallet.objects.create(owner = user, wallet_type = 'ROI')
 
@@ -363,7 +363,8 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     user_BN_wallet = Wallet.objects.filter(owner = user, wallet_type = 'BN')
     user_BN_wallet = user_BN_wallet[0] if user_BN_wallet else Wallet.objects.create(owner = user, wallet_type = 'BN')
 
-    avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
+    # avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
+    avicrypto_user = admin_param['admin'] or User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
     avicrypto_wallet = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'AW')
     avicrypto_wallet =  avicrypto_wallet[0] if avicrypto_wallet else Wallet.objects.create(owner = avicrypto_user, wallet_type = 'AW')
     
@@ -402,10 +403,6 @@ def run_investment_calc(user, pkg, last_date, next_payout):
     )
     
     pkg.total_payout = calc_txns(EPOCH_BEGIN , today, **kw)
-    print "calculated investment"
-    # pdb.set_trace()
-    # print res
-    pkg.total_payout = res
     pkg.last_payout_date = today
     pkg.save()
 

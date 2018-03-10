@@ -223,6 +223,13 @@ class CreateUserTest(TestCase):
 
         self.next_date = self.UTC.normalize(self.UTC.localize(datetime(2018, 02, 19, 00, 00, 00, 00)))
 
+        self.avicrypto_user = User.objects.create(username='harshul', email = 'harshul.kaushik@avicrypto.us')
+        self.avicrypto_user.set_password('avi1234')
+        self.avicrypto_user.save()
+
+    def test_avicrypto_user(self):
+        self.assertTrue(self.avicrypto_user)
+
     def test_case(self):
         self.assertTrue(isinstance(self.user1, User))
         self.assertTrue(is_member_of(self.user1, self.user7), True)
@@ -342,7 +349,7 @@ class CreateUserTest(TestCase):
         pkg = get_package(self.user1)
         next_date = self.UTC.normalize(self.UTC.localize(datetime(2018, 03, 05)))
         print "pkg.created_at {} pkg.last_payout_date {}".format(pkg.created_at, pkg.last_payout_date)
-        run_investment_calc(self.user1, pkg, pkg.created_at, next_date)
+        run_investment_calc(self.user1, pkg, pkg.created_at, next_date, admin=self.avicrypto_user)
         pkg = get_package(self.user1)
         print [pkg.binary, pkg.direct, pkg.weekly]
         self.assertListEqual([pkg.binary, pkg.direct, pkg.weekly], [180, 210, 140], "Failed. value is {}".format([pkg.binary, pkg.direct, pkg.weekly]))
