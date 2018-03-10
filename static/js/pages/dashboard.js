@@ -23,4 +23,34 @@ jQuery(document).ready(function() {
       toastr.warning("Select currency for withdraw.", "Error", toastr_options);
     }
   });
+
+  jQuery("#dashboard_withdrawal").click(function() {
+    jQuery("#dashboard_withdrawal_otp_modal").modal('show');
+    $("#dashboard_withdrawal_otp").val();
+  });
+  $("input,select,textarea")
+      .not("[type=submit]")
+        .jqBootstrapValidation({
+            submitError: function(){
+              console.log("errooorr")
+            },
+            submitSuccess: function($form, event) {
+                var formId = $form.attr("id");
+                var data = getFormData($form);
+                console.log("data ---",data)
+                // $.ajax({
+                //   type: "POST",
+                //   url: "/withdraw",
+                //   data: data,
+                //   success: function(data) {
+                //     data = JSON.parse(data);
+                //     if (data.status == "error") {
+                //       toastr.warning(data.message, "Error", toastr_options);
+                //     } else {
+                //       toastr.success(data.message, "Success", toastr_options);
+                //     }
+                //   }
+                // });
+            }
+  });
 });
