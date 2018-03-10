@@ -7,7 +7,10 @@ $(document).ready(function() {
 	});
 
 	$("input,select,textarea").not("[type=submit]").jqBootstrapValidation({});
-
+	$("#country").change(function() {
+		var optionSelected = $("option:selected", this);
+		$("#countryCode").html(optionSelected.data("code"));
+	})
 	if($(".sidebar-sticky").length) {
 		var headerNavbarHeight, footerNavbarHeight;
 		$("body").hasClass("vertical-content-menu")
@@ -46,6 +49,33 @@ $(document).ready(function() {
 			}
 		});
 	});
+	
+	$("#mobile_profile").jqBootstrapValidation()
+
+	$("#verifiy_mobile_otp").click(function(){
+		$("#profile_mobile_verify_otp_modal").modal('show')
+	})
+	
+	$("#success_verified").hide();
+
+	$("#verifiy_mobile_otp").click(function(){
+		event.preventDefault();
+		$.ajax({
+			type: "POST",
+			url: "/profile",
+			dataType: "json",
+			data: {
+				"type":"",
+				"data":$("#mobile_profile").val()
+			},
+			success: function(data) {
+				//block_element.unblock()
+				//toastr.success(data.message, "Success", toastr_options);
+				$("#verifiy_mobile_otp").hide();
+				$("#success_verified").show();
+			}
+		});
+	})
 
 	$("#profile_crypto_accounts_form").submit(function(event) {
 		event.preventDefault();
