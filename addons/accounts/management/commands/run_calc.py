@@ -62,7 +62,7 @@ class Command(BaseCommand):
     help = 'runs and resets few accounts to initial values'
 
     def handle(self, *args, **options):
-        dt = datetime.datetime(2018, 03, 05, 00, 00, 00, 00)
+        dt = datetime.datetime(2018, 03, 12, 00, 00, 00, 00)
         dt = UTC.normalize(UTC.localize(dt))
         users = User.objects.all()
         [foo(user, dt) for user in users]
