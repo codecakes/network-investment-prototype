@@ -34,8 +34,8 @@ def reset_these():
     users = User.objects.all()
     for u in users:
         try:
-            u.set_password('avi1234')
-            u.save()
+            # u.set_password('avi1234')
+            # u.save()
             profile = u.profile
             pkg = get_package(u)
             if pkg:
