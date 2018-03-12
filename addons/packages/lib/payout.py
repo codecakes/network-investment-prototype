@@ -365,7 +365,7 @@ def run_investment_calc(user, pkg, last_date, next_payout, **admin_param):
     user_BN_wallet = user_BN_wallet[0] if user_BN_wallet else Wallet.objects.create(owner = user, wallet_type = 'BN')
 
     # avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
-    avicrypto_user = admin_param['admin'] or User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
+    avicrypto_user = admin_param.get('admin', User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'))
     avicrypto_wallet = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'AW')
     avicrypto_wallet =  avicrypto_wallet[0] if avicrypto_wallet else Wallet.objects.create(owner = avicrypto_user, wallet_type = 'AW')
     
