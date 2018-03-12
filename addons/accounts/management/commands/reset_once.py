@@ -55,7 +55,7 @@ def reset_these():
         except Exception as e:
             print "error for", u.username
             print "error is", e, e.message
-            # raise Exception(u.username)
+            raise Exception(e)
             pass
     # print "running"
     # # print run_scheduler()
