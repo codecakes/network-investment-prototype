@@ -52,8 +52,9 @@ def reset_these():
                 # pdb.set_trace()
                 run_investment_calc(u, pkg, EPOCH_BEGIN, today)
                 print "called"
-        except:
-            print "Profile Doesn't Exist", u.username
+        except Exception as e:
+            print "error for", u.username
+            print e
             # raise Exception(u.username)
             pass
     # print "running"
