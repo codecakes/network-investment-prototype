@@ -3,12 +3,31 @@ from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
 from addons.packages.models import Packages, User_packages
 
-from addons.packages.lib.payout import calc_txns_reducer, get_package
-
 from django.db.models import Sum
 from django.conf import settings
 
 
+
+def get_package(user):
+    packages = User_packages.objects.filter(user=user, status='A')
+    if packages:
+        # packages = User_packages.objects.get(user=user, status='A')
+        return packages[0] if packages else None
+    return None
+
+
+def calc_txns_reducer(txn_obj):
+    # import pdb
+    # pdb.set_trace()
+    if type(txn_obj) == float:
+        return txn_obj
+    if txn_obj:
+        if txn_obj[0]:
+            return txn_obj[0].data_sum
+    # if txn_obj.values():
+    #     if txn_obj.values()[0]['data_sum']:
+    #         return txn_obj.values()[0]['data_sum']
+    return 0.0
 
 ######## calculate binary/direct/roi txns per user ########### 
 
