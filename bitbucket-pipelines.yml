@@ -12,16 +12,16 @@ pipelines:
           - python manage.py collectstatic --noinput
           - python manage.py makemigrations
           - python manage.py migrate
-          - pwd_dir=$(pwd)
-          - cd .. && git clone git@github.com:avicrypto-us/avi.github.io.git
-          - cd avi.github.io && cp -R $pwd_dir/staticfiles ./
-          - git config --global user.email $AKUL_GITHUB_EMAIL
-          - git config --global user.name $AKUL_GITHUB_USER
-          - rm staticfiles/site/lib/owl.carousel/docs_src/templates/pages/docs/dev-buildin-plugins.hbs
-          - echo $(git status)
-          - git add * && git commit -am "updated staticfiles"
-          - echo $(git status)
-          - git push
+          # - pwd_dir=$(pwd)
+          # - cd .. && git clone git@github.com:avicrypto-us/avi.github.io.git
+          # - cd avi.github.io && cp -R $pwd_dir/staticfiles ./
+          # - git config --global user.email $AKUL_GITHUB_EMAIL
+          # - git config --global user.name $AKUL_GITHUB_USER
+          # - rm staticfiles/site/lib/owl.carousel/docs_src/templates/pages/docs/dev-buildin-plugins.hbs
+          # - echo $(git status)
+          # - git add * && git commit -am "updated staticfiles"
+          # - echo $(git status)
+          # - git push
         services:
           - database
 definitions:
