@@ -118,6 +118,9 @@ def app_login(request):
                 user = authenticate(username=username, password=password)
                 if user is not None:
                     login(request, user)
+                    otp = random.randrange(1, 1090000+1)
+                    otp_obj = Userotp.objects.get(otp=otp, status='active', type="login", mobile=user.profile.mobile)
+                    send_otp_sms_mail(otp, user.profile.mobile, user.email)
                     # send_otp(request)
                     return HttpResponse(json.dumps({
                         "status": "ok"
@@ -977,3 +980,11 @@ def verify_otp(request):
             except Userotp.DoesNotExist:
                 return  HttpResponse({'message': 'Invalid OTP', status:'error'})
         return  HttpResponse({'message': 'Invalid OTP', status:'error'})
+
+
+def send_otp_sms_mail(otp=None, mobile=None, email=None):
+    if mobile and otp:
+        services.send_sms(mobile, otp)
+    if email and otp:
+        body = "Your avicrypto varification code is: %s"%otp
+        services.send_email_mailgun('Avicrypto Varification', body, email, from_email="postmaster")
