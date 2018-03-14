@@ -12,6 +12,8 @@ class TransactionsAdmin(admin.ModelAdmin):
 	actions = ['export_data_in_csv', 'export_all_in_csv']
 	
 	search_fields = ('status', 'tx_type')
+	
+	list_filter = ['created_at', 'tx_type', 'status']
 
 	def __init__(self, model, admin_site):
 		self.list_display = [field.name for field in model._meta.fields]
