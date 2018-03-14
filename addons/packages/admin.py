@@ -18,6 +18,9 @@ class PackagesAdmin(admin.ModelAdmin):
 
 class UserPackagesAdmin(admin.ModelAdmin):
 	actions = ['export_data_in_csv']
+	
+	
+	list_filter = ['created_at', 'status', 'package']
 
 	def __init__(self, model, admin_site):
 		self.list_display = [field.name for field in model._meta.fields]
