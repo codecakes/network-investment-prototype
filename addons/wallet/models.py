@@ -25,4 +25,4 @@ class Wallet(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
-		return "%s" %(self.uuid)
+		return "%s %s %s" %(self.owner, self.owner.first_name, self.wallet_type)
