@@ -8,7 +8,7 @@ import csv
 from time import gmtime, strftime
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import StreamingHttpResponse
-from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
+from addons.packages.lib.payout import calc_binary, calc_direct, calc_weekly
 
 
 class PackagesAdmin(admin.ModelAdmin):

@@ -79,11 +79,7 @@
                                         <td>
                                             {% for key,value in transaction_status_choices  %}
                                                 {% if key == transaction.status %}
-                                                    {% if transaction.status == 'C' %}
-                                                        Paid
-                                                    {% else %}
-                                                        {{value}}
-                                                    {% endif %}    
+                                                    {{value}}    
                                                 {% endif %}
                                             {% endfor %}
                                         </td>
