@@ -63,7 +63,7 @@ class UserPackagesAdmin(admin.ModelAdmin):
 		UTC = pytz.UTC	
 		next_date = UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 12)))
 		last_date = EPOC
-
+		created_at = UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 13, 5,00,00)))
 		for data in queryset:
 			user = data.user
 			avi_owner_wallet_btc = Wallet.objects.filter(owner=request.user, wallet_type='BTC').first()
@@ -76,7 +76,7 @@ class UserPackagesAdmin(admin.ModelAdmin):
 				wallet_XRP = Wallet.objects.filter(owner=user, wallet_type='XRP')
 			wallet_ETH = Wallet.objects.get_or_create(owner=user, wallet_type='ETH')
 			total_payout = calc_direct(data.user, last_date, next_date)[0] + calc_binary(data.user, last_date, next_date)[0][0] + calc_weekly(data.user, last_date, next_date)[0]
-			Transactions.objects.create(sender_wallet=avi_owner_wallet_btc, reciever_wallet=wallet_BTC[0], amount=total_payout, tx_type='W', status='processing')
+			Transactions.objects.create(sender_wallet=avi_owner_wallet_btc, reciever_wallet=wallet_BTC[0], amount=total_payout, tx_type='W', status='processing', created_at=created_at)
 			
 	export_data_in_csv.short_description = 'Export'
 	create_manual_withdraw.short_description = "Manual Withdraw Create (We don't suggest to use manual withdraw create )"
