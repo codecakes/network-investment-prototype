@@ -37,8 +37,8 @@ def reset_these():
     for user in users:
         u = user
         # try:
-        u.set_password('avi1234')
-        u.save()
+        # u.set_password('avi1234')
+        # u.save()
         pkg = get_package(u)
         if pkg:
             print "has pkg"
