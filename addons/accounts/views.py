@@ -31,7 +31,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from addons.accounts.models import Members, Profile, SupportTicket, UserAccount, Userotp
 from addons.packages.lib.payout import (UTC, calc, calculate_investment,
                                         find_next_monday)
-from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
 from addons.packages.lib.payout import (UTC, calc, calculate_investment, find_next_monday)
 from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
 from addons.packages.models import Packages, User_packages
@@ -116,10 +115,11 @@ def app_login(request):
             password = str(request.POST.get('password'))
             if username and password:
                 user = authenticate(username=username, password=password)
+                import pdb; pdb.set_trace()
                 if user is not None:
                     login(request, user)
-                    otp = random.randrange(1, 1090000+1)
-                    otp_obj = Userotp.objects.get(otp=otp, status='active', type="login", mobile=user.profile.mobile)
+                    # send and generate otp  
+                    otp = genearte_user_otp(user, 'login')
                     send_otp_sms_mail(otp, user.profile.mobile, user.email)
                     # send_otp(request)
                     return HttpResponse(json.dumps({
@@ -136,6 +136,7 @@ def app_login(request):
                     "message": "Provide username or password."
                 }))
     else:
+        print "----"
         return HttpResponseRedirect('/home')
 
 
@@ -961,6 +962,8 @@ def send_otp(request):
 
 def verify_otp(request):
     if request.method == 'POST':
+        print "---"
+        import pdb; pdb.set_trace()
         mobile = request.data.get('mobile', None)
         otp = request.data.get('otp', None)
         otp_type = request.data.get('type', None)
@@ -981,10 +984,35 @@ def verify_otp(request):
                 return  HttpResponse({'message': 'Invalid OTP', status:'error'})
         return  HttpResponse({'message': 'Invalid OTP', status:'error'})
 
+import hashlib
+import time
+from datetime import datetime, timedelta
+def genearte_user_otp(user, type):
+    hash = hashlib.sha1()
+    hash.update(str(time.time()))
+    print hash.hexdigest()
+    print hash.hexdigest()[:10]
+
+    otp = random.randrange(1, 1090000+1)
+    otp_obj = Userotp.objects.create(otp=otp, status='active', type=type, mobile=user.profile.mobile)
+    return otp
+
+
+def check_user_exist_otp(user,type):    
+    time_threshold = datetime.now() - timedelta(min=2)
+    results = Userotp.objects.filter(created__at=time_threshold, mobile=user.profile.mobile, type=type, status='active')
+    return True
+
+def varify_user_otp(user,type, otp):
+    otp = Userotp.objects.filter(otp=otp, mobile=user.profile.mobile, type=type, status='active')
+    for key in otp:
+        key.status='expire'
+        key.save()
+    return True
 
 def send_otp_sms_mail(otp=None, mobile=None, email=None):
-    if mobile and otp:
-        services.send_sms(mobile, otp)
+    # if mobile and otp:
+    #     services.send_sms('+%s'%mobile, otp)
     if email and otp:
         body = "Your avicrypto varification code is: %s"%otp
         services.send_email_mailgun('Avicrypto Varification', body, email, from_email="postmaster")

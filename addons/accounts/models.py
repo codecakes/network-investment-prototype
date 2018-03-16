@@ -122,6 +122,9 @@ class UserAccount(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 
 class Userotp(models.Model):
+	otp = models.CharField(max_length=6, default=None, null=True, blank=True)
+	time = models.DateTimeField(auto_now_add=True)
+	mobile = models.CharField(max_length=15, blank=True)
 	otp_type = (
 		('login', 'login'),
 		('signup', 'signup'),
@@ -132,9 +135,9 @@ class Userotp(models.Model):
 	otp_status = (
 		('active', 'active'),
 		('expire', 'expire')
-	)
-	otp = models.CharField(max_length=6, default=None, null=True, blank=True)
+	)	
 	type = models.CharField(max_length=10, default=None, null=True, blank=True, choices=otp_type)
-	time = models.DateTimeField(auto_now_add=True)
 	status = models.CharField(max_length=10, default=None, null=True, blank=True, choices=otp_status)
-	mobile = models.CharField(max_length=15, blank=True)
+	
+
+# CREATE TABLE "accounts_userotp" ("id" serial NOT NULL PRIMARY KEY,"otp" varchar(30) NOT NULL,"time" timestamp NOT NULL,"mobile" varchar(60) NOT NULL,"type" varchar(30) NOT NULL,"status" varchar(50) NOT NULL,);

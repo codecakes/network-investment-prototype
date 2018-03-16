@@ -7,6 +7,16 @@ from django.conf import settings
 from urllib2 import urlparse
 from functools import wraps
 
+from addons.packages.lib.payout_aux import binary_txns, direct_txns, roi_txns
+
+from django.conf import settings
+EPOCH_BEGIN = settings.EPOCH_BEGIN
+
+# from avicrypto.settings import EPOCH_BEGIN
+import datetime
+import pytz
+
+UTC = pytz.UTC
 
 ICON = urlparse.urljoin(getattr(settings, "STATIC_URL",
                                 "/static"), "images/node2.png")
@@ -277,6 +287,7 @@ def get_relationship(user):
 
 
 def get_user_json(user, profile):
+    
     # try:
     #    user_package = User_packages.objects.get(user=user, status="A")
     #    package = user_package.package.price
@@ -286,6 +297,8 @@ def get_user_json(user, profile):
 
     user_investment = User_packages.objects.filter(user=user).annotate(investment=Sum('package__price')).values()
     investment = user_investment[0]['investment'] if user_investment else 0
+
+    today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
 
     return dict(id=user.id,
                 avi_id=profile.user_auto_id,
@@ -298,7 +311,11 @@ def get_user_json(user, profile):
                 link=dict(href=urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"),
                 # package=package,
                 investment=investment,
-                transaction=tot_txn_vol(user))
+                transaction=tot_txn_vol(user),
+                binary=binary_txns(user, EPOCH_BEGIN, today),
+                direct=direct_txns(user, EPOCH_BEGIN, today),
+                roi=roi_txns(user, EPOCH_BEGIN, today)
+                )
 
 
 def load_next_subtree(func):
@@ -349,3 +366,7 @@ def load_users(user, ref_code, level=4):
             ])
         )
     return user_json
+
+
+# AUXILLIARY FUNCTIONS
+
