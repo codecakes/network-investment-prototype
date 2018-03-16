@@ -12,14 +12,14 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 
 def reset_these():
-    users = User.objects.all()
+    # users = User.objects.all()
     # delete all avicrypto wallet and Transactions
     avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
     Wallet.objects.filter(owner=avicrypto_user, wallet_type='AW').delete()
     Wallet.objects.filter(owner=avicrypto_user, wallet_type='BTC').delete()
     Wallet.objects.filter(owner=avicrypto_user, wallet_type='ETH').delete()
     Wallet.objects.filter(owner=avicrypto_user, wallet_type='XRP').delete()
-    for user in users:
+    for user in User.objects.all():
         u = user
         # delete all user wallets and Transactions
         user_ROI_wallet = Wallet.objects.filter(owner=user, wallet_type='ROI')
@@ -27,11 +27,11 @@ def reset_these():
         user_BN_wallet = Wallet.objects.filter(owner=user, wallet_type='BN')
         
         Transactions.objects.filter(Q(reciever_wallet__in=user_ROI_wallet) | 
-        Q(reciever_wallet__in=user_BN_wallet) | Q(reciever_wallet__in=user_DR_wallet)).delete()
+        Q(reciever_wallet__in=user_BN_wallet) | Q(reciever_wallet__in=user_DR_wallet), tx_type='W').delete()
 
-        user_ROI_wallet.delete()
-        user_DR_wallet.delete()
-        user_BN_wallet.delete()
+        # user_ROI_wallet.delete()
+        # user_DR_wallet.delete()
+        # user_BN_wallet.delete()
 
         user_btc = Wallet.objects.filter(owner=user, wallet_type='BTC')
         user_eth = Wallet.objects.filter(owner=user, wallet_type='ETH')
@@ -43,9 +43,9 @@ def reset_these():
         Q(sender_wallet__in=user_xrp) | 
         Q(reciever_wallet__in=user_xrp)).delete()
 
-        user_btc.delete()
-        user_eth.delete()
-        user_xrp.delete()
+        # user_btc.delete()
+        # user_eth.delete()
+        # user_xrp.delete()
 
 
 class Command(BaseCommand):

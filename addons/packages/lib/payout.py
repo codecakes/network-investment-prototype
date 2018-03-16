@@ -420,9 +420,7 @@ def calc_txns(start_dt, end_dt, **kw):
     sum_txns = Transactions.objects.filter(sum_subquery, created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
     
 
-    diff_subquery = Q(sender_wallet=kw['user_btc'], reciever_wallet=kw['avicrypto_btc']) | Q(sender_wallet=kw['user_xrp'], reciever_wallet=kw['avicrypto_xrp']) | \
-    Q(sender_wallet=kw['user_eth'], reciever_wallet=kw['avicrypto_eth']) & \
-    Q(tx_type__in=["W", "U", "topup"]) & Q(status__in=["C", "paid"])
+    diff_subquery = Q(reciever_wallet=kw['user_btc']) | Q(reciever_wallet=kw['user_eth']) | Q(reciever_wallet=kw['user_xrp']) & Q(tx_type__in=["W", "U", "topup"]) & Q(status__in=["pending", "processing", "C", "paid"])
     # deduct withdrawals from all wallet types
     diff_txns = Transactions.objects.filter(diff_subquery, created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
     # pdb.set_trace()
@@ -443,7 +441,8 @@ def calc_txns(start_dt, end_dt, **kw):
 
 def update_wallet_dt(user, wallet, wallet_type, last_date):
     wallet = wallet.first() if wallet else Wallet.objects.create(owner=user, wallet_type=wallet_type)
-    wallet.created_at = min(wallet.created_at, last_date)
+    p = Profile.objects.get(user=user)
+    wallet.created_at = p.created_at if wallet.created_at > p.created_at else wallet.created_at
     wallet.save(update_fields=['created_at'])
     return wallet
     
