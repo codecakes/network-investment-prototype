@@ -392,10 +392,13 @@ def home(request):
         # user_direct = calc_direct(user, None, None)[0]
         # user_binary = calc_binary(user, None, None)[0][0]
         # user_weekly = calc_weekly(user, None, None)[0]
-
-        user_direct = pkg.direct
-        user_binary = pkg.binary
-        user_weekly = pkg.weekly
+        if pkg:
+            assert pkg
+            user_direct = pkg.direct
+            user_binary = pkg.binary
+            user_weekly = pkg.weekly
+        else:
+            user_direct = user_binary = user_weekly = None
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
@@ -408,7 +411,7 @@ def home(request):
             "direct": user_direct,
             "binary": user_binary,
             "weekly": user_weekly,
-            "total": pkg.total_payout
+            "total": pkg.total_payout if pkg else None
         }
 
         if 0<= is_day < 2:
