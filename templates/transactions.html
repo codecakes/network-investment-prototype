@@ -16,7 +16,7 @@
                                 <tr>
                                     <th>Wallet Id</th>
                                     <th>Receiver Wallet Address</th>
-                                    <th>Type</th>
+                                    <th>Wallet Name</th>
                                     <th>Wallet Amount</th>
                                 </tr>
                             </thead>
@@ -55,10 +55,12 @@
                             <thead>
                                 <tr>
                                     <th>Transation ID</th>
+                                    <th>Date</th>
                                     <th>Receiver Wallet</th>
                                     <th>Sender Wallet</th>
                                     <th>Price</th>
-                                    <th>Type</th>
+                                    <th>Type of Transaction</th>
+                                    <th>Wallet Name</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -66,6 +68,7 @@
                                 {% for transaction in transactions %}
                                     <tr>
                                         <td>{{ transaction.pk }}</td>
+                                        <td>{{ transaction.created_at }}</td>
                                         <td>{{ transaction.reciever_wallet.owner.username }}</td>
                                         <td>
                                             {% if transaction.sender_wallet.owner.username == 'harshul' %}
@@ -75,6 +78,7 @@
                                             {% endif %}
                                         </td>
                                         <td>${{ transaction.amount }}</td>
+                                        <td>{{ transaction.get_tx_type_display }}</td>
                                         <td>{{ transaction.reciever_wallet.wallet_type }}</td>
                                         <td>
                                             {% for key,value in transaction_status_choices  %}
