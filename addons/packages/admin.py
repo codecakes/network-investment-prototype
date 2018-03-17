@@ -27,10 +27,21 @@ class UserPackagesAdmin(admin.ModelAdmin):
 
 	list_filter = ['created_at', 'status', 'package']
 
-
+	list_display = []
+	
 	def __init__(self, model, admin_site):
-		self.list_display = [field.name for field in model._meta.fields]
+		self.list_display.extend([field.name for field in model._meta.fields])
+		self.list_display.insert(13, self.total)
 		super(UserPackagesAdmin, self).__init__(model, admin_site)
+
+	
+
+	def total(self,obj):
+		# import pdb; pdb.set_trace()
+		total_value =  obj.binary + obj.direct + obj.weekly
+		return total_value
+
+	total.short_description = 'Total Amount'
 	
 	def export_data_in_csv(self, request, queryset):
 		UTC = pytz.UTC	
