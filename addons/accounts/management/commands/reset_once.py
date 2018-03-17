@@ -4,9 +4,12 @@ from pytz import UTC
 from avicrypto.settings import EPOCH_BEGIN
 from addons.accounts.models import User
 from addons.packages.models import User_packages
+from addons.transactions.models import Transactions
+from addons.wallet.models import Wallet
 from addons.packages.lib.payout import  get_package, run_scheduler, calculate_investment, run_investment_calc, find_next_monday
 
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 
 def reset_these():
     # import pdb
@@ -30,33 +33,39 @@ def reset_these():
     #         pkg.left_binary_cf = 0.0
     #         pkg.right_binary_cf = 0.0
     #         pkg.save()
-
     users = User.objects.all()
-    for u in users:
-        try:
-            # u.set_password('avi1234')
-            # u.save()
-            profile = u.profile
-            pkg = get_package(u)
-            if pkg:
-                print "has pkg"
-                pkg.last_payout_date = EPOCH_BEGIN
-                pkg.binary = 0.0
-                pkg.weekly = 0.0
-                pkg.direct = 0.0
-                # pkg.total_payout += pkg.weekly
-                pkg.left_binary_cf = 0.0
-                pkg.right_binary_cf = 0.0
-                pkg.save()
-                today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
-                # pdb.set_trace()
-                run_investment_calc(u, pkg, EPOCH_BEGIN, today)
-                print "called"
-        except Exception as e:
-            print "error for", u.username
-            print "error is", e, e.message
-            print Exception(e)
-            pass
+    for user in users:
+        u = user
+        # try:
+        # u.set_password('avi1234')
+        # u.save()
+        pkg = get_package(u)
+        if pkg:
+            print "has pkg"
+            pkg.last_payout_date = EPOCH_BEGIN
+            pkg.binary = 0.0
+            pkg.weekly = 0.0
+            pkg.direct = 0.0
+            # pkg.total_payout += pkg.weekly
+            pkg.left_binary_cf = 0.0
+            pkg.right_binary_cf = 0.0
+            pkg.save()
+            # today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+            # # pdb.set_trace()
+            admin_param = {
+                'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
+                'start_dt': EPOCH_BEGIN,
+                'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 03, 12)))
+            }
+            # print "calling run_investment_calc(u, pkg, EPOCH_BEGIN, today, **admin_param)"
+            run_investment_calc(u, pkg, EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
+            print "called run_investment_calc"
+
+        # except Exception as e:
+        #     print "error for", u.username
+        #     print "error is", e, e.message
+        #     print Exception(e)
+        #     pass
     # print "running"
     # # print run_scheduler()
     # for u in users:

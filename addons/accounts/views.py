@@ -29,8 +29,8 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import *
 from django.core.exceptions import ObjectDoesNotExist
 from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
-from addons.packages.lib.payout import (UTC, calc, calculate_investment, find_next_monday)
-from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
+from addons.packages.lib.payout import UTC, calc, calculate_investment, find_next_monday, get_package
+# from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
 from addons.packages.models import Packages, User_packages
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
@@ -381,15 +381,24 @@ def home(request):
         user = request.user
         today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
         is_day = calendar.weekday(today.year, today.month, today.day)
-        if today.hour == 23 and today.minute == 59 and is_day == 6:
-            calculate_investment(user)
+        # NO NEED. THIS WAS TEMP!!
+        # if today.hour == 23 and today.minute == 59 and is_day == 6:
+        #     calculate_investment(user)
 
         packages = User_packages.objects.filter(user=user)
+        pkg = get_package(user)
         support_tickets = SupportTicket.objects.filter(user=user)
 
-        user_direct = calc_direct(user, None, None)[0]
-        user_binary = calc_binary(user, None, None)[0][0]
-        user_weekly = calc_weekly(user, None, None)[0]
+        # user_direct = calc_direct(user, None, None)[0]
+        # user_binary = calc_binary(user, None, None)[0][0]
+        # user_weekly = calc_weekly(user, None, None)[0]
+        if pkg:
+            assert pkg
+            user_direct = pkg.direct
+            user_binary = pkg.binary
+            user_weekly = pkg.weekly
+        else:
+            user_direct = user_binary = user_weekly = None
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
@@ -402,14 +411,13 @@ def home(request):
             "direct": user_direct,
             "binary": user_binary,
             "weekly": user_weekly,
-            "total": user_direct + user_binary + user_weekly
+            "total": pkg.total_payout if pkg else None
         }
 
         if 0<= is_day < 2:
             context["enable_withdraw"] = True
 
-        user_active_package = [
-            package for package in packages if package.status == 'A']
+        user_active_package = [package for package in packages if package.status == 'A']
         if user_active_package:
             pkg = user_active_package[0]
             dt = UTC.normalize(UTC.localize(datetime.datetime.now())) - pkg.created_at
@@ -417,6 +425,7 @@ def home(request):
             next_payout = find_next_monday()
             context["next_payout"] = "%s-%s-%s" % (
                 next_payout.year, next_payout.month, next_payout.day)
+            context["active_pkg"] = pkg.created_at
 
         if len(user_active_package) == 0:
             context["weekly_payout"] = 0
