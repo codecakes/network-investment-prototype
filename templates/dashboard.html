@@ -169,7 +169,7 @@
                                 {% for package in packages %}
                                 <tr>
                                     <td>{{ package.package.package_name }}</td>
-                                    <td>{{ package.package.created_at }}</td>
+                                    <td>{{ package.created_at }}</td>
                                     <td>${{ package.package.price }}</td>
                                     <td>
                                         {% for key,value in userpackages_status_choices %}
