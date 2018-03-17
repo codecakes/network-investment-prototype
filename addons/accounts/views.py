@@ -398,7 +398,7 @@ def home(request):
             user_binary = pkg.binary
             user_weekly = pkg.weekly
         else:
-            user_direct = user_binary = user_weekly = None
+            user_direct = user_binary = user_weekly = 0.0
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
@@ -411,7 +411,7 @@ def home(request):
             "direct": user_direct,
             "binary": user_binary,
             "weekly": user_weekly,
-            "total": pkg.total_payout if pkg else None
+            "total": user_direct + user_binary + user_weekly
         }
 
         if 0<= is_day < 2:
