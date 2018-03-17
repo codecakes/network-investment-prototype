@@ -53,9 +53,9 @@ class UserPackagesAdmin(admin.ModelAdmin):
 				status = 'Active'
 			else:
 				status = 'Not-Active'
-			user_direct = calc_direct(data.user, last_date, next_date)[0]
-			user_binary = calc_binary(data.user, last_date, next_date)[0][0]
-			user_weekly = calc_weekly(data.user, last_date, next_date)[0]
+			user_direct = data.direct
+			user_binary = data.binary
+			user_weekly = data.weekly
 			total_payout = user_direct + user_binary + user_weekly
 			writer.writerow([data.id, data.user, data.user.first_name, data.user.last_name, data.user.profile.mobile, data.user.email, data.user.date_joined, data.package, data.created_at, status ,user_binary, user_direct, user_weekly, total_payout, data.paid_cur])
 		return response
