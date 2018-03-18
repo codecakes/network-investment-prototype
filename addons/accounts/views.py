@@ -96,16 +96,22 @@ def app_login(request):
                 }
             else:
                 referal = request.GET['ref']
-                sponser = Profile.objects.get(my_referal_code=referal)
-                sponser_id = sponser.user_auto_id
-                placement_users = find_min_max(sponser.user)
+                try:
+                    sponser = Profile.objects.get(my_referal_code=referal)
+                    sponser_id = sponser.user_auto_id
+                    placement_users = find_min_max(sponser.user)
 
-                context = {
-                    'referal': referal,
-                    'sponser_id': sponser_id,
-                    'placement_user_left_id': placement_users[0].profile.user_auto_id,
-                    'placement_user_right_id': placement_users[1].profile.user_auto_id
-                }
+                    context = {
+                        'referal': referal,
+                        'sponser_id': sponser_id,
+                        'placement_user_left_id': placement_users[0].profile.user_auto_id,
+                        'placement_user_right_id': placement_users[1].profile.user_auto_id
+                    }
+                except:
+                    context = {
+                        "status": "error",
+                        "message": "Invalid Referal Link."
+                    }
             return HttpResponse(template.render(context, request))
 
         if request.method == 'POST':
