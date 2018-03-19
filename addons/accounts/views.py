@@ -8,6 +8,8 @@ import sys
 import datetime
 from pytz import UTC
 import calendar
+import hashlib
+import time
 
 from django.conf import settings
 from django.contrib import messages
@@ -29,10 +31,8 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import *
 from django.core.exceptions import ObjectDoesNotExist
 from addons.accounts.models import Members, Profile, SupportTicket, UserAccount, Userotp
-from addons.packages.lib.payout import (UTC, calc, calculate_investment,
-                                        find_next_monday)
-from addons.packages.lib.payout import (UTC, calc, calculate_investment, find_next_monday)
-from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
+from addons.packages.lib.payout import UTC, calc, calculate_investment, find_next_monday, get_package
+# from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
 from addons.packages.models import Packages, User_packages
 from addons.transactions.models import Transactions
 from addons.wallet.models import Wallet
@@ -120,22 +120,41 @@ def app_login(request):
             username = str(request.POST.get('username'))
             password = str(request.POST.get('password'))
             if username and password:
-                user = authenticate(username=username, password=password)
-                import pdb; pdb.set_trace()
-                if user is not None:
-                    login(request, user)
-                    # send and generate otp  
-                    otp = genearte_user_otp(user, 'login')
-                    send_otp_sms_mail(otp, user.profile.mobile, user.email)
-                    # send_otp(request)
-                    return HttpResponse(json.dumps({
-                        "status": "ok"
-                    }))
-                else:
+                try:
+                    user = User.objects.get(username=username)
+                    if user.check_password(password) is True:
+                        otp = genearte_user_otp(user, 'login')
+                        send_otp_sms_mail(otp, user.profile.mobile, user.email)
+                        return HttpResponse(json.dumps({
+                            "status": "successr",
+                            "message": "OTP is sent to registred email and mobile."
+                        }))
+                    else:
+                        return HttpResponse(json.dumps({
+                            "status": "error",
+                            "message": "Password is invalid."
+                        }))
+                except:
                     return HttpResponse(json.dumps({
                         "status": "error",
-                        "message": "Invalid Username or password."
+                        "message": "Invalid Username."
                     }))
+                # user = authenticate(username=username, password=password)
+                # import pdb; pdb.set_trace()
+                # if user is not None:
+                #     login(request, user)
+                #     # send and generate otp  
+                #     otp = genearte_user_otp(user, 'login')
+                #     send_otp_sms_mail(otp, user.profile.mobile, user.email)
+                #     # send_otp(request)
+                #     return HttpResponse(json.dumps({
+                #         "status": "ok"
+                #     }))
+                # else:
+                #     return HttpResponse(json.dumps({
+                #         "status": "error",
+                #         "message": "Invalid Username or password."
+                #     }))
             else:
                 return HttpResponse(json.dumps({
                     "status": "error",
@@ -983,31 +1002,24 @@ def send_otp(request):
 
 def verify_otp(request):
     if request.method == 'POST':
-        print "---"
-        import pdb; pdb.set_trace()
-        mobile = request.data.get('mobile', None)
-        otp = request.data.get('otp', None)
-        otp_type = request.data.get('type', None)
-        if mobile and otp and otp_type:
-            try:
-                otp_obj = Userotp.objects.get(otp=otp, status='active', type=otp_type, mobile=mobile)
-                otp_obj.status='expire'
-                otp_obj.save()
-                if otp_type == 'mobile':
-                    profile = Profile.objects.get(mobile=mobile)
-                    profile.mobile_verified = True
-                    profile.save()
-                elif otp_type == 'login':
-                    pass
-                    return HttpResponse({'message': 'Mobile successfully varify', status:'success'})
-                return HttpResponse({'message': 'OTP successfully varify', status:'success'})
-            except Userotp.DoesNotExist:
-                return  HttpResponse({'message': 'Invalid OTP', status:'error'})
-        return  HttpResponse({'message': 'Invalid OTP', status:'error'})
+        data = request.POST
+        otp = str(data['mobileOtp'])
+        otp_type = str(data['type'])
+        if otp and otp_type:
+            if otp_type == 'login':
+                user_otp = Userotp.objects.get(otp=otp)
+                user = authenticate(username=user_otp.user.username, password=str(data['password']))
+                if user is not None:
+                    login(request, user)
+                    user_otp.status='expire'
+                    user_otp.save()
+                    return HttpResponse(json.dumps({
+                        "status": "ok",
+                        "message": "OTP Success"
+                    }))
+                return HttpResponse({})
+        return  HttpResponse({'message': 'Invalid OTP', 'status':'error'})
 
-import hashlib
-import time
-from datetime import datetime, timedelta
 def genearte_user_otp(user, type):
     hash = hashlib.sha1()
     hash.update(str(time.time()))
@@ -1015,7 +1027,7 @@ def genearte_user_otp(user, type):
     print hash.hexdigest()[:10]
 
     otp = random.randrange(1, 1090000+1)
-    otp_obj = Userotp.objects.create(otp=otp, status='active', type=type, mobile=user.profile.mobile)
+    otp_obj = Userotp.objects.create(otp=otp, status='active', type=type, mobile=user.profile.mobile, user=user)
     return otp
 
 
