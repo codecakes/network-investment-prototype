@@ -318,10 +318,10 @@ def get_user_json(user, profile):
                 binary=binary_txns(user, EPOCH_BEGIN, today),
                 direct=direct_txns(user, EPOCH_BEGIN, today),
                 roi=roi_txns(user, EPOCH_BEGIN, today),
-                direct_left=direct_child(user, EPOCH_BEGIN, today, leg='left'),
-                direct_right=direct_child(user, EPOCH_BEGIN, today, leg='right'),
-                binary_left=binary_child(user, EPOCH_BEGIN, today, leg='left'),
-                binary_right=binary_child(user, EPOCH_BEGIN, today, leg='right')
+                direct_left=direct_child(user, EPOCH_BEGIN, today, leg='l'),
+                direct_right=direct_child(user, EPOCH_BEGIN, today, leg='r'),
+                binary_left=binary_child(user, EPOCH_BEGIN, today, leg='l'),
+                binary_right=binary_child(user, EPOCH_BEGIN, today, leg='r')
                 )
 
 
