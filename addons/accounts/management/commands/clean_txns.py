@@ -1,7 +1,8 @@
 # runs one time
 import datetime
 from pytz import UTC
-from avicrypto.settings import EPOCH_BEGIN
+from django.conf import settings
+EPOCH_BEGIN = settings.EPOCH_BEGIN
 from addons.accounts.models import User
 from addons.packages.models import User_packages
 from addons.transactions.models import Transactions
