@@ -9,6 +9,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.http import StreamingHttpResponse
 import csv
 class TransactionsAdmin(admin.ModelAdmin):
+	date_hierarchy = 'created_at'
+	empty_value_display = 'NONE'
 	actions = ['export_data_in_csv', 'export_all_in_csv']
 	
 	search_fields = ('status', 'tx_type')
