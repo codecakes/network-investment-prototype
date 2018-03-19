@@ -160,7 +160,8 @@ def calc_direct(user, last_date, next_date, dry=True):
     direct_payout = pkg.package.directout
     l_sum = calc_leg(user, last_date, next_date, leg='l', dry=dry)
     r_sum = calc_leg(user, last_date, next_date, leg='r', dry=dry)
-    return ((l_sum + r_sum) * direct_payout/100.0, 'binary')
+    final_amt = round((l_sum + r_sum) * direct_payout/100.0, 2)
+    return (final_amt, 'binary')
 
 
 # ################# Binary sum calculation #######################
@@ -225,7 +226,8 @@ def calc_binary(user, last_date, next_date, dry=True, date=None):
     left_sum += pkg.left_binary_cf
     right_sum += pkg.right_binary_cf
     l_cf, r_cf = calc_cf(left_sum, right_sum)
-    return ((min(left_sum, right_sum) * binary_payout, l_cf, r_cf), 'end')
+    final_amt = round(min(left_sum, right_sum) * binary_payout, 2)
+    return ((final_amt, l_cf, r_cf), 'end')
     # return ((0.0, 0.0, 0.0), 'end')
 
 
@@ -235,28 +237,24 @@ def calc_daily(user, last_date, next_date):
     from math import ceil, floor
     pkg = get_package(user)
     active_date = pkg.created_at.date()
-    last_dt = greater_date(active_date, date(
-        last_date.year, last_date.month, last_date.day))
-    new_date = next_date.date()
-    if last_dt < new_date:
-        delta = new_date - last_dt
+    # last_dt = greater_date(active_date, date(last_date.year, last_date.month, last_date.day))
+    if last_date < next_date:
+        delta = next_date - last_date
         days = floor(delta.days)
-        return ((pkg.package.payout/100.) * pkg.package.price * days, 'direct')
+        final_amt = round((pkg.package.payout/100.0) * pkg.package.price * days/7.0, 2)
+        return (final_amt, 'direct')
     return (0.0, 'direct')
 
+
 #### GENERATE TRANSACTION ####
-
-
 def gen_txn_weekly(week_num, old_date, new_date, user, weekly_payout):
     """calculate for which TIMESTAMP is the Transaction to be generated"""
-
-    print "inside gen_txn_weekly"
     rem_dt = timedelta(days=7*week_num)
     old_date_time = datetime(old_date.year, old_date.month, old_date.day)
     dt = UTC.normalize(UTC.localize(old_date_time + rem_dt))
-    if dt.date() <= new_date:
+    new_date_time = UTC.normalize(UTC.localize(datetime(new_date.year, new_date.month, new_date.day)))
+    if dt <= new_date_time:
         user_ROI_wallet = Wallet.objects.filter(owner=user, wallet_type='ROI').first()
-
         avicrypto_user = User.objects.get(username='harshul', email='harshul.kaushik@avicrypto.us')
         avicrypto_wallet = Wallet.objects.filter(
             owner=avicrypto_user, wallet_type='AW').first()
@@ -264,12 +262,11 @@ def gen_txn_weekly(week_num, old_date, new_date, user, weekly_payout):
         roi_txn = Transactions.objects.create(
             sender_wallet=avicrypto_wallet, 
             reciever_wallet=user_ROI_wallet, 
-            amount=weekly_payout, 
+            amount=calc_daily(user, dt, new_date_time)[0],
             tx_type="roi", status="C")
-        roi_txn.created_at = find_next_monday()
+        roi_txn.created_at = min(dt, new_date_time)
         roi_txn.save(update_fields=['created_at'])
         assert Transactions.objects.all()
-        # print "asserted Txns"
     return
 
 # ################# Weekly sum calculation #######################
@@ -294,23 +291,15 @@ def calc_weekly(user, last_date, next_date, dry=True):
         last_date.year, last_date.month, last_date.day))
     new_date = next_date.date()
     if old_date < new_date:
-        # new_date = date(user_doj.year, user_doj.month, user_doj.day)
         delta = new_date - old_date
         num_weeks = floor(delta.days/7.0)
-        # print "old date is {}, next_date is {}".format(old_date, next_date.date())
-        # print "delta is %s" %delta
-        # print "num of week: {}, old date is {}. new date is {}. difference in num weeks: {}".format(num_weeks, old_date, new_date, num_weeks)
         pkg = get_package(user)
         payout = (pkg.package.payout/100.) * pkg.package.price
-        res = (payout * num_weeks, 'direct')
+        res = (round((payout * num_weeks), 2), 'direct')
     else:
         res = payout, _ = (0.0, 'direct')
-    # print "dry is %s"%dry
-    if dry == False:
-        # print "running weekly divide_conquer with num weeks = %s"%num_weeks
-
-        if num_weeks:
-            divide_conquer(range(int(num_weeks)), 0, int(num_weeks) - 1,
+    if num_weeks and dry == False:
+        divide_conquer(range(int(num_weeks)), 0, int(num_weeks) - 1,
                        lambda num: gen_txn_weekly(num, old_date, new_date, user, payout))
     return res
 
@@ -389,19 +378,9 @@ def calc(user, last_date, investment_type):
 
 
 def calc_txns_reducer(txn_obj):
-    # print "txn_obj is {}".format(txn_obj)
-    # pdb.set_trace()
     if type(txn_obj) == float:
         return txn_obj
     return txn_obj.data_sum
-    # print txn_obj
-    # if txn_obj:
-    #     if txn_obj[0]:
-    #         return txn_obj[0].data_sum
-    # if txn_obj.values():
-    #     if txn_obj.values()[0]['data_sum']:
-    #         return txn_obj.values()[0]['data_sum']
-    # return 0.0
 
 
 def calc_txns(start_dt, end_dt, **kw):
@@ -413,15 +392,18 @@ def calc_txns(start_dt, end_dt, **kw):
 
     assert Transactions.objects.all()
     sum_subquery = Q(reciever_wallet__in=[
-        kw['user_ROI_wallet'],
+        kw['user_ROI_wallet'], 
         kw['user_DR_wallet'],
         kw['user_BN_wallet'] 
-        ]) & Q(tx_type__in=["roi", "direct", "binary"]) & Q(status__in=["C", "P", "processing", "paid"])
-        # & Q(sender_wallet=kw['avicrypto_wallet']) & 
+        ], status="C") & Q(tx_type__in=["roi", "direct", "binary"])
     sum_txns = Transactions.objects.filter(sum_subquery, created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
     
 
-    diff_subquery = Q(reciever_wallet=kw['user_btc']) | Q(reciever_wallet=kw['user_eth']) | Q(reciever_wallet=kw['user_xrp']) & Q(tx_type__in=["W", "U", "topup"]) & Q(status__in=["pending", "processing", "C", "paid"])
+    diff_subquery = Q(reciever_wallet__in=[
+        kw['user_btc'],
+        kw['user_eth'],
+        kw['user_xrp']
+        ]) & Q(tx_type__in=["W", "U", "topup"], status__in=["pending", "processing", "C", "paid"])
     # deduct withdrawals from all wallet types
     diff_txns = Transactions.objects.filter(diff_subquery, created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
     # pdb.set_trace()
@@ -442,7 +424,7 @@ def calc_txns(start_dt, end_dt, **kw):
 
 
 def update_wallet_dt(user, wallet, wallet_type, last_date):
-    wallet = wallet.first() if wallet else Wallet.objects.create(owner=user, wallet_type=wallet_type)
+    wallet = Wallet.objects.get_or_create(owner=user, wallet_type=wallet_type)
     p = Profile.objects.get(user=user)
     wallet.created_at = p.created_at if wallet.created_at > p.created_at else wallet.created_at
     wallet.save(update_fields=['created_at'])
