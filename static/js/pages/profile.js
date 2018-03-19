@@ -7,10 +7,7 @@ $(document).ready(function() {
 	});
 
 	$("input,select,textarea").not("[type=submit]").jqBootstrapValidation({});
-	$("#country").change(function() {
-		var optionSelected = $("option:selected", this);
-		$("#countryCode").html(optionSelected.data("code"));
-	})
+
 	if($(".sidebar-sticky").length) {
 		var headerNavbarHeight, footerNavbarHeight;
 		$("body").hasClass("vertical-content-menu")
@@ -50,10 +47,17 @@ $(document).ready(function() {
 		});
 	});
 	
-	$("#mobile_profile").jqBootstrapValidation()
 
 	$("#verifiy_mobile_otp").click(function(){
-		$("#profile_mobile_verify_otp_modal").modal('show')
+		//var block_element = $(event.target).closest(".card");
+		//block_element.block(block_options);
+		
+		var mobile_number = $("#mobile_profile").val().trim();
+		if(mobile_number && (mobile_number.match(/^[0-9]+$/)!=null) && ((mobile_number.length >=9)&& (mobile_number.length <=15))){
+			$("#profile_mobile_verify_otp_modal").modal('show')
+		} else {
+			toastr.warning("Incorrect Mobile Number", "Error", toastr_options);	
+		}
 	})
 	
 	$("#success_verified").hide();
@@ -133,4 +137,11 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	$("#country").change(function() {
+		var optionSelected = $("option:selected", this);
+		$("#countryCode").html(optionSelected.data("code"));
+	})
+
+	$("#mobile_profile").jqBootstrapValidation()
 });
