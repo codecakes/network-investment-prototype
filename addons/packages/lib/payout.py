@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, date
 from functools import wraps
 from avicrypto.lib.dsm import StateMachine
 
+from django.db.models import Q
+
 
 UTC = pytz.UTC
 
@@ -104,7 +106,7 @@ def is_valid_date(func):
         """
         if user:
             pkg = get_package(user)
-            if pkg:    
+            if pkg:
                 doj = UTC.normalize(pkg.created_at)
                 # doj = UTC.normalize(user.date_joined)
                 if last_date <= doj < next_date:
@@ -127,21 +129,27 @@ def is_valid_date(func):
 def is_eligible(func):
     """Decorator for calculation function"""
     @wraps(func)
-    def wrapped_f(user, last_date, next_date):
+    def wrapped_f(*args, **kw):
         """
         Checks if user has active package else returns end state for relevant investment
         """
+        print "inside is_eligible. calling %s"%func.__name__
+        user, last_date, next_date = args[:3]
         pkg = get_package(user)
         if pkg:
             # print "calling %s with attr: %s, %s, %s" %(func.__name__, user.username, last_date, next_date)
-            return func(user, last_date, next_date)
+            return func(*args, **kw)
         else:
-            return ((0.0, 0.0, 0.0), 'end') if func.__name__ == 'calc_binary' else (0.0, 'end')
+            return ((0.0, 0.0, 0.0), 'end') if 'binary' in func.__name__ else (0.0, 'end')
     return wrapped_f
 
 
+def direct_wet(user, last_date, next_date):
+    return calc_direct(user, last_date, next_date, dry=False)
+
+
 @is_eligible
-def calc_direct(user, last_date, next_date):
+def calc_direct(user, last_date, next_date, dry=True):
     """calculate the direct:
         - For the cycle with time T for all T i.e. last_date <= T < next_date
         - filter users with (doj = T) and with active package
@@ -150,8 +158,8 @@ def calc_direct(user, last_date, next_date):
     """
     pkg = get_package(user)
     direct_payout = pkg.package.directout
-    l_sum = calc_leg(user, last_date, next_date, leg='l')
-    r_sum = calc_leg(user, last_date, next_date, leg='r')
+    l_sum = calc_leg(user, last_date, next_date, leg='l', dry=dry)
+    r_sum = calc_leg(user, last_date, next_date, leg='r', dry=dry)
     return ((l_sum + r_sum) * direct_payout/100.0, 'binary')
 
 
@@ -163,15 +171,53 @@ def calc_cf(left_sum, right_sum):
     return (res, 0) if left_sum > right_sum else (0, res)
 
 
+def gen_txn_binary(func):
+    @wraps(func)
+    def wrapped_f(user, last_date, next_date, dry, date):
+        res = func(user, last_date, next_date, dry=dry, date=date)
+        calc, _ = res
+        binary_payout, l_cf, r_cf = calc
+        if not dry and date:
+            print "generating binary transaction"
+            pkg = get_package(user)
+            user_BN_wallet = Wallet.objects.filter(
+                owner=user, wallet_type='BN').first()
+            
+            avicrypto_user = User.objects.get(
+                username='harshul', email='harshul.kaushik@avicrypto.us')
+            avicrypto_wallet = Wallet.objects.filter(
+                owner=avicrypto_user, wallet_type='AW').first()
+            
+            bn_status = 'C' if pkg.binary_enable else 'P'
+            bn_txn = Transactions.objects.create(
+                sender_wallet=avicrypto_wallet, 
+                reciever_wallet=user_BN_wallet, 
+                amount=binary_payout, 
+                tx_type="binary", status=bn_status)
+            bn_txn.created_at = date
+            bn_txn.save(update_fields=['created_at'])
+            
+            assert Transactions.objects.all()
+            print "transaction generated"
+        return res
+    return wrapped_f
+
+
+def binary_wet(user, last_date, next_date):
+    return calc_binary(user, last_date, next_date, dry=False, date=None)
+
+
+@gen_txn_binary
 @is_eligible
-def calc_binary(user, last_date, next_date):
+def calc_binary(user, last_date, next_date, dry=True, date=None):
     """calculate the binary on minimum of two legs"""
     # calculate if binary has atleast one direct pair
     pairs = get_direct_pair(user, last_date, next_date)
     pkg = get_package(user)
     if pairs:
         pkg.binary_enable = True
-    
+        pkg.save()
+
     binary_payout = pkg.package.binary_payout/100.0
     # finds leg with minimium total package prices
     res = get_left_right_agg(user, last_date, next_date)
@@ -189,7 +235,8 @@ def calc_daily(user, last_date, next_date):
     from math import ceil, floor
     pkg = get_package(user)
     active_date = pkg.created_at.date()
-    last_dt = greater_date(active_date, date(last_date.year, last_date.month, last_date.day))
+    last_dt = greater_date(active_date, date(
+        last_date.year, last_date.month, last_date.day))
     new_date = next_date.date()
     if last_dt < new_date:
         delta = new_date - last_dt
@@ -197,19 +244,56 @@ def calc_daily(user, last_date, next_date):
         return ((pkg.package.payout/100.) * pkg.package.price * days, 'direct')
     return (0.0, 'direct')
 
+#### GENERATE TRANSACTION ####
+
+
+def gen_txn_weekly(week_num, old_date, new_date, user, weekly_payout):
+    """calculate for which TIMESTAMP is the Transaction to be generated"""
+
+    print "inside gen_txn_weekly"
+    rem_dt = timedelta(days=7*week_num)
+    old_date_time = datetime(old_date.year, old_date.month, old_date.day)
+    dt = UTC.normalize(UTC.localize(old_date_time + rem_dt))
+    if dt.date() <= new_date:
+        user_ROI_wallet = Wallet.objects.filter(owner=user, wallet_type='ROI').first()
+
+        avicrypto_user = User.objects.get(username='harshul', email='harshul.kaushik@avicrypto.us')
+        avicrypto_wallet = Wallet.objects.filter(
+            owner=avicrypto_user, wallet_type='AW').first()
+        
+        roi_txn = Transactions.objects.create(
+            sender_wallet=avicrypto_wallet, 
+            reciever_wallet=user_ROI_wallet, 
+            amount=weekly_payout, 
+            tx_type="roi", status="C")
+        roi_txn.created_at = dt
+        roi_txn.save(update_fields=['created_at'])
+        assert Transactions.objects.all()
+        print "asserted Txns"
+    return
+
 # ################# Weekly sum calculation #######################
+
+
+def weekly_wet(user, last_date, next_date):
+    print "inside weekly_wet"
+    return calc_weekly(user, last_date, next_date, dry=False)
+
+
 @is_eligible
-def calc_weekly(user, last_date, next_date):
+def calc_weekly(user, last_date, next_date, dry=True):
     from math import ceil, floor
     # calculate number of weeks passed since last_date before next_date
     # print "for user %s" %(user.username)
     pkg = get_package(user)
     user_doj = pkg.created_at.date()
+    num_weeks = 0
     # user_doj = user.date_joined.date()
     # user_doj = date(user_doj.year, user_doj.month, user_doj.day)
-    old_date = greater_date(user_doj, date(last_date.year, last_date.month, last_date.day))
+    old_date = greater_date(user_doj, date(
+        last_date.year, last_date.month, last_date.day))
     new_date = next_date.date()
-    if old_date < new_date:        
+    if old_date < new_date:
         # new_date = date(user_doj.year, user_doj.month, user_doj.day)
         delta = new_date - old_date
         num_weeks = floor(delta.days/7.0)
@@ -217,11 +301,21 @@ def calc_weekly(user, last_date, next_date):
         # print "delta is %s" %delta
         # print "num of week: {}, old date is {}. new date is {}. difference in num weeks: {}".format(num_weeks, old_date, new_date, num_weeks)
         pkg = get_package(user)
-        return ((pkg.package.payout/100.) * pkg.package.price * num_weeks, 'direct')
-    return (0.0, 'direct')
+        payout = (pkg.package.payout/100.) * pkg.package.price
+        res = (payout * num_weeks, 'direct')
+    else:
+        res = payout, _ = (0.0, 'direct')
+    print "dry is %s"%dry
+    if dry == False:
+        print "running weekly divide_conquer with num weeks = %s"%num_weeks
+
+        if num_weeks:
+            divide_conquer(range(int(num_weeks)), 0, int(num_weeks) - 1,
+                       lambda num: gen_txn_weekly(num, old_date, new_date, user, payout))
+    return res
 
 
-def calc_leg(user, last_date, next_date, leg='l'):
+def calc_leg(user, last_date, next_date, leg='l', dry=True):
     """Calculates sum of the total packages of members under a user sponsored by the user
     Uses function calc_sum"""
     check_leg = LEG[leg]
@@ -230,7 +324,7 @@ def calc_leg(user, last_date, next_date, leg='l'):
     members = Members.objects.filter(parent_id=user.id)
     # filter members by `leg`
     filter_members = filter(check_leg, members)
-    return calc_sum(sponsor_id, last_date, next_date, filter_members)
+    return calc_sum(sponsor_id, last_date, next_date, filter_members, dry=dry)
 
 
 def filter_by_active_package(member):
@@ -249,7 +343,7 @@ def get_active_mem_price(member):
     return 0.0
 
 
-def calc_sum(sponsor_id, last_date, next_date, members):
+def calc_sum(sponsor_id, last_date, next_date, members, dry=True):
     """Used for Direct Sum Calculation:
     Calculates total package price of all members under a user sponsored by that user"""
     users_sum = 0.0
@@ -263,7 +357,7 @@ def calc_sum(sponsor_id, last_date, next_date, members):
     while members:
         # find active members' total package price sum in current cycle by sponsor id
         users_sum += sum(map(lambda m: get_active_mem_price(m),
-                             filter_by_sponsor(sponsor_id, last_date, next_date, members)))
+                             filter_by_sponsor(sponsor_id, last_date, next_date, members, dry=dry)))
         # tree level traversal - get more members per child level
         # print "FUNCTION calc_sum > users_sum is: %s" %users_sum
         members = reduce(lambda x, y: x | y, divide_conquer(
@@ -275,6 +369,9 @@ def calc_sum(sponsor_id, last_date, next_date, members):
 
 # ############## Calculate Investment ###################
 INVESTMENT_TYPE = {
+    'weekly_wet': weekly_wet,
+    'direct_wet': direct_wet,
+    'binary_wet': binary_wet,
     'direct': calc_direct,
     'binary': calc_binary,
     'weekly': calc_weekly,
@@ -292,86 +389,121 @@ def calc(user, last_date, investment_type):
 
 
 def calc_txns_reducer(txn_obj):
-    # import pdb
+    print "txn_obj is {}".format(txn_obj)
     # pdb.set_trace()
     if type(txn_obj) == float:
         return txn_obj
-    if txn_obj:
-        if txn_obj[0]:
-            return txn_obj[0].data_sum
+    return txn_obj.data_sum
+    # print txn_obj
+    # if txn_obj:
+    #     if txn_obj[0]:
+    #         return txn_obj[0].data_sum
     # if txn_obj.values():
     #     if txn_obj.values()[0]['data_sum']:
     #         return txn_obj.values()[0]['data_sum']
-    return 0.0
+    # return 0.0
+
 
 def calc_txns(start_dt, end_dt, **kw):
     """
     Calculates total payout between date ranges
     """
-    sum_txns = [
-        Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_ROI_wallet'], tx_type="roi", status='C', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_DR_wallet'], tx_type="direct", status='C', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        Transactions.objects.filter(sender_wallet=kw['avicrypto_wallet'], reciever_wallet = kw['user_BN_wallet'], tx_type="binary", status='C', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
-        ]
+    import pdb
+    pdb.pprint.pprint(kw, depth=2)
+
+    assert Transactions.objects.all()
+    sum_subquery = Q(sender_wallet=kw['avicrypto_wallet']) & Q(reciever_wallet__in=[
+        kw['user_ROI_wallet'],
+        kw['user_DR_wallet'],
+        kw['user_BN_wallet'] 
+        ]) & Q(tx_type__in=["roi", "direct", "binary"]) & Q(status__in=["C", "P"])
+    sum_txns = Transactions.objects.filter(sum_subquery, created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
     
-    diff_txns = [
-        # deduct withdrawals from all wallet types
-        Transactions.objects.filter(sender_wallet=kw['user_btc'], reciever_wallet=kw['avicrypto_btc'], tx_type="W", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        Transactions.objects.filter(sender_wallet=kw['user_xrp'], reciever_wallet =kw['avicrypto_xrp'], tx_type="W", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        Transactions.objects.filter(sender_wallet=kw['user_eth'], reciever_wallet =kw['avicrypto_eth'], tx_type="W", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        # deduct user to user transfer from all wallet types
-        Transactions.objects.filter(sender_wallet=kw['user_btc'], tx_type="U", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        Transactions.objects.filter(sender_wallet=kw['user_xrp'], tx_type="U", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        Transactions.objects.filter(sender_wallet=kw['user_eth'], tx_type="U", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        # deduct topup from all wallet types
-        Transactions.objects.filter(sender_wallet=kw['user_btc'], tx_type="topup", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        Transactions.objects.filter(sender_wallet=kw['user_xrp'], tx_type="topup", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')),
-        Transactions.objects.filter(sender_wallet=kw['user_eth'], tx_type="topup", status='paid', created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
-    ]
 
-    return reduce(lambda x, y: calc_txns_reducer(x) + calc_txns_reducer(y), sum_txns) - reduce(lambda x, y: calc_txns_reducer(x) + calc_txns_reducer(y),  diff_txns)
+    diff_subquery = Q(reciever_wallet=kw['user_btc']) | Q(reciever_wallet=kw['user_eth']) | Q(reciever_wallet=kw['user_xrp']) & Q(tx_type__in=["W", "U", "topup"]) & Q(status__in=["pending", "processing", "C", "paid"])
+    # deduct withdrawals from all wallet types
+    diff_txns = Transactions.objects.filter(diff_subquery, created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
+    # pdb.set_trace()
+    # return sum_txns - diff_txns
+    if sum_txns:
+        agg = reduce(lambda x, y: calc_txns_reducer(x) + calc_txns_reducer(y), sum_txns)
+        agg = agg if type(agg) == float else agg.data_sum
+    else:
+        agg = 0.0
+    
+    if diff_txns:
+        diff = reduce(lambda x, y: calc_txns_reducer(x) + calc_txns_reducer(y),  diff_txns)    
+        diff = diff if type(diff) == float else diff.data_sum
+    else:
+        diff = 0.0
+    return agg - diff if diff_txns else agg 
 
+
+def update_wallet_dt(user, wallet, wallet_type, last_date):
+    wallet = wallet.first() if wallet else Wallet.objects.create(owner=user, wallet_type=wallet_type)
+    p = Profile.objects.get(user=user)
+    wallet.created_at = p.created_at if wallet.created_at > p.created_at else wallet.created_at
+    wallet.save(update_fields=['created_at'])
+    return wallet
+    
 def run_investment_calc(user, pkg, last_date, next_payout, **admin_param):
+    # get user and avicrypto wallets
+    user_btc = Wallet.objects.filter(owner=user, wallet_type='BTC')
+    user_btc = update_wallet_dt(user, user_btc, 'BTC', last_date)
+    
+    user_eth = Wallet.objects.filter(owner=user, wallet_type='ETH')
+    user_eth = update_wallet_dt(user, user_eth, 'ETH', last_date)
+
+    user_xrp = Wallet.objects.filter(owner=user, wallet_type='XRP')
+    user_xrp = update_wallet_dt(user, user_xrp, 'XRP', last_date)
+
+    user_ROI_wallet = Wallet.objects.filter(owner=user, wallet_type='ROI')
+    user_ROI_wallet = update_wallet_dt(user, user_ROI_wallet, 'ROI', last_date)
+
+    user_DR_wallet = Wallet.objects.filter(owner=user, wallet_type='DR')
+    user_DR_wallet = update_wallet_dt(user, user_DR_wallet, 'DR', last_date)
+
+    user_BN_wallet = Wallet.objects.filter(owner=user, wallet_type='BN')
+    user_BN_wallet = update_wallet_dt(user, user_BN_wallet, 'BN', last_date)
+
+    # avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
+    avicrypto_user = admin_param.get('admin', User.objects.get(
+        username='harshul', email='harshul.kaushik@avicrypto.us'))
+    avicrypto_wallet = Wallet.objects.filter(
+        owner=avicrypto_user, wallet_type='AW')
+    avicrypto_wallet = update_wallet_dt(avicrypto_user, avicrypto_wallet, 'AW', last_date)
+
+    avicrypto_btc = Wallet.objects.filter(
+        owner=avicrypto_user, wallet_type='BTC')
+    avicrypto_btc = update_wallet_dt(avicrypto_user, avicrypto_btc, 'BTC', last_date)
+
+    avicrypto_eth = Wallet.objects.filter(
+        owner=avicrypto_user, wallet_type='ETH')
+    avicrypto_eth = update_wallet_dt(avicrypto_user, avicrypto_eth, 'ETH', last_date)
+
+    avicrypto_xrp = Wallet.objects.filter(
+        owner=avicrypto_user, wallet_type='XRP')
+    avicrypto_xrp = update_wallet_dt(avicrypto_user, avicrypto_xrp, 'XRP', last_date)
+
+    ################# Calculations Happen here ############
+
+    # import pdb; pdb.set_trace()
     state_m = StateMachine(user)
-    state_m.add_state('weekly', INVESTMENT_TYPE, end_state='direct')
-    state_m.add_state('direct', INVESTMENT_TYPE, end_state='binary')
+    state_m.add_state('weekly_wet', INVESTMENT_TYPE, end_state='direct_wet')
+    state_m.add_state('direct_wet', INVESTMENT_TYPE, end_state='binary')
     state_m.add_state('binary', INVESTMENT_TYPE, end_state='end')
 
-    state_m.set_start('weekly')
+    state_m.set_start('weekly_wet')
     state_m.run(last_date, next_payout)
-    state_m.set_start('direct')
+    state_m.set_start('direct_wet')
     state_m.run(last_date, next_payout)
     state_m.set_start('binary')
-    state_m.run(last_date, next_payout)
+    state_m.run(last_date, next_payout, dry=True, date=None)
 
     # print state_m.results
     binary, left_binary_cf, right_binary_cf = state_m.results['binary']
-    direct = state_m.results['direct']
-    weekly = state_m.results['weekly']
-
-    
-    # get user and avicrypto wallets
-    user_btc = Wallet.objects.filter(owner = user, wallet_type = 'BTC')
-    user_eth = Wallet.objects.filter(owner = user, wallet_type = 'ETH')
-    user_xrp = Wallet.objects.filter(owner = user, wallet_type = 'XRP')
-
-    user_ROI_wallet = Wallet.objects.filter(owner = user, wallet_type = 'ROI')
-    user_ROI_wallet = user_ROI_wallet[0] if user_ROI_wallet else Wallet.objects.create(owner = user, wallet_type = 'ROI')
-
-    user_DR_wallet = Wallet.objects.filter(owner = user, wallet_type = 'DR')
-    user_DR_wallet = user_DR_wallet[0] if user_DR_wallet else Wallet.objects.create(owner = user, wallet_type = 'DR')
-
-    user_BN_wallet = Wallet.objects.filter(owner = user, wallet_type = 'BN')
-    user_BN_wallet = user_BN_wallet[0] if user_BN_wallet else Wallet.objects.create(owner = user, wallet_type = 'BN')
-
-    # avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
-    avicrypto_user = admin_param.get('admin', User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'))
-    avicrypto_wallet = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'AW')
-    avicrypto_wallet =  avicrypto_wallet[0] if avicrypto_wallet else Wallet.objects.create(owner = avicrypto_user, wallet_type = 'AW')
-    
-    avicrypto_btc = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'BTC')
-    avicrypto_eth = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'ETH')
-    avicrypto_xrp = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'XRP')
+    direct = state_m.results['direct_wet']
+    weekly = state_m.results['weekly_wet']
 
     # set current pkg calculations and carry forwards
     pkg.binary = binary
@@ -380,15 +512,15 @@ def run_investment_calc(user, pkg, last_date, next_payout, **admin_param):
     pkg.direct = direct
     pkg.weekly = weekly
 
+    print "weekly: {} direct: {} binary: {}".format(weekly, direct, binary)
+
     # Add Transactions
+    assert Transactions.objects.all()
     # Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_ROI_wallet, amount, tx_type="roi", status="P/C/processing/paid")
     bn_status = 'C' if pkg.binary_enable else 'P'
     today = UTC.normalize(UTC.localize(datetime.utcnow()))
+
     
-    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_ROI_wallet, amount = weekly, tx_type="roi", status="C")
-    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_DR_wallet, amount = direct, tx_type="direct", status="C")
-    Transactions.objects.create(sender_wallet=avicrypto_wallet, reciever_wallet=user_BN_wallet, amount = binary, tx_type="binary", status=bn_status)
-        
     # sum the total transactions for this user since epoch
     kw = dict(
         avicrypto_wallet=avicrypto_wallet,
@@ -402,12 +534,13 @@ def run_investment_calc(user, pkg, last_date, next_payout, **admin_param):
         avicrypto_xrp=avicrypto_xrp,
         avicrypto_eth=avicrypto_eth
     )
-    
-    pkg.total_payout = calc_txns(EPOCH_BEGIN , today, **kw)
-    pkg.last_payout_date = today
+
+    start_dt = admin_param.get('start_dt', pkg.last_payout_date or EPOCH_BEGIN)
+    end_dt = admin_param.get('end_dt', find_next_monday())
+    if start_dt < end_dt:
+        pkg.total_payout = calc_txns(start_dt, end_dt, **kw)
+        pkg.last_payout_date = today
     pkg.save()
-
-
 
 
 def calculate_investment(user, **kw):
@@ -441,6 +574,8 @@ def get_left_right_agg(user, last_date, next_date):
 #print "left user {} and right users {}".format(left_user.username, right_user.username)
     return [calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date)]
 
+# @gen_txn_binary
+
 
 @is_valid_date
 def calc_aggregate_left(user, last_date, next_date):
@@ -452,6 +587,8 @@ def calc_aggregate_left(user, last_date, next_date):
             return pkg.package.price + calc_aggregate_left(left_user, last_date, next_date) + calc_aggregate_right(left_user, last_date, next_date)
         return 0.0
     return 0.0
+
+# @gen_txn_binary
 
 
 @is_valid_date
@@ -480,13 +617,56 @@ def get_user_from_member(member):
 
 
 # filter functions
-def filter_by_sponsor(sponsor_id, last_date, next_date, members):
+def filter_by_sponsor(sponsor_id, last_date, next_date, members, dry=True):
     # print "filter_by_sponsor members ", members
-    return [m for m in members if valid_payout_user(sponsor_id, m, last_date, next_date)]
+    return [m for m in members if valid_payout_user(sponsor_id, m, last_date, next_date, dry=dry)]
 
 
-def valid_payout_user(sponsor_id, member, last_date, next_date):
-    """Filter users that have their Date of Joining between last payout and next payout day"""
+def gen_txn_direct(func):
+    @wraps(func)
+    def wrapped_f(sponsor_id, member, last_date, next_date, dry):
+        res = func(sponsor_id, member, last_date, next_date, dry=dry)
+        if res and dry == False:
+            print "generating direct transaction. sponsor_id is %s"%sponsor_id
+            p = Profile.objects.get(user_auto_id=sponsor_id)
+            sponsor_user = p.user
+            doj = UTC.normalize(member.child_id.date_joined)
+            pkg = get_package(sponsor_user)
+
+            assert type(member.child_id) == User
+            child_pkg = get_package(member.child_id)
+            print "child_pkg is ", child_pkg, member.child_id.username, 
+
+            dr = (pkg.package.directout/100.0) * child_pkg.package.price
+
+            user_DR_wallet = Wallet.objects.filter(
+                owner=sponsor_user, wallet_type='DR').first()
+
+            avicrypto_user = User.objects.get(
+                username='harshul', email='harshul.kaushik@avicrypto.us')
+            avicrypto_wallet = Wallet.objects.filter(
+                owner=avicrypto_user, wallet_type='AW').first()
+            
+            dr_txn = Transactions.objects.create(
+                sender_wallet=avicrypto_wallet, reciever_wallet=user_DR_wallet, amount=dr, tx_type="direct", status="C")
+            dr_txn.created_at = child_pkg.package.created_at
+            dr_txn.save(update_fields=['created_at'])
+            
+            assert Transactions.objects.all()
+            print "Txn asserted"
+
+            calc_binary(sponsor_user, last_date, next_date, dry=False,
+                        date=child_pkg.package.created_at)
+        return res
+    return wrapped_f
+
+
+@gen_txn_direct
+def valid_payout_user(sponsor_id, member, last_date, next_date, dry=True):
+    """Filter users that have their Date of Joining between last payout and next payout day
+    - params:
+        dry: For dry run, no side-effect function if True. If False, generates a Direct Type Transaction. Defaults to True.
+    """
     # print "member is", member
     # pkg = get_package(member.child_id)
     doj = UTC.normalize(member.child_id.date_joined)

@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="alert {% if message %} alert-{{ message }}{% endif %}">{{ message }}</div>
 	<div class="content-header"></div>
 	<div class="content-body">
 		<section class="flexbox-container">

@@ -1,4 +1,10 @@
-{% extends "base.html" %} {% block content %} {% load staticfiles %} {% load add %} {% csrf_token %}
+{% extends "base.html" %} 
+{% block content %} 
+{% load staticfiles %} 
+{% load add %}
+{% load date_format %}
+{% csrf_token %}
+
 <div class="content-header"></div>
 <div class="content-body">
     <div class="row">
@@ -148,6 +154,7 @@
                             <thead>
                                 <tr>
                                     <th>Fixed Deposit Name</th>
+                                    <th>Activation Date</th>
                                     <th>Price</th>
                                     <th>Status</th>
                                     <th>Total Payouts </th>
@@ -162,6 +169,7 @@
                                 {% for package in packages %}
                                 <tr>
                                     <td>{{ package.package.package_name }}</td>
+                                    <td>{{ package.created_at }}</td>
                                     <td>${{ package.package.price }}</td>
                                     <td>
                                         {% for key,value in userpackages_status_choices %}

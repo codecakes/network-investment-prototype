@@ -98,16 +98,22 @@ def app_login(request):
                 }
             else:
                 referal = request.GET['ref']
-                sponser = Profile.objects.get(my_referal_code=referal)
-                sponser_id = sponser.user_auto_id
-                placement_users = find_min_max(sponser.user)
+                try:
+                    sponser = Profile.objects.get(my_referal_code=referal)
+                    sponser_id = sponser.user_auto_id
+                    placement_users = find_min_max(sponser.user)
 
-                context = {
-                    'referal': referal,
-                    'sponser_id': sponser_id,
-                    'placement_user_left_id': placement_users[0].profile.user_auto_id,
-                    'placement_user_right_id': placement_users[1].profile.user_auto_id
-                }
+                    context = {
+                        'referal': referal,
+                        'sponser_id': sponser_id,
+                        'placement_user_left_id': placement_users[0].profile.user_auto_id,
+                        'placement_user_right_id': placement_users[1].profile.user_auto_id
+                    }
+                except:
+                    context = {
+                        "status": "error",
+                        "message": "Invalid Referal Link."
+                    }
             return HttpResponse(template.render(context, request))
 
         if request.method == 'POST':
@@ -388,15 +394,24 @@ def home(request):
         user = request.user
         today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
         is_day = calendar.weekday(today.year, today.month, today.day)
-        if today.hour == 23 and today.minute == 59 and is_day == 6:
-            calculate_investment(user)
+        # NO NEED. THIS WAS TEMP!!
+        # if today.hour == 23 and today.minute == 59 and is_day == 6:
+        #     calculate_investment(user)
 
         packages = User_packages.objects.filter(user=user)
+        pkg = get_package(user)
         support_tickets = SupportTicket.objects.filter(user=user)
 
-        user_direct = calc_direct(user, None, None)[0]
-        user_binary = calc_binary(user, None, None)[0][0]
-        user_weekly = calc_weekly(user, None, None)[0]
+        # user_direct = calc_direct(user, None, None)[0]
+        # user_binary = calc_binary(user, None, None)[0][0]
+        # user_weekly = calc_weekly(user, None, None)[0]
+        if pkg:
+            assert pkg
+            user_direct = pkg.direct
+            user_binary = pkg.binary
+            user_weekly = pkg.weekly
+        else:
+            user_direct = user_binary = user_weekly = 0.0
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
@@ -415,8 +430,7 @@ def home(request):
         if 0<= is_day < 2:
             context["enable_withdraw"] = True
 
-        user_active_package = [
-            package for package in packages if package.status == 'A']
+        user_active_package = [package for package in packages if package.status == 'A']
         if user_active_package:
             pkg = user_active_package[0]
             dt = UTC.normalize(UTC.localize(datetime.datetime.now())) - pkg.created_at
@@ -424,6 +438,7 @@ def home(request):
             next_payout = find_next_monday()
             context["next_payout"] = "%s-%s-%s" % (
                 next_payout.year, next_payout.month, next_payout.day)
+            context["active_pkg"] = pkg.created_at
 
         if len(user_active_package) == 0:
             context["weekly_payout"] = 0
