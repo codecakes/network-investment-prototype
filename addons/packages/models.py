@@ -67,7 +67,9 @@ class User_packages(models.Model):
 
 
     def save(self, *args, **kwargs):
-		if not self.pk:
-			self.expiry_date = datetime.date.today() + relativedelta(years=self.duration)
+        if not self.pk:
+            days = datetime.timedelta(days=self.package.no_payout*7)
+            self.expiry_date = datetime.date.today() + days
+            self.duration = self.package.no_payout
 
-		super(User_packages, self).save(*args, **kwargs)
+        super(User_packages, self).save(*args, **kwargs)

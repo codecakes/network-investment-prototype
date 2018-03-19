@@ -15,10 +15,10 @@ def reset_these():
     # users = User.objects.all()
     # delete all avicrypto wallet and Transactions
     avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
-    Wallet.objects.filter(owner=avicrypto_user, wallet_type='AW').delete()
-    Wallet.objects.filter(owner=avicrypto_user, wallet_type='BTC').delete()
-    Wallet.objects.filter(owner=avicrypto_user, wallet_type='ETH').delete()
-    Wallet.objects.filter(owner=avicrypto_user, wallet_type='XRP').delete()
+    avicrypto_wallet = Wallet.objects.filter(owner=avicrypto_user, wallet_type='AW')
+    avicrypto_btc = Wallet.objects.filter(owner=avicrypto_user, wallet_type='BTC')
+    avicrypto_eth = Wallet.objects.filter(owner=avicrypto_user, wallet_type='ETH')
+    avicrypto_xrp = Wallet.objects.filter(owner=avicrypto_user, wallet_type='XRP')
     for user in User.objects.all():
         u = user
         # delete all user wallets and Transactions
@@ -26,8 +26,8 @@ def reset_these():
         user_DR_wallet = Wallet.objects.filter(owner=user, wallet_type='DR')
         user_BN_wallet = Wallet.objects.filter(owner=user, wallet_type='BN')
         
-        Transactions.objects.filter(Q(reciever_wallet__in=user_ROI_wallet) | 
-        Q(reciever_wallet__in=user_BN_wallet) | Q(reciever_wallet__in=user_DR_wallet), tx_type='W').delete()
+        # delete all roi/direct/binary received from avicrypto_wallet 
+        Transactions.objects.filter(Q(reciever_wallet__in=user_ROI_wallet) | Q(reciever_wallet__in=user_BN_wallet) | Q(reciever_wallet__in=user_DR_wallet) & Q(sender_wallet__in=avicrypto_wallet)).delete()
 
         # user_ROI_wallet.delete()
         # user_DR_wallet.delete()
@@ -37,11 +37,12 @@ def reset_these():
         user_eth = Wallet.objects.filter(owner=user, wallet_type='ETH')
         user_xrp = Wallet.objects.filter(owner=user, wallet_type='XRP')
 
+        # delete all transactions to/from user crypto wallets that are not of Withdraw type
         Transactions.objects.filter(Q(sender_wallet__in=user_btc) | 
         Q(reciever_wallet__in=user_btc) | Q(sender_wallet__in=user_eth) | 
         Q(reciever_wallet__in=user_eth) | 
         Q(sender_wallet__in=user_xrp) | 
-        Q(reciever_wallet__in=user_xrp)).delete()
+        Q(reciever_wallet__in=user_xrp)).exclude(tx_type='W').delete()
 
         # user_btc.delete()
         # user_eth.delete()

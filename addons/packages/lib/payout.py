@@ -178,7 +178,7 @@ def gen_txn_binary(func):
         calc, _ = res
         binary_payout, l_cf, r_cf = calc
         if not dry and date:
-            print "generating binary transaction"
+            # print "generating binary transaction"
             pkg = get_package(user)
             user_BN_wallet = Wallet.objects.filter(
                 owner=user, wallet_type='BN').first()
@@ -198,7 +198,7 @@ def gen_txn_binary(func):
             bn_txn.save(update_fields=['created_at'])
             
             assert Transactions.objects.all()
-            print "transaction generated"
+            # print "transaction generated"
         return res
     return wrapped_f
 
@@ -266,17 +266,17 @@ def gen_txn_weekly(week_num, old_date, new_date, user, weekly_payout):
             reciever_wallet=user_ROI_wallet, 
             amount=weekly_payout, 
             tx_type="roi", status="C")
-        roi_txn.created_at = dt
+        roi_txn.created_at = find_next_monday()
         roi_txn.save(update_fields=['created_at'])
         assert Transactions.objects.all()
-        print "asserted Txns"
+        # print "asserted Txns"
     return
 
 # ################# Weekly sum calculation #######################
 
 
 def weekly_wet(user, last_date, next_date):
-    print "inside weekly_wet"
+    # print "inside weekly_wet"
     return calc_weekly(user, last_date, next_date, dry=False)
 
 
@@ -305,9 +305,9 @@ def calc_weekly(user, last_date, next_date, dry=True):
         res = (payout * num_weeks, 'direct')
     else:
         res = payout, _ = (0.0, 'direct')
-    print "dry is %s"%dry
+    # print "dry is %s"%dry
     if dry == False:
-        print "running weekly divide_conquer with num weeks = %s"%num_weeks
+        # print "running weekly divide_conquer with num weeks = %s"%num_weeks
 
         if num_weeks:
             divide_conquer(range(int(num_weeks)), 0, int(num_weeks) - 1,
@@ -389,7 +389,7 @@ def calc(user, last_date, investment_type):
 
 
 def calc_txns_reducer(txn_obj):
-    print "txn_obj is {}".format(txn_obj)
+    # print "txn_obj is {}".format(txn_obj)
     # pdb.set_trace()
     if type(txn_obj) == float:
         return txn_obj
@@ -412,11 +412,12 @@ def calc_txns(start_dt, end_dt, **kw):
     pdb.pprint.pprint(kw, depth=2)
 
     assert Transactions.objects.all()
-    sum_subquery = Q(sender_wallet=kw['avicrypto_wallet']) & Q(reciever_wallet__in=[
+    sum_subquery = Q(reciever_wallet__in=[
         kw['user_ROI_wallet'],
         kw['user_DR_wallet'],
         kw['user_BN_wallet'] 
-        ]) & Q(tx_type__in=["roi", "direct", "binary"]) & Q(status__in=["C", "P"])
+        ]) & Q(tx_type__in=["roi", "direct", "binary"]) & Q(status__in=["C", "P", "processing", "paid"])
+        # & Q(sender_wallet=kw['avicrypto_wallet']) & 
     sum_txns = Transactions.objects.filter(sum_subquery, created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
     
 
@@ -436,7 +437,8 @@ def calc_txns(start_dt, end_dt, **kw):
         diff = diff if type(diff) == float else diff.data_sum
     else:
         diff = 0.0
-    return agg - diff if diff_txns else agg 
+    print "agg: %s | diff: %s | agg-diff=%s " %(agg, diff, agg - diff if diff_txns else agg)
+    return agg - diff if diff_txns else agg
 
 
 def update_wallet_dt(user, wallet, wallet_type, last_date):
@@ -571,7 +573,7 @@ def get_left_right_agg(user, last_date, next_date):
     """Returns aggregate package of both legs"""
     left_user = get_left(user)
     right_user = get_right(user)
-#print "left user {} and right users {}".format(left_user.username, right_user.username)
+    #print "left user {} and right users {}".format(left_user.username, right_user.username)
     return [calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date)]
 
 # @gen_txn_binary
@@ -627,7 +629,7 @@ def gen_txn_direct(func):
     def wrapped_f(sponsor_id, member, last_date, next_date, dry):
         res = func(sponsor_id, member, last_date, next_date, dry=dry)
         if res and dry == False:
-            print "generating direct transaction. sponsor_id is %s"%sponsor_id
+            # print "generating direct transaction. sponsor_id is %s"%sponsor_id
             p = Profile.objects.get(user_auto_id=sponsor_id)
             sponsor_user = p.user
             doj = UTC.normalize(member.child_id.date_joined)
@@ -635,7 +637,7 @@ def gen_txn_direct(func):
 
             assert type(member.child_id) == User
             child_pkg = get_package(member.child_id)
-            print "child_pkg is ", child_pkg, member.child_id.username, 
+            # print "child_pkg is ", child_pkg, member.child_id.username, 
 
             dr = (pkg.package.directout/100.0) * child_pkg.package.price
 
@@ -653,7 +655,7 @@ def gen_txn_direct(func):
             dr_txn.save(update_fields=['created_at'])
             
             assert Transactions.objects.all()
-            print "Txn asserted"
+            # print "Txn asserted"
 
             calc_binary(sponsor_user, last_date, next_date, dry=False,
                         date=child_pkg.package.created_at)

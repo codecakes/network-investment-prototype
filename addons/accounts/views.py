@@ -96,16 +96,22 @@ def app_login(request):
                 }
             else:
                 referal = request.GET['ref']
-                sponser = Profile.objects.get(my_referal_code=referal)
-                sponser_id = sponser.user_auto_id
-                placement_users = find_min_max(sponser.user)
+                try:
+                    sponser = Profile.objects.get(my_referal_code=referal)
+                    sponser_id = sponser.user_auto_id
+                    placement_users = find_min_max(sponser.user)
 
-                context = {
-                    'referal': referal,
-                    'sponser_id': sponser_id,
-                    'placement_user_left_id': placement_users[0].profile.user_auto_id,
-                    'placement_user_right_id': placement_users[1].profile.user_auto_id
-                }
+                    context = {
+                        'referal': referal,
+                        'sponser_id': sponser_id,
+                        'placement_user_left_id': placement_users[0].profile.user_auto_id,
+                        'placement_user_right_id': placement_users[1].profile.user_auto_id
+                    }
+                except:
+                    context = {
+                        "status": "error",
+                        "message": "Invalid Referal Link."
+                    }
             return HttpResponse(template.render(context, request))
 
         if request.method == 'POST':
@@ -392,10 +398,13 @@ def home(request):
         # user_direct = calc_direct(user, None, None)[0]
         # user_binary = calc_binary(user, None, None)[0][0]
         # user_weekly = calc_weekly(user, None, None)[0]
-
-        user_direct = pkg.direct
-        user_binary = pkg.binary
-        user_weekly = pkg.weekly
+        if pkg:
+            assert pkg
+            user_direct = pkg.direct
+            user_binary = pkg.binary
+            user_weekly = pkg.weekly
+        else:
+            user_direct = user_binary = user_weekly = 0.0
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
@@ -408,10 +417,13 @@ def home(request):
             "direct": user_direct,
             "binary": user_binary,
             "weekly": user_weekly,
-            "total": pkg.total_payout
+            "total": user_direct + user_binary + user_weekly
         }
 
-        if 0<= is_day < 2:
+        # TODO: CHANGE BACK. ONLY FOR TODAY!
+        # if 0<= is_day < 2:
+        # changed to 
+        if is_day == 2:
             context["enable_withdraw"] = True
 
         user_active_package = [package for package in packages if package.status == 'A']
@@ -419,7 +431,10 @@ def home(request):
             pkg = user_active_package[0]
             dt = UTC.normalize(UTC.localize(datetime.datetime.now())) - pkg.created_at
             context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
-            next_payout = find_next_monday()
+            # TEMP adding 1 more day to Tuesday
+            rem_delta = datetime.timedelta(days=1)
+            next_payout = find_next_monday() + rem_delta
+            
             context["next_payout"] = "%s-%s-%s" % (
                 next_payout.year, next_payout.month, next_payout.day)
             context["active_pkg"] = pkg.created_at
