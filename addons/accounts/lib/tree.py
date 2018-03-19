@@ -289,6 +289,14 @@ def get_relationship(user):
     children = '1' if len(Members.objects.filter(parent_id=user)) > 0 else '0'
     return parent + sibling + children
 
+def get_user_count(user, leg = 'l'):
+    child = get_left(user) if leg == 'l' else get_right(user)
+    if child:
+        return 1 + get_user_count(child, leg = 'l') + get_user_count(child, leg = 'r')
+    else:
+        return 0
+        
+        
 def get_user_json(user, profile):
     
     # try:
@@ -321,7 +329,9 @@ def get_user_json(user, profile):
                 direct_left=direct_child(user, EPOCH_BEGIN, today, leg='l'),
                 direct_right=direct_child(user, EPOCH_BEGIN, today, leg='r'),
                 binary_left=binary_child(user, EPOCH_BEGIN, today, leg='l'),
-                binary_right=binary_child(user, EPOCH_BEGIN, today, leg='r')
+                binary_right=binary_child(user, EPOCH_BEGIN, today, leg='r'),
+                left_members_count=get_user_count(user, 'l'),
+                right_members_count=get_user_count(user, 'r')
                 )
 
 
