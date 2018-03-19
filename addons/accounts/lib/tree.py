@@ -7,11 +7,18 @@ from django.conf import settings
 from urllib2 import urlparse
 from functools import wraps
 
-from addons.packages.lib.payout_aux import binary_txns, direct_txns, roi_txns
+from addons.packages.lib.payout_aux import binary_txns, direct_txns, roi_txns, binary_child, direct_child
 from django.conf import settings
 EPOCH_BEGIN = settings.EPOCH_BEGIN
 import datetime
 import pytz
+from addons.accounts.models import Profile, Members, User
+from addons.transactions.models import Transactions
+from addons.wallet.models import Wallet
+from addons.packages.models import Packages, User_packages
+
+from django.db.models import Sum
+from django.conf import settings
 
 UTC = pytz.UTC
 
@@ -282,7 +289,14 @@ def get_relationship(user):
     children = '1' if len(Members.objects.filter(parent_id=user)) > 0 else '0'
     return parent + sibling + children
 
-
+def get_user_count(user, leg = 'l'):
+    child = get_left(user) if leg == 'l' else get_right(user)
+    if child:
+        return 1 + get_user_count(child, leg = 'l') + get_user_count(child, leg = 'r')
+    else:
+        return 0
+        
+        
 def get_user_json(user, profile):
     
     # try:
@@ -311,7 +325,13 @@ def get_user_json(user, profile):
                 transaction=tot_txn_vol(user),
                 binary=binary_txns(user, EPOCH_BEGIN, today),
                 direct=direct_txns(user, EPOCH_BEGIN, today),
-                roi=roi_txns(user, EPOCH_BEGIN, today)
+                roi=roi_txns(user, EPOCH_BEGIN, today),
+                direct_left=direct_child(user, EPOCH_BEGIN, today, leg='l'),
+                direct_right=direct_child(user, EPOCH_BEGIN, today, leg='r'),
+                binary_left=binary_child(user, EPOCH_BEGIN, today, leg='l'),
+                binary_right=binary_child(user, EPOCH_BEGIN, today, leg='r'),
+                left_members_count=get_user_count(user, 'l'),
+                right_members_count=get_user_count(user, 'r')
                 )
 
 
