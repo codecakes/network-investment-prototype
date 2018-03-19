@@ -414,7 +414,10 @@ def home(request):
             "total": pkg.total_payout if pkg else None
         }
 
-        if 0<= is_day < 2:
+        # TODO: CHANGE BACK. ONLY FOR TODAY!
+        # if 0<= is_day < 2:
+        # changed to tuesday
+        if is_day == 2:
             context["enable_withdraw"] = True
 
         user_active_package = [package for package in packages if package.status == 'A']

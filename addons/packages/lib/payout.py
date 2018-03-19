@@ -266,7 +266,7 @@ def gen_txn_weekly(week_num, old_date, new_date, user, weekly_payout):
             reciever_wallet=user_ROI_wallet, 
             amount=weekly_payout, 
             tx_type="roi", status="C")
-        roi_txn.created_at = dt
+        roi_txn.created_at = find_next_monday()
         roi_txn.save(update_fields=['created_at'])
         assert Transactions.objects.all()
         print "asserted Txns"

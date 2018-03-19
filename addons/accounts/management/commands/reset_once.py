@@ -37,29 +37,29 @@ def reset_these():
     for user in users:
         u = user
         # try:
-        # u.set_password('avi1234')
-        # u.save()
-        pkg = get_package(u)
-        if pkg:
-            print "has pkg"
-            pkg.last_payout_date = EPOCH_BEGIN
-            pkg.binary = 0.0
-            pkg.weekly = 0.0
-            pkg.direct = 0.0
-            # pkg.total_payout += pkg.weekly
-            pkg.left_binary_cf = 0.0
-            pkg.right_binary_cf = 0.0
-            pkg.save()
-            # today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
-            # # pdb.set_trace()
-            admin_param = {
-                'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
-                'start_dt': EPOCH_BEGIN,
-                'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 03, 12)))
-            }
-            # print "calling run_investment_calc(u, pkg, EPOCH_BEGIN, today, **admin_param)"
-            run_investment_calc(u, pkg, EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
-            print "called run_investment_calc"
+        u.set_password('avi1234')
+        u.save()
+        # pkg = get_package(u)
+        # if pkg:
+        #     print "has pkg"
+        #     pkg.last_payout_date = EPOCH_BEGIN
+        #     pkg.binary = 0.0
+        #     pkg.weekly = 0.0
+        #     pkg.direct = 0.0
+        #     # pkg.total_payout += pkg.weekly
+        #     pkg.left_binary_cf = 0.0
+        #     pkg.right_binary_cf = 0.0
+        #     pkg.save()
+        #     # today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+        #     # # pdb.set_trace()
+        #     admin_param = {
+        #         'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
+        #         'start_dt': EPOCH_BEGIN,
+        #         'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 03, 12)))
+        #     }
+        #     # print "calling run_investment_calc(u, pkg, EPOCH_BEGIN, today, **admin_param)"
+        #     run_investment_calc(u, pkg, EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
+        #     print "called run_investment_calc"
 
         # except Exception as e:
         #     print "error for", u.username
