@@ -21,6 +21,17 @@
   padding: 0;
 }
 
+.orgchart span {
+  color:orange;
+  padding-left: 5px;
+  padding-right: 5px; 
+}
+
+.orgchart img {
+  height: 110px;
+  width: 110px;
+}
+
 .orgchart>table:first-child {
   margin: 5px auto 0px auto;
 }
@@ -40,11 +51,20 @@
 .orgchart .drill-icon {
   transition: opacity .5s;
   opacity: 0;
-  right: -10px;
-  top: -10px;
+  right: 15px;
+  top: 5px;
   z-index: 2;
   color: #000;
   font-size: 30px;
+  position: absolute;
+}
+
+.orgchart .drill-info {
+  right: 9px;
+  top: 80px;
+  z-index: 2;
+  color: #000;
+  font-size: 23px;
   position: absolute;
 }
 
@@ -57,24 +77,58 @@
 }
 
 .inactive-node-title{
-  background-color: #7d7474 !important;
+  /*background-color: #7d7474 !important;*/
 }
 .inactive-node-border{
-  border-color: #7d7474 !important;
+  /*border-color: #7d7474 !important;*/
 }
 
 .inactive-node:hover{
-  background-color: #7d7474 !important;
+  /*background-color: #7d7474 !important;*/
 }
 
 
 .nouser-node-title{
-  background-color: #3BAFDA !important;
+  /*background-color: #3BAFDA !important;*/
 }
 .nouser-node-border{
-  border-color: #3BAFDA !important;
+  /*border-color: #3BAFDA !important;*/
 }
 
 .nouser-node:hover{
-  background-color: #3BAFDA !important;
+  /*background-color: #3BAFDA !important;*/
+}
+
+@media (min-width: 768px) {
+    .social-icons {
+    position: absolute;
+    right: 1.5rem;
+    bottom: calc(50% - 100px);
+    /* display: none; */
+    transition: 500ms all linear;
+    /*right: -350px;*/
+    opacity:0;
+  }
+
+    .social-icons.show {
+      position: absolute;
+      background-color: orange;
+      display: block;
+      right: 10px;
+      opacity: 0.96;
+      z-index: 32;
+      position: absolute;
+    }
+  
+    .form{
+      margin: 0;
+    }
+}
+
+.social-icons table {
+  margin:40px;
+}
+
+.social-icons td {
+  padding:10px; 
 }
