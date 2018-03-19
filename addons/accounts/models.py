@@ -125,6 +125,7 @@ class Userotp(models.Model):
 	otp = models.CharField(max_length=6, default=None, null=True, blank=True)
 	time = models.DateTimeField(auto_now_add=True)
 	mobile = models.CharField(max_length=15, blank=True)
+	user = models.ForeignKey(User, related_name='+', null=True)
 	otp_type = (
 		('login', 'login'),
 		('signup', 'signup'),
