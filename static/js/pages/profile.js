@@ -49,38 +49,51 @@ $(document).ready(function() {
 	
 
 	$("#verifiy_mobile_otp").click(function(){
-		//var block_element = $(event.target).closest(".card");
-		//block_element.block(block_options);
-		
+		event.preventDefault();
 		var mobile_number = $("#mobile_profile").val().trim();
 		if(mobile_number && (mobile_number.match(/^[0-9]+$/)!=null) && ((mobile_number.length >=9)&& (mobile_number.length <=15))){
-			$("#profile_mobile_verify_otp_modal").modal('show')
+			$.ajax({
+				type: "POST",
+				url: "/send/",
+				data: "",
+				success: function(data) {
+					//block_element.unblock()
+					//toastr.success(data.message, "Success", toastr_options);
+					if (data.status == "error") {
+	                    toastr.warning(data.message, "Error", toastr_options);
+	                } else {
+					  $("#profile_mobile_verify_otp_modal").modal('show')
+	                  $("#profile_mobile_verify_otp").val();		    
+	                }
+				}
+			});
+
 		} else {
 			toastr.warning("Incorrect Mobile Number", "Error", toastr_options);	
 		}
 	})
-	
-	$("#success_verified").hide();
 
-	$("#verifiy_mobile_otp").click(function(){
+	$("#profile_mobile_verify_otp_send").click(function(){
 		event.preventDefault();
-		$.ajax({
-			type: "POST",
-			url: "/profile",
-			dataType: "json",
-			data: {
-				"type":"",
-				"data":$("#mobile_profile").val()
-			},
-			success: function(data) {
-				//block_element.unblock()
-				//toastr.success(data.message, "Success", toastr_options);
-				$("#verifiy_mobile_otp").hide();
-				$("#success_verified").show();
-			}
-		});
+        $.ajax({
+            type: "POST",
+            url: "/varify/",
+            data: {
+              "type":"mobile",
+              "otp": $("#profile_mobile_verify_otp").val() 
+            },
+            success: function(data) {
+                if (data.status == "error") {
+                    toastr.warning(data.message, "Error", toastr_options);
+                } else {
+  				  $("#profile_mobile_verify_otp_modal").modal('hide')
+                  $("#profile_mobile_verify_otp").val();
+                  toastr.success(data.message, "Success", toastr_options);
+                }
+            }
+        });
 	})
-
+	
 	$("#profile_crypto_accounts_form").submit(function(event) {
 		event.preventDefault();
 

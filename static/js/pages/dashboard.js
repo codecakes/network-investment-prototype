@@ -25,9 +25,40 @@ jQuery(document).ready(function() {
   });
 
   jQuery("#dashboard_withdrawal").click(function() {
-    jQuery("#dashboard_withdrawal_otp_modal").modal('show');
-    $("#dashboard_withdrawal_otp").val();
+    $.ajax({
+        type: "POST",
+        url: "/send/",
+        data: "",
+        success: function(data) {
+            if (data.status == "error") {
+                toastr.warning(data.message, "Error", toastr_options);
+            } else {
+              jQuery("#dashboard_withdrawal_otp_modal").modal('show');
+              $("#dashboard_withdrawal_otp").val();    
+            }
+        }
+    });
   });
+
+  jQuery("#dashboard_withdrawal_otp_send").click(function() {
+    $.ajax({
+        type: "POST",
+        url: "/varify/",
+        data: {
+          "type":"withdraw",
+          "otp": $("#dashboard_withdrawal_otp").val() 
+        },
+        success: function(data) {
+            if (data.status == "error") {
+                toastr.warning(data.message, "Error", toastr_options);
+            } else {
+              jQuery("#dashboard_withdrawal_otp_modal").modal('hide');
+              toastr.success(data.message, "Success", toastr_options);
+            }
+        }
+    });
+  });
+
   $("input,select,textarea")
       .not("[type=submit]")
         .jqBootstrapValidation({

@@ -296,12 +296,43 @@
     $("#cryptoSubmit").click(function(event){
         event.preventDefault();
         if($("#transaction_id").val() && $("#wallet_adddress").val() && $("#destinationTag").val()){
-            $("#otpContainer").toggle()
-            $("#message").hide();
-            $("#purchasePackageFormContainer").hide()
+            $.ajax({
+                type: "POST",
+                url: "/send/",
+                data: "",
+                success: function(data) {
+                    if (data.status == "error") {
+                        toastr.warning(data.message, "Error", toastr_options);
+                    } else {
+                      $("#otpContainer").toggle()
+                      $("#message").hide();
+                      $("#purchasePackageFormContainer").hide()    
+                    }
+                }
+            });
         } else {
           toastr.warning("Provide Details", "Error", toastr_options);  
         }
+    })
+
+    $("#package_otp_send").click(function(event){
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "/varify/",
+            data: {
+              "type":"package",
+              "otp": $("#mobile_otp").val() 
+            },
+            success: function(data) {
+                if (data.status == "error") {
+                    toastr.warning(data.message, "Error", toastr_options);
+                } else {
+                  jQuery("#subscribeModal").modal('hide');
+                  toastr.success(data.message, "Success", toastr_options);
+                }
+            }
+        });
     })
 
     $("#package_otp").jqBootstrapValidation();
