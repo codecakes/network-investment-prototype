@@ -79,7 +79,7 @@ $(document).ready(function() {
             type: "POST",
 			url: "/varify/",
 			data: {
-                "type":"withdraw",
+                "type":"mobile",
                 "mobileOtp": $("#profile_mobile_verify_otp").val() 
                 },
             success: function(data) {

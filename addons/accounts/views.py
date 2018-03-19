@@ -998,7 +998,6 @@ def send_otp(request):
 def verify_otp(request):
     if request.method == 'POST':
         data = request.POST
-        import pdb; pdb.set_trace()
         otp = str(data['mobileOtp'])
         otp_type = str(data['type'])
         if otp and otp_type:
