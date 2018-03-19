@@ -76,3 +76,36 @@ def roi_txns(user, start_dt, end_dt, **kw):
     
     subquery = Q(reciever_wallet__in=user_ROI_wallet) & Q(status__in=['C', 'processing', 'paid']) # Q(sender_wallet__in=avicrypto_wallet) & 
     return calc_txns_reducer(Transactions.objects.filter(subquery, tx_type="roi", created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')))
+
+
+def direct_child(user, EPOCH_BEGIN, today, leg = 'left'):
+    # get avicrypto wallet
+    avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
+    avicrypto_wallet = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'AW')
+    
+    check_leg = LEG[leg]
+    # get user wallet
+    child_user = check_leg(user)
+    if child_user:
+        pkg = get_package(child_user)
+        user_DR_wallet = Wallet.objects.filter(owner = child_user, wallet_type = 'DR')
+        
+        subquery = Q(reciever_wallet__in=user_DR_wallet) & Q(status__in=['C', 'processing', 'paid'])
+        return calc_txns_reducer(Transactions.objects.filter(subquery, tx_type="direct", created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')))
+    return None
+
+def binary_child(user, EPOCH_BEGIN, today, leg = 'left'):
+    # get avicrypto wallet
+    avicrypto_user = User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us')
+    avicrypto_wallet = Wallet.objects.filter(owner = avicrypto_user, wallet_type = 'AW')
+    
+    check_leg = LEG[leg]
+    # get user wallet
+    child_user = check_leg(user)
+    if child_user:
+        pkg = get_package(child_user)
+        user_BN_wallet = Wallet.objects.filter(owner = child_user, wallet_type = 'BN')
+        
+        subquery = Q(reciever_wallet__in=user_BN_wallet) & Q(status__in=['C', 'processing', 'paid'])
+        return calc_txns_reducer(Transactions.objects.filter(subquery, tx_type="binary", created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount')))
+    return None

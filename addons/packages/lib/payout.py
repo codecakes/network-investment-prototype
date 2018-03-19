@@ -424,7 +424,7 @@ def calc_txns(start_dt, end_dt, **kw):
 
 
 def update_wallet_dt(user, wallet, wallet_type, last_date):
-    wallet = Wallet.objects.get_or_create(owner=user, wallet_type=wallet_type)
+    wallet, _ = Wallet.objects.get_or_create(owner=user, wallet_type=wallet_type)
     p = Profile.objects.get(user=user)
     wallet.created_at = p.created_at if wallet.created_at > p.created_at else wallet.created_at
     wallet.save(update_fields=['created_at'])
