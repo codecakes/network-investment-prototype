@@ -299,7 +299,7 @@
             $.ajax({
                 type: "POST",
                 url: "/send/",
-                data: "",
+                data: {'type':'withdraw'},
                 success: function(data) {
                     if (data.status == "error") {
                         toastr.warning(data.message, "Error", toastr_options);
@@ -321,9 +321,9 @@
             type: "POST",
             url: "/varify/",
             data: {
-              "type":"package",
-              "otp": $("#mobile_otp").val() 
-            },
+                "type":"withdraw",
+                "mobileOtp": $("#package_otp").val() 
+                },
             success: function(data) {
                 if (data.status == "error") {
                     toastr.warning(data.message, "Error", toastr_options);

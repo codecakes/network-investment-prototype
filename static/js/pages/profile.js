@@ -55,7 +55,7 @@ $(document).ready(function() {
 			$.ajax({
 				type: "POST",
 				url: "/send/",
-				data: "",
+				data:  {'type':'withdraw'},
 				success: function(data) {
 					//block_element.unblock()
 					//toastr.success(data.message, "Success", toastr_options);
@@ -77,11 +77,11 @@ $(document).ready(function() {
 		event.preventDefault();
         $.ajax({
             type: "POST",
-            url: "/varify/",
-            data: {
-              "type":"mobile",
-              "otp": $("#profile_mobile_verify_otp").val() 
-            },
+			url: "/varify/",
+			data: {
+                "type":"withdraw",
+                "mobileOtp": $("#profile_mobile_verify_otp").val() 
+                },
             success: function(data) {
                 if (data.status == "error") {
                     toastr.warning(data.message, "Error", toastr_options);

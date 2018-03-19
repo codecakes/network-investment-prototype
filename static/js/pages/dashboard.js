@@ -28,7 +28,7 @@ jQuery(document).ready(function() {
     $.ajax({
         type: "POST",
         url: "/send/",
-        data: "",
+        data: {'type':'withdraw'},
         success: function(data) {
             if (data.status == "error") {
                 toastr.warning(data.message, "Error", toastr_options);
@@ -46,12 +46,14 @@ jQuery(document).ready(function() {
         url: "/varify/",
         data: {
           "type":"withdraw",
-          "otp": $("#dashboard_withdrawal_otp").val() 
+          "mobileOtp": $("#dashboard_withdrawal_otp").val() 
         },
         success: function(data) {
             if (data.status == "error") {
-                toastr.warning(data.message, "Error", toastr_options);
+                console.log('---')
+                // toastr.warning(data.message, "Error", toastr_options);
             } else {
+              console.log('- ')
               jQuery("#dashboard_withdrawal_otp_modal").modal('hide');
               toastr.success(data.message, "Success", toastr_options);
             }

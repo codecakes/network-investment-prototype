@@ -985,24 +985,20 @@ def withdraw(request):
 @csrf_exempt
 def send_otp(request):
     if request.method == 'POST':
-        mobile = request.data.get('mobile', None)
-        otp_type = request.data.get('type', None)
-        if mobile:
-            otp = random.randrange(1, 1090000+1)
-            # otp = random.randrange(1, upper_limit+1)
-            services.send_sms(mobile, otp)
-            otp_obj = Userotp.objects.create(otp=otp, mobile=mobile, type=otp_type, status='active')
-            # profile = Profile.objects.get(mobile=mobile)
-            # profile.otp=otp
-            # profile.mobile_verified = False
-            # profile.save()
+        data = request.POST
+        otp_type = data['type']
+        if request.user:
+            otp = genearte_user_otp(request.user, otp_type)
+            send_otp_sms_mail(otp, request.user.profile.mobile, request.user.email)
             return HttpResponse({'success': True})
         else:
             return HttpResponse("Invalid mobile number")
 
+@csrf_exempt
 def verify_otp(request):
     if request.method == 'POST':
         data = request.POST
+        import pdb; pdb.set_trace()
         otp = str(data['mobileOtp'])
         otp_type = str(data['type'])
         if otp and otp_type:
@@ -1018,16 +1014,47 @@ def verify_otp(request):
                         "message": "OTP Success"
                     }))
                 return HttpResponse({})
+            elif otp_type=='withdraw':
+                try:
+                    user_otp = Userotp.objects.get(otp=otp, type='withdraw')
+                    user_otp.status='expire'
+                    user_otp.save()
+                    print 'otp match'
+                    return HttpResponse(json.dumps({
+                        "status": "ok",
+                        "message": "OTP Success"
+                    }))
+                except:
+                    HttpResponse({'message': 'Invalid OTP', 'status':'error'})
+            elif otp_type=='package':
+                try:
+                    user_otp = Userotp.objects.get(otp=otp, type='package')
+                    user_otp.status='expire'
+                    user_otp.save()
+                    return HttpResponse(json.dumps({
+                        "status": "ok",
+                        "message": "OTP Success"
+                    }))
+                except:
+                    HttpResponse({'message': 'Invalid OTP', 'status':'error'})
+            elif otp_type=='mobile':
+                try:
+                    user_otp = Userotp.objects.get(otp=otp, type='mobile')
+                    user_otp.status='expire'
+                    user_otp.save()
+                    return HttpResponse(json.dumps({
+                        "status": "ok",
+                        "message": "OTP Success"
+                    }))
+                except:
+                    HttpResponse({'message': 'Invalid OTP', 'status':'error'})    
         return  HttpResponse({'message': 'Invalid OTP', 'status':'error'})
 
 def genearte_user_otp(user, type):
     hash = hashlib.sha1()
     hash.update(str(time.time()))
-    print hash.hexdigest()
-    print hash.hexdigest()[:10]
-
     otp = random.randrange(1, 1090000+1)
-    otp_obj = Userotp.objects.create(otp=otp, status='active', type=type, mobile=user.profile.mobile, user=user)
+    otp_obj = Userotp.objects.create(otp=otp, status='active', type=type, user=user)
     return otp
 
 
