@@ -427,7 +427,10 @@ def home(request):
             "total": user_direct + user_binary + user_weekly
         }
 
-        if 0<= is_day < 2:
+        # TODO: CHANGE BACK. ONLY FOR TODAY!
+        # if 0<= is_day < 2:
+        # changed to 
+        if is_day == 2:
             context["enable_withdraw"] = True
 
         user_active_package = [package for package in packages if package.status == 'A']
@@ -435,7 +438,10 @@ def home(request):
             pkg = user_active_package[0]
             dt = UTC.normalize(UTC.localize(datetime.datetime.now())) - pkg.created_at
             context["payout_remain"] = pkg.package.no_payout - (dt.days/7)
-            next_payout = find_next_monday()
+            # TEMP adding 1 more day to Tuesday
+            rem_delta = datetime.timedelta(days=1)
+            next_payout = find_next_monday() + rem_delta
+            
             context["next_payout"] = "%s-%s-%s" % (
                 next_payout.year, next_payout.month, next_payout.day)
             context["active_pkg"] = pkg.created_at
