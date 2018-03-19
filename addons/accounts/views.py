@@ -96,16 +96,22 @@ def app_login(request):
                 }
             else:
                 referal = request.GET['ref']
-                sponser = Profile.objects.get(my_referal_code=referal)
-                sponser_id = sponser.user_auto_id
-                placement_users = find_min_max(sponser.user)
+                try:
+                    sponser = Profile.objects.get(my_referal_code=referal)
+                    sponser_id = sponser.user_auto_id
+                    placement_users = find_min_max(sponser.user)
 
-                context = {
-                    'referal': referal,
-                    'sponser_id': sponser_id,
-                    'placement_user_left_id': placement_users[0].profile.user_auto_id,
-                    'placement_user_right_id': placement_users[1].profile.user_auto_id
-                }
+                    context = {
+                        'referal': referal,
+                        'sponser_id': sponser_id,
+                        'placement_user_left_id': placement_users[0].profile.user_auto_id,
+                        'placement_user_right_id': placement_users[1].profile.user_auto_id
+                    }
+                except:
+                    context = {
+                        "status": "error",
+                        "message": "Invalid Referal Link."
+                    }
             return HttpResponse(template.render(context, request))
 
         if request.method == 'POST':
@@ -398,7 +404,7 @@ def home(request):
             user_binary = pkg.binary
             user_weekly = pkg.weekly
         else:
-            user_direct = user_binary = user_weekly = None
+            user_direct = user_binary = user_weekly = 0.0
 
         context = {
             'link': request.META['HTTP_HOST'] + '/login?ref=' + str(user.profile.my_referal_code),
@@ -411,7 +417,7 @@ def home(request):
             "direct": user_direct,
             "binary": user_binary,
             "weekly": user_weekly,
-            "total": pkg.total_payout if pkg else None
+            "total": user_direct + user_binary + user_weekly
         }
 
         # TODO: CHANGE BACK. ONLY FOR TODAY!
