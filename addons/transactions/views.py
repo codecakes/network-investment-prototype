@@ -83,6 +83,61 @@ class TransactionsSummary(ListView):
         transactions = Transactions.objects.filter(reciever_wallet__owner=user)
         packages = User_packages.objects.filter(user=user)
         wallets = Wallet.objects.filter(owner=user)
+
+#         {
+#     roi:{
+#         till_now:0,
+#         withdraw:0,
+#         pending:0,
+#         total:0
+#     },
+#     binary:{
+#         till_now:0,
+#         withdraw:0,
+#         pending:0,
+#         total:0
+#     },
+#     direct:{
+#         till_now:0,
+#         withdraw:0,
+#         pending:0,
+#         total:0
+#     }
+# }
+#  get the current payout of weeks 
+        roi = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
+        binary = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
+        direct = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
+
+        for pkg in packages:
+            roi['till_now'] += pkg.weekly
+            binary['till_now'] += pkg.binary
+            direct['till_now'] += pkg.direct
+# get the total paid withdraw 
+        for txns in transactions:
+            if txns.status == 'paid' and txns.tx_type == 'roi':
+                roi['withdraw'] += txns.amount
+            elif txns.status == 'P' or txns.status=='C' or txns.status=='processing' and txns.tx_type == 'roi':
+                roi['pending'] += txns.amount
+            elif txns.status == 'paid' and txns.tx_type == 'binary':
+                binary['withdraw'] += txns.amount
+            elif txns.status == 'P' or txns.status=='C' or txns.status=='processing' and txns.tx_type == 'roi':
+                binary['pending'] += txns.amount
+            elif txns.status == 'paid' and txns.tx_type == 'direct':
+                direct['withdraw'] += txns.amount
+            elif txns.status == 'P' or txns.status=='C' or txns.status=='processing' and txns.tx_type == 'roi':
+                direct['pending'] += txns.amount
+
+        
+        for key in roi:
+            roi['total'] += roi[key]
+            
+        for key in binary:
+            roi['total'] += roi[key]
+            
+        for key in direct:
+            roi['total'] += roi[key]
+
         context = {
             'packages': packages,
             'transactions': transactions,
