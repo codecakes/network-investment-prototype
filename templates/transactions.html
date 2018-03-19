@@ -7,6 +7,118 @@
         <div class="col-xs-12">
             <div class="card">
                 <div class="card-header">
+                    <h4 class="card-title">Receiver's Summary</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>ROI</th>
+                                    <th>Direct</th>
+                                    <th>Binary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Till Now</td>
+                                    <td>${{roi.till_now}}</td>
+                                    <td>${{direct.till_now}}</td>
+                                    <td>${{binary.till_now}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Withdraw</td>
+                                    <td>${{roi.withdraw}}</td>
+                                    <td>${{direct.withdraw}}</td>
+                                    <td>${{binary.withdraw}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Pending</td>
+                                    <td>${{roi.pending}}</td>
+                                    <td>${{direct.pending}}</td>
+                                    <td>${{binary.pending}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total</td>
+                                    <td>${{roi.total}}</td>
+                                    <td>${{direct.total}}</td>
+                                    <td>${{binary.total}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Transactions Summary</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Transation ID</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Receiver's Wallet</th>
+                                    <th>Sender's Wallet</th>
+                                    <th>Amount Withdral</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                    <tr>
+                                        <td>{{ transaction.pk }}</td>
+                                        <td>{{ transaction.date }}</td> 
+                                        <td>{{ transaction.time }}</td>                                       
+                                        <td>{{ transaction.reciever_wallet.owner.username }}</td>
+                                        <td>
+                                            {% if transaction.sender_wallet.owner.username == 'harshul' %}
+                                                AVICRYPTO
+                                            {% else %}
+                                                {{ transaction.sender_wallet.owner.username }}
+                                            {% endif %}
+                                        </td>
+                                        <td>${{ transaction.amount }}</td>
+                                        <td>
+                                            {% for key,value in transaction_status_choices  %}
+                                                {% if key == transaction.status %}
+                                                    {% if transaction.status == 'C' %}
+                                                        Paid
+                                                    {% else %}
+                                                        {{value}}
+                                                    {% endif %}    
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td>
+                                            You have no transactions yet
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
                     <h4 class="card-title">Wallet Summary</h4>
                 </div>
                 <div class="card-body collapse in">
@@ -32,66 +144,6 @@
                                     <tr>
                                         <td>
                                             You currently have no wallet
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Transactions Summary</h4>
-                </div>
-                <div class="card-body collapse in">
-                    <div class="table-responsive">
-                        <table class="table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Transation ID</th>
-                                    <th>Receiver Wallet</th>
-                                    <th>Sender Wallet</th>
-                                    <th>Price</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for transaction in transactions %}
-                                    <tr>
-                                        <td>{{ transaction.pk }}</td>
-                                        <td>{{ transaction.reciever_wallet.owner.username }}</td>
-                                        <td>
-                                            {% if transaction.sender_wallet.owner.username == 'harshul' %}
-                                                AVICRYPTO
-                                            {% else %}
-                                                {{ transaction.sender_wallet.owner.username }}
-                                            {% endif %}
-                                        </td>
-                                        <td>${{ transaction.amount }}</td>
-                                        <td>{{ transaction.reciever_wallet.wallet_type }}</td>
-                                        <td>
-                                            {% for key,value in transaction_status_choices  %}
-                                                {% if key == transaction.status %}
-                                                    {% if transaction.status == 'C' %}
-                                                        Paid
-                                                    {% else %}
-                                                        {{value}}
-                                                    {% endif %}    
-                                                {% endif %}
-                                            {% endfor %}
-                                        </td>
-                                    </tr>
-                                {% empty %}
-                                    <tr>
-                                        <td>
-                                            You have no transactions yet
                                         </td>
                                     </tr>
                                 {% endfor %}
