@@ -99,7 +99,7 @@ def new_user_text(ref_code, *ref_kw):
     sibling = '1'
     relationship = parent+sibling+children
     return dict(
-        name='<a href= {}><img src="static/images/logo_add_tree.png"/><p>Add New User</p></a>'.format(href),
+        name='<a href= {}><img src="https://github.com/avicrypto-us/avi.github.io/blob/master/staticfiles/images/logo_add_tree.png"/><p>Add New User</p></a>'.format(href),
         relationship=relationship
     )
 
