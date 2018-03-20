@@ -1002,7 +1002,7 @@ def verify_otp(request):
         otp_type = str(data['type'])
         if otp and otp_type:
             if otp_type == 'login':
-                user_otp = Userotp.objects.get(otp=otp)
+                user_otp = Userotp.objects.get(otp=otp, type='login')
                 user = authenticate(username=user_otp.user.username, password=str(data['password']))
                 if user is not None:
                     login(request, user)
