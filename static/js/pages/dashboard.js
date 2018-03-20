@@ -41,6 +41,7 @@ jQuery(document).ready(function() {
   });
 
   jQuery("#dashboard_withdrawal_otp_send").click(function() {
+    event.preventDefault();
     $.ajax({
         type: "POST",
         url: "/varify/",
@@ -50,12 +51,11 @@ jQuery(document).ready(function() {
         },
         success: function(data) {
             if (data.status == "error") {
-                console.log('---')
-                // toastr.warning(data.message, "Error", toastr_options);
+                toastr.warning(data.message, "Error", toastr_options);
             } else {
-              console.log('- ')
               jQuery("#dashboard_withdrawal_otp_modal").modal('hide');
-              toastr.success(data.message, "Success", toastr_options);
+              jQuery("#withdrawModal").modal("show");
+              // toastr.success(data.message, "Success", toastr_options);
             }
         }
     });

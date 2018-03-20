@@ -10,8 +10,9 @@ from pytz import UTC
 import calendar
 import hashlib
 import time
-
+from addons.packages.lib.payout import run_investment_calc
 from django.conf import settings
+EPOCH_BEGIN = settings.EPOCH_BEGIN
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -949,7 +950,14 @@ def withdraw(request):
                             }
                             body = render_to_string('mail/transaction-admin.html', email_data)
                             services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
-
+                            wallets = Wallet.objects.filter(owner=user)
+                            Transactions.objects.filter(Q(reciever_wallet__in=[w for w in wallets])).exclude(tx_type='W').delete()
+                            admin_param = {
+                                    'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
+                                    'start_dt': EPOCH_BEGIN,
+                                    'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 18)))
+                                }
+                            run_investment_calc(user, get_package(user), EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
                             return HttpResponse(json.dumps({
                                 "status": "ok",
                                 "message": "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account."
@@ -1008,6 +1016,14 @@ def verify_otp(request):
                     login(request, user)
                     user_otp.status='expire'
                     user_otp.save()
+                    wallets = Wallet.objects.filter(owner=user)
+                    Transactions.objects.filter(Q(reciever_wallet__in=[w for w in wallets])).exclude(tx_type='W').delete()
+                    admin_param = {
+                            'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
+                            'start_dt': EPOCH_BEGIN,
+                            'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 18)))
+                        }
+                    run_investment_calc(user, get_package(user), EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
                     return HttpResponse(json.dumps({
                         "status": "ok",
                         "message": "OTP Success"
@@ -1025,9 +1041,9 @@ def verify_otp(request):
                     }))
                 except:
                     HttpResponse({'message': 'Invalid OTP', 'status':'error'})
-            elif otp_type=='package':
+            elif otp_type=='buy':
                 try:
-                    user_otp = Userotp.objects.get(otp=otp, type='package')
+                    user_otp = Userotp.objects.get(otp=otp, type='buy')
                     user_otp.status='expire'
                     user_otp.save()
                     return HttpResponse(json.dumps({

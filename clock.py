@@ -5,8 +5,8 @@ Run the background scheduler to schedule a job
 from datetime import datetime
 import time
 import os
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'avicrypto.settings')
+if not os.environ.get("DJANGO_SETTINGS_MODULE"):
+  os.environ.setdefault("DJANGO_SETTINGS_MODULE", "avicrypto.settings")
 
 from apscheduler.schedulers.background import BackgroundScheduler
 

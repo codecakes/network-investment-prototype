@@ -299,7 +299,7 @@
             $.ajax({
                 type: "POST",
                 url: "/send/",
-                data: {'type':'withdraw'},
+                data: {'type':'buy'},
                 success: function(data) {
                     if (data.status == "error") {
                         toastr.warning(data.message, "Error", toastr_options);
@@ -328,8 +328,21 @@
                 if (data.status == "error") {
                     toastr.warning(data.message, "Error", toastr_options);
                 } else {
-                  jQuery("#subscribeModal").modal('hide');
-                  toastr.success(data.message, "Success", toastr_options);
+                  var formData = getFormData($("#purchasePackageForm"));
+                  $.ajax({
+                      type: "POST",
+                      url: "/validate-user-transaction",
+                      data: formData,
+                      success: function(data) {
+                          data = JSON.parse(data)
+                          if(data.status == "error") {
+                            toastr.warning(data.message, "Error", toastr_options);
+                          } else {
+                            jQuery("#subscribeModal").modal('hide');
+                            toastr.success(data.message, "Success", toastr_options);
+                          }
+                      }
+                  });
                 }
             }
         });
