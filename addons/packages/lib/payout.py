@@ -431,7 +431,17 @@ def update_wallet_dt(user, wallet, wallet_type, last_date):
     wallet.created_at = p.created_at if wallet.created_at > p.created_at else wallet.created_at
     wallet.save(update_fields=['created_at'])
     return wallet
-    
+
+def check_pkg_investment(func):
+    @wraps(func)
+    def wrapped_f(*args, **kw):
+        user, pkg, last_date, next_payout = args
+        if pkg:
+            return func(*args, **kw)
+        return
+    return wrapped_f
+
+@check_pkg_investment
 def run_investment_calc(user, pkg, last_date, next_payout, **admin_param):
     # get user and avicrypto wallets
     user_btc = Wallet.objects.filter(owner=user, wallet_type='BTC')
