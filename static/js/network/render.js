@@ -121,6 +121,8 @@ $(function() {
   } 
 
   var user_info_dialog = function(data){
+    var active_date = data.package_active_date|| "Inactive";
+
     var info_template = '<table>'+
         '<thead>'+
             '<th>'+
@@ -138,7 +140,7 @@ $(function() {
             // '</tr>'+
             '<tr>'+
                 '<td>Package Active Date:</td>'+
-                '<td>'+data.package_active_date+'</td>'+
+                '<td>'+active_date+'</td>'+
             '</tr>'+
             '<tr>'+
                 '<td>Invesment:</td>'+
