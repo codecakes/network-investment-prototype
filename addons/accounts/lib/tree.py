@@ -310,7 +310,8 @@ def get_user_json(user, profile):
     investment = user_investment[0]['investment'] if user_investment else 0
 
     today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
-    
+    pkg = get_package(user)
+    pkg_dt = pkg.created_at.strftime("%D") if pkg else None
     return dict(id=user.id,
                 avi_id=profile.user_auto_id,
                 relationship=get_relationship(user),
@@ -332,7 +333,7 @@ def get_user_json(user, profile):
                 binary_right=binary_child(user, EPOCH_BEGIN, today, leg='r'),
                 left_members_count=get_user_count(user, 'l'),
                 right_members_count=get_user_count(user, 'r'),
-                package_active_date=get_package(user).created_at.strftime("%D")
+                package_active_date=pkg_dt
                 )
 
 
