@@ -99,7 +99,7 @@ def new_user_text(ref_code, *ref_kw):
     sibling = '1'
     relationship = parent+sibling+children
     return dict(
-        name="<a href= {}>Add New User</a>".format(href),
+        name='<a href= {}><img src="static/images/logo_add_tree.png"/><p>Add New User</p></a>'.format(href),
         relationship=relationship
     )
 
@@ -310,7 +310,7 @@ def get_user_json(user, profile):
     investment = user_investment[0]['investment'] if user_investment else 0
 
     today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
-
+    
     return dict(id=user.id,
                 avi_id=profile.user_auto_id,
                 relationship=get_relationship(user),
@@ -320,7 +320,7 @@ def get_user_json(user, profile):
                 placement_id=None if profile.placement_id is None else profile.placement_id.id,
                 placement_position=profile.placement_position, image=ICON,
                 link=dict(href=urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"),
-                # package=package,
+                image_Name= "inactive" if investment is 0 else "active",
                 investment=investment,
                 transaction=tot_txn_vol(user),
                 binary=binary_txns(user, EPOCH_BEGIN, today),
