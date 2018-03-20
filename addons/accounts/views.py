@@ -8,6 +8,8 @@ import sys
 import datetime
 from pytz import UTC
 import calendar
+import hashlib
+import time
 
 from django.conf import settings
 from django.contrib import messages
@@ -28,7 +30,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import *
 from django.core.exceptions import ObjectDoesNotExist
-from addons.accounts.models import Members, Profile, SupportTicket, UserAccount
+from addons.accounts.models import Members, Profile, SupportTicket, UserAccount, Userotp
 from addons.packages.lib.payout import UTC, calc, calculate_investment, find_next_monday, get_package
 # from addons.packages.lib.binary import calc_binary, calc_direct, calc_weekly
 from addons.packages.models import Packages, User_packages
@@ -117,25 +119,49 @@ def app_login(request):
         if request.method == 'POST':
             username = str(request.POST.get('username'))
             password = str(request.POST.get('password'))
-
             if username and password:
-                user = authenticate(username=username, password=password)
-                if user is not None:
-                    login(request, user)
-                    return HttpResponse(json.dumps({
-                        "status": "ok"
-                    }))
-                else:
+                try:
+                    user = User.objects.get(username=username)
+                    if user.check_password(password) is True:
+                        otp = genearte_user_otp(user, 'login')
+                        send_otp_sms_mail(otp, user.profile.mobile, user.email)
+                        return HttpResponse(json.dumps({
+                            "status": "successr",
+                            "message": "OTP is sent to registred email and mobile."
+                        }))
+                    else:
+                        return HttpResponse(json.dumps({
+                            "status": "error",
+                            "message": "Password is invalid."
+                        }))
+                except:
                     return HttpResponse(json.dumps({
                         "status": "error",
-                        "message": "Invalid Username or password."
+                        "message": "Invalid Username."
                     }))
+                # user = authenticate(username=username, password=password)
+                # import pdb; pdb.set_trace()
+                # if user is not None:
+                #     login(request, user)
+                #     # send and generate otp  
+                #     otp = genearte_user_otp(user, 'login')
+                #     send_otp_sms_mail(otp, user.profile.mobile, user.email)
+                #     # send_otp(request)
+                #     return HttpResponse(json.dumps({
+                #         "status": "ok"
+                #     }))
+                # else:
+                #     return HttpResponse(json.dumps({
+                #         "status": "error",
+                #         "message": "Invalid Username or password."
+                #     }))
             else:
                 return HttpResponse(json.dumps({
                     "status": "error",
                     "message": "Provide username or password."
                 }))
     else:
+        print "----"
         return HttpResponseRedirect('/home')
 
 
@@ -953,3 +979,99 @@ def withdraw(request):
                 "status": "error",
                 "message": "Select currency for withdraw."
             }))
+
+# OTP Based authentication
+# @api_view(['POST'])
+@csrf_exempt
+def send_otp(request):
+    if request.method == 'POST':
+        data = request.POST
+        otp_type = data['type']
+        if request.user:
+            otp = genearte_user_otp(request.user, otp_type)
+            send_otp_sms_mail(otp, request.user.profile.mobile, request.user.email)
+            return HttpResponse({'success': True})
+        else:
+            return HttpResponse("Invalid mobile number")
+
+@csrf_exempt
+def verify_otp(request):
+    if request.method == 'POST':
+        data = request.POST
+        otp = str(data['mobileOtp'])
+        otp_type = str(data['type'])
+        if otp and otp_type:
+            if otp_type == 'login':
+                user_otp = Userotp.objects.get(otp=otp, type='login')
+                user = authenticate(username=user_otp.user.username, password=str(data['password']))
+                if user is not None:
+                    login(request, user)
+                    user_otp.status='expire'
+                    user_otp.save()
+                    return HttpResponse(json.dumps({
+                        "status": "ok",
+                        "message": "OTP Success"
+                    }))
+                return HttpResponse({})
+            elif otp_type=='withdraw':
+                try:
+                    user_otp = Userotp.objects.get(otp=otp, type='withdraw')
+                    user_otp.status='expire'
+                    user_otp.save()
+                    print 'otp match'
+                    return HttpResponse(json.dumps({
+                        "status": "ok",
+                        "message": "OTP Success"
+                    }))
+                except:
+                    HttpResponse({'message': 'Invalid OTP', 'status':'error'})
+            elif otp_type=='package':
+                try:
+                    user_otp = Userotp.objects.get(otp=otp, type='package')
+                    user_otp.status='expire'
+                    user_otp.save()
+                    return HttpResponse(json.dumps({
+                        "status": "ok",
+                        "message": "OTP Success"
+                    }))
+                except:
+                    HttpResponse({'message': 'Invalid OTP', 'status':'error'})
+            elif otp_type=='mobile':
+                try:
+                    user_otp = Userotp.objects.get(otp=otp, type='mobile')
+                    user_otp.status='expire'
+                    user_otp.save()
+                    return HttpResponse(json.dumps({
+                        "status": "ok",
+                        "message": "OTP Success"
+                    }))
+                except:
+                    HttpResponse({'message': 'Invalid OTP', 'status':'error'})    
+        return  HttpResponse({'message': 'Invalid OTP', 'status':'error'})
+
+def genearte_user_otp(user, type):
+    hash = hashlib.sha1()
+    hash.update(str(time.time()))
+    otp = random.randrange(1, 1090000+1)
+    otp_obj = Userotp.objects.create(otp=otp, status='active', type=type, user=user)
+    return otp
+
+
+def check_user_exist_otp(user,type):    
+    time_threshold = datetime.now() - timedelta(min=2)
+    results = Userotp.objects.filter(created__at=time_threshold, mobile=user.profile.mobile, type=type, status='active')
+    return True
+
+def varify_user_otp(user,type, otp):
+    otp = Userotp.objects.filter(otp=otp, mobile=user.profile.mobile, type=type, status='active')
+    for key in otp:
+        key.status='expire'
+        key.save()
+    return True
+
+def send_otp_sms_mail(otp=None, mobile=None, email=None):
+    # if mobile and otp:
+    #     services.send_sms('+%s'%mobile, otp)
+    if email and otp:
+        body = "Your avicrypto varification code is: %s"%otp
+        services.send_email_mailgun('Avicrypto Varification', body, email, from_email="postmaster")

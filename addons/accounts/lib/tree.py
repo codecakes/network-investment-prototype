@@ -10,6 +10,8 @@ from functools import wraps
 from addons.packages.lib.payout_aux import get_package, binary_txns, direct_txns, roi_txns, binary_child, direct_child
 from django.conf import settings
 EPOCH_BEGIN = settings.EPOCH_BEGIN
+
+# from avicrypto.settings import EPOCH_BEGIN
 import datetime
 import pytz
 from addons.accounts.models import Profile, Members, User

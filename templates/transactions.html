@@ -7,7 +7,7 @@
         <div class="col-xs-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Wallet Summary</h4>
+                    <h4 class="card-title">Receiver's Summary</h4>
                 </div>
                 <div class="card-body collapse in">
                     <div class="table-responsive">
@@ -15,26 +15,36 @@
                             <thead>
                                 <tr>
                                     <th>Wallet Id</th>
-                                    <th>Receiver Wallet Address</th>
-                                    <th>Wallet Name</th>
-                                    <th>Wallet Amount</th>
+                                    <th>ROI</th>
+                                    <th>Binary</th>
+                                    <th>Direct</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for wallet in wallets %}
-                                    <tr>
-                                        <td>{{ wallet.uuid }}</td>
-                                        <td>{{ wallet.description }}</td>
-                                        <td>{{ wallet.wallet_type }}</td>
-                                        <td>${{ wallet.amount }}</td>
-                                    </tr>
-                                {% empty %}
-                                    <tr>
-                                        <td>
-                                            You currently have no wallet
-                                        </td>
-                                    </tr>
-                                {% endfor %}
+                                <tr>
+                                    <td>Till Now</td>
+                                    <td>${{roi.till_now}}</td>
+                                    <td>${{direct.till_now}}</td>
+                                    <td>${{binary.till_now}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Withdraw</td>
+                                    <td>${{roi.withdraw}}</td>
+                                    <td>${{direct.withdraw}}</td>
+                                    <td>${{binary.withdraw}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Pending</td>
+                                    <td>${{roi.pending}}</td>
+                                    <td>${{direct.pending}}</td>
+                                    <td>${{binary.pending}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total</td>
+                                    <td>${{roi.total}}</td>
+                                    <td>${{direct.total}}</td>
+                                    <td>${{binary.total}}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -92,6 +102,46 @@
                                     <tr>
                                         <td>
                                             You have no transactions yet
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Wallet Summary</h4>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Wallet Id</th>
+                                    <th>Receiver Wallet Address</th>
+                                    <th>Type</th>
+                                    <th>Wallet Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for wallet in wallets %}
+                                    <tr>
+                                        <td>{{ wallet.uuid }}</td>
+                                        <td>{{ wallet.description }}</td>
+                                        <td>{{ wallet.wallet_type }}</td>
+                                        <td>${{ wallet.amount }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td>
+                                            You currently have no wallet
                                         </td>
                                     </tr>
                                 {% endfor %}

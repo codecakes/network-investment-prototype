@@ -3,9 +3,12 @@ from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from addons.accounts.models import *
 from addons.packages.models import *
+from twilio.rest import Client
 
 uri = 'https://api.mailgun.net/v3/avicrypto.us/messages'
 key = 'key-1055741f06d43a548bf5def6962b536a'
+
+
 
 def send_email_results(amt, crypto_addr, bool_result):
     """
@@ -68,3 +71,21 @@ def active_required(function):
 def set_package_status(user, package, status):
     set_package = User_packages.objects.get_or_create(user=user, package=package, status=status)
     return True
+
+
+
+def send_sms(number, otp):
+    # Your Account SID from twilio.com/console
+    
+    account_sid = 'AC81b488d6cfc29c9db0a30de3eab91ef0'
+    # Your Auth Token from twilio.com/console
+    auth_token = '0f13a228d4b6f3224dbd5067e1a2d268'
+
+    client = Client(account_sid, auth_token)
+
+    message = client.messages.create(
+        to=number, 
+        from_="+19252663148",
+        body="Here is your varifation code- %s" %otp
+        )
+    print message.sid
