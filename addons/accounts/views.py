@@ -1089,5 +1089,5 @@ def send_otp_sms_mail(otp=None, mobile=None, email=None):
     # if mobile and otp:
     #     services.send_sms('+%s'%mobile, otp)
     if email and otp:
-        body = "Your avicrypto varification code is: %s"%otp
-        services.send_email_mailgun('Avicrypto Varification', body, email, from_email="postmaster")
+        body = "Your avicrypto verification code is: %s"%otp
+        services.send_email_mailgun('Avicrypto Verification', body, email, from_email="postmaster")
