@@ -45,6 +45,10 @@
                             <div id="otp_verification" class="hidden">
                                 <form id="otpLoginForm" method="post" action="/varify/" class="form-horizontal form-simple" novalidate>
                                     {% csrf_token %}
+                                    <fieldset>
+                                        <h4>Kindly check your email for OTP</h4>
+                                        <br>
+                                    </fieldset>
                                     <fieldset class="form-group position-relative has-icon-left">
                                         <input type="text" name="mobileOtp" id="mobileOtp" class="form-control input-lg" placeholder="OTP" pattern="^\+?1?\d{6}$" required data-validation-required-message="Please enter valid OTP" data-validation-pattern-message="Please enter 6 digit valid OTP number">
                                         <div class="form-control-position">

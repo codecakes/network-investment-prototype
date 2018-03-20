@@ -63,7 +63,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 id="subscribeTitle"class="modal-title"></h4>
+                            <h4 id="subscribeTitle" class="modal-title"></h4>
                         </div>
                         <div class="modal-body">
                             <div id="packCode"></div>
@@ -304,6 +304,7 @@
                     if (data.status == "error") {
                         toastr.warning(data.message, "Error", toastr_options);
                     } else {
+                        $("#subscribeTitle").html("Kindly check your email for OTP")
                       $("#otpContainer").toggle()
                       $("#message").hide();
                       $("#purchasePackageFormContainer").hide()    
