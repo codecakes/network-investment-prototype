@@ -22,79 +22,8 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Business Detail: Selected User Name</h4>
-                    <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
-                    <div class="heading-elements">
-                        <ul class="list-inline mb-0">
-                            <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
                 <div class="card-body">
                     <div class="card-block py-0">
-                        <!-- <div class="row">
-                            <div class="col-xl-6 col-sm-12 border-right-blue-grey border-right-lighten-5">
-                                <div class="media px-1">
-                                    <div class="media-left media-middle">
-                                        <i class="icon-box font-large-1 blue-grey"></i>
-                                    </div>
-                                    <div class="media-body text-xs-center">
-                                        <span class="font-large-2 text-bold-300 info">Left</span>
-                                    </div>
-                                    <div class="row mt-1">
-                                        <div>
-                                            <table class="table aling-center">
-                                               <tbody>
-                                                   <tr>
-                                                       <td>Total: </td>
-                                                       <td>0000</td>
-                                                   </tr>         
-                                                   <tr>
-                                                       <td>Binary: </td>
-                                                       <td>0000</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <td>Direct: </td>
-                                                       <td>0000</td>
-                                                   </tr>
-                                               </tbody> 
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-6 col-sm-12 border-right-blue-grey border-right-lighten-5">
-                                <div class="media px-1">
-                                    <div class="media-left media-middle">
-                                        <i class="icon-tag3 font-large-1 blue-grey"></i>
-                                    </div>
-                                    <div class="media-body text-xs-center">
-                                        <span class="font-large-2 text-bold-200 deep-orange">Right</span>
-                                    </div>
-                                    <div class="row mt-1">
-                                        <div>
-                                            <table class="table aling-center">
-                                               <tbody>
-                                                   <tr>
-                                                       <td>Total: </td>
-                                                       <td>0000</td>
-                                                   </tr>         
-                                                   <tr>
-                                                       <td>Binary: </td>
-                                                       <td>0000</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <td>Direct: </td>
-                                                       <td>0000</td>
-                                                   </tr>
-                                               </tbody> 
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
                         <div class="row">
                             <div class="col-xs-12">
                                 <!--<div class="chart" id="networkTree"></div>-->
@@ -110,7 +39,27 @@
                                 {% endif %} -->
                             </div>
                         </div>
+                        <div class="form social-icons">
+                            <button type="button" id="close-user-info-dialog-button" style="color:#000;" class="close btn btn-arrow-right btn-right" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <div id="sign-up-form">
+                                <form class="text-center">
+                                   <div id="info_dialog"></div>
+                                </form>
+                            </div>
+                        </div>
                         <div id="sequence" class="hidden"></div>
+                        <div id="info_dialog_info" class="hidden"></div>    
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-block py-0">
+                        <div class="row">
+                          <div id="business_details" class="col-xs-12"></div>
+                        </div>
                     </div>
                 </div>
             </div>

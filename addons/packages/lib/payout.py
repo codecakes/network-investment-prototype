@@ -293,6 +293,9 @@ def calc_weekly(user, last_date, next_date, dry=True):
     if old_date < new_date:
         delta = new_date - old_date
         num_weeks = floor(delta.days/7.0)
+        # pkg = get_package(user)
+        # payout = (pkg.package.payout/100.) * pkg.package.price
+        # res = (round((payout * num_weeks), 2), 'direct')
         res = payout, _ = calc_daily(user, old_date_time, next_date)
     else:
         res = payout, _ = (0.0, 'direct')
