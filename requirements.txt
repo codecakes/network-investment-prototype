@@ -109,7 +109,7 @@ storage==0.0.4.3
 tablib==0.12.1
 texttable==1.1.1
 traitlets==4.3.2
-twilio==6.10.4
+twilio==6.10.5
 tzlocal==1.5.1
 unicodecsv==0.14.1
 uritemplate==3.0.0
