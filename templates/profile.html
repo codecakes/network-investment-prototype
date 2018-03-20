@@ -72,19 +72,44 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-md-3 label-control">Mobile</label>
-                                <div class="col-md-9">
-                                    {{user.profile.mobile}}
-                                </div>
-                            </div>
-                            <div class="form-group row">
                                 <label class="col-md-3 label-control" for="country">Country</label>
                                 <div class="col-md-9">
-                                    <select name="country" id="country" class="form-control">
+                                    {% if user.mobile_verified %}
+                                        <select name="country" id="country" class="form-control" disabled>
                                         {% for country in countries %}
                                             <option {% if user.profile.country == country.country_code %}selected{% endif %} data-code="{{country.dialling_code}}" value="{{country.country_code}}">{{country.country_name}}</option>
                                         {% endfor %}
                                     </select>
+                                    {% else %}
+                                        <select name="country" id="country" class="form-control">
+                                        {% for country in countries %}
+                                            <option {% if user.profile.country == country.country_code %}selected{% endif %} data-code="{{country.dialling_code}}" value="{{country.country_code}}">{{country.country_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 label-control">Mobile</label>
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <span class="col-md-1" id="countryCode">+93</span>
+                                        {% if user.profile.verified %}
+                                            <div class="col-md-7">
+                                                <input type="text" name="mobile" id="mobile_profile" class="form-control" placeholder="Mobile Number" pattern="^\+?1?\d{9,15}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number." name="user_mobile" value="{{user.profile.mobile|default_if_none:""}}" aria-describedby="countryCode" disabled>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <span class="btn btn-green  btn-primary"> Verified</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="col-md-7">
+                                                <input readonly type="text" name="mobile" id="mobile_profile" class="form-control" placeholder="Mobile Number" pattern="^\+?1?\d{9,15}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number." name="user_mobile" value="{{user.profile.mobile|default_if_none:""}}" aria-describedby="countryCode" required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <!-- <button id="verifiy_mobile_otp" class="btn btn-primary">Send OTP</button> -->
+                                            </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -204,6 +229,31 @@
     </div>
 </div>
 
+<div id="profile_mobile_verify_otp_modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Kindly check your email for OTP</h4>
+            </div>
+            <div class="modal-body">
+                <form id="otpWithdrawlForm" method="post" action="" class="form-horizontal form-simple" novalidate>
+                    {% csrf_token %}
+                    <fieldset class="form-group position-relative has-icon-left">
+                        <input type="text" name="mobileOtp" id="profile_mobile_verify_otp" class="form-control input-lg" placeholder="OTP" pattern="^\+?1?\d{6}$" required data-validation-required-message="Please enter valid OTP" data-validation-pattern-message="Please enter 6 digit valid OTP number">
+                        <div class="form-control-position">
+                            <i class="icon-head"></i>
+                        </div>
+                        <div class="help-block font-small-3"></div>
+                    </fieldset>
+                    <button id="profile_mobile_verify_otp_send" class="btn btn-primary btn-lg btn-block">
+                        <i class="icon-unlock2"></i> Ok
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block page_javascript %}

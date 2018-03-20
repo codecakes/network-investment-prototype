@@ -46,7 +46,54 @@ $(document).ready(function() {
 			}
 		});
 	});
+	
 
+	$("#verifiy_mobile_otp").click(function(){
+		event.preventDefault();
+		var mobile_number = $("#mobile_profile").val().trim();
+		if(mobile_number && (mobile_number.match(/^[0-9]+$/)!=null) && ((mobile_number.length >=9)&& (mobile_number.length <=15))){
+			$.ajax({
+				type: "POST",
+				url: "/send/",
+				data:  {'type':'withdraw'},
+				success: function(data) {
+					//block_element.unblock()
+					//toastr.success(data.message, "Success", toastr_options);
+					if (data.status == "error") {
+	                    toastr.warning(data.message, "Error", toastr_options);
+	                } else {
+					  $("#profile_mobile_verify_otp_modal").modal('show')
+	                  $("#profile_mobile_verify_otp").val();		    
+	                }
+				}
+			});
+
+		} else {
+			toastr.warning("Incorrect Mobile Number", "Error", toastr_options);	
+		}
+	})
+
+	$("#profile_mobile_verify_otp_send").click(function(){
+		event.preventDefault();
+        $.ajax({
+            type: "POST",
+			url: "/varify/",
+			data: {
+                "type":"mobile",
+                "mobileOtp": $("#profile_mobile_verify_otp").val() 
+                },
+            success: function(data) {
+                if (data.status == "error") {
+                    toastr.warning(data.message, "Error", toastr_options);
+                } else {
+  				  $("#profile_mobile_verify_otp_modal").modal('hide')
+                  $("#profile_mobile_verify_otp").val();
+                  toastr.success(data.message, "Success", toastr_options);
+                }
+            }
+        });
+	})
+	
 	$("#profile_crypto_accounts_form").submit(function(event) {
 		event.preventDefault();
 
@@ -103,4 +150,11 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	$("#country").change(function() {
+		var optionSelected = $("option:selected", this);
+		$("#countryCode").html(optionSelected.data("code"));
+	})
+
+	$("#mobile_profile").jqBootstrapValidation()
 });

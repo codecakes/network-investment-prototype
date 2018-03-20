@@ -15,7 +15,7 @@ $(function() {
       /*<p class="m-0">Package: ${data.package}</p>*/
       return `
         <div>
-          <img src="static/images/logo_tree_${data.image_Name}.png"/>
+          <img src="https://avicrypto-us.github.io/avi.github.io/staticfiles/images/logo_tree_${data.image_Name}.png"/>
           <div>
           <div>${data.avi_id}</div>
           <div>${data.name}</div>
@@ -121,6 +121,8 @@ $(function() {
   } 
 
   var user_info_dialog = function(data){
+    var active_date = data.package_active_date|| "Inactive";
+
     var info_template = '<table>'+
         '<thead>'+
             '<th>'+
@@ -132,13 +134,13 @@ $(function() {
                 '<td>User Id:</td>'+
                 '<td>'+data.avi_id+'</td>'+
             '</tr>'+
-            '<tr>'+
-                '<td>Package Add Date:</td>'+
-                '<td>'+data.package_creation_date+'</td>'+
-            '</tr>'+
+            // '<tr>'+
+            //     '<td>Package Add Date:</td>'+
+            //     '<td>'+data.package_creation_date+'</td>'+
+            // '</tr>'+
             '<tr>'+
                 '<td>Package Active Date:</td>'+
-                '<td>'+data.package_active_date+'</td>'+
+                '<td>'+active_date+'</td>'+
             '</tr>'+
             '<tr>'+
                 '<td>Invesment:</td>'+

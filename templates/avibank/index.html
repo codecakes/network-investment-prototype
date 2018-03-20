@@ -1,0 +1,359 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<title>Avicrypto Bank</title>
+
+	<!-- Bootstrap core CSS -->
+	
+	<link href="{% static 'avibank/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+	<!-- Custom fonts for this template -->
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,200i,300,300i,400,400i,600,600i,700,700i,900,900i"
+	 rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Merriweather:300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
+	<link href="{% static 'avibank/vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="{% static 'vendors/css/extensions/toastr.css' %}">
+	<!-- Custom styles for this template -->
+	<link href="{% static 'avibank/css/coming-soon.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+	<div class="d-none d-md-block h-100">
+		<div class="masthead">
+			<div class="masthead-bg"></div>
+			<div class="container h-100">
+				<div class="row h-100">
+					<div class="col-11 my-auto">
+						<div class="masthead-content text-white py-5 py-md-0  text-center">
+							<img class="logo imd-fluid" src="{% static 'avibank/logo.png'%}">
+						</div>
+						<div class="message-site">
+							<h3>Bank on us, Bank with us</h3>
+							<h5>virtual money real wealth</h5>
+							<a class="btn btn-primary-outline button mb-4" id="form-Toggle">Subscribe</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+		<div class="form social-icons">
+			<div id="sign-up-form">
+				<form class="text-center" id="bankSubscribeForm">
+					<button type="button" id="close-form-button" style="color:#fff;" class="close btn-right d-none d-md-inline-block" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h2 style="padding-left: 15%" class="mb-3">Join the Team</h2>
+					<br>
+					<div>
+						<input type="text" class="form-control" name="name" placeholder="Name..." aria-label="Name..." aria-describedby="basic-addon" required>
+						<br>
+						<input type="email" class="form-control" name="email" placeholder="Email..." aria-label="Email..." aria-describedby="basic-addon" required>
+						<!-- <input type="text" class="form-control" placeholder="Country..." aria-label="Country..." aria-describedby="basic-addon" required> -->
+						<br>
+						<input type="number" class="form-control" name="mobile" placeholder="Mobile..." aria-label="Mobile..." aria-describedby="basic-addon" required>
+						<br>
+						<select class="form-control" name="country" placeholder="Country..." aria-label="Country..." aria-describedby="basic-addon" required>
+							<option data-code="00" value="">Country...</option>
+							<option data-code="+93" value="AF">Afghanistan</option>
+							<option data-code="+355" value="AL">Albania</option>
+							<option data-code="+213" value="DZ">Algeria</option>
+							<option data-code="+1" value="AS">American Samoa</option>
+							<option data-code="+376" value="AD">Andorra</option>
+							<option data-code="+244" value="AO">Angola</option>
+							<option data-code="+1" value="AI">Anguilla</option>
+							<option data-code="+1" value="AG">Antigua</option>
+							<option data-code="+54" value="AR">Argentina</option>
+							<option data-code="+374" value="AM">Armenia</option>
+							<option data-code="+297" value="AW">Aruba</option>
+							<option data-code="+61" value="AU">Australia</option>
+							<option data-code="+43" value="AI">Austria</option>
+							<option data-code="+994" value="AZ">Azerbaijan</option>
+							<option data-code="+973" value="BH">Bahrain</option>
+							<option data-code="+880" value="BD">Bangladesh</option>
+							<option data-code="+1" value="BB">Barbados</option>
+							<option data-code="+375" value="BY">Belarus</option>
+							<option data-code="+32" value="BE">Belgium</option>
+							<option data-code="+501" value="BZ">Belize</option>
+							<option data-code="+229" value="BJ">Benin</option>
+							<option data-code="+1" value="BM">Bermuda</option>
+							<option data-code="+975" value="BT">Bhutan</option>
+							<option data-code="+591" value="BO">Bolivia</option>
+							<option data-code="+387" value="BA">Bosnia and Herzegovina</option>
+							<option data-code="+267" value="BW">Botswana</option>
+							<option data-code="+55" value="BR">Brazil</option>
+							<option data-code="+246" value="IO">British Indian Ocean Territory</option>
+							<option data-code="+1" value="VG">British Virgin Islands</option>
+							<option data-code="+673" value="BN">Brunei</option>
+							<option data-code="+359" value="BG">Bulgaria</option>
+							<option data-code="+226" value="BF">Burkina Faso</option>
+							<option data-code="+95" value="MM">Burma Myanmar</option>
+							<option data-code="+257" value="BI">Burundi</option>
+							<option data-code="+855" value="KH">Cambodia</option>
+							<option data-code="+237" value="CM">Cameroon</option>
+							<option data-code="+1" value="CA">Canada</option>
+							<option data-code="+238" value="CV">Cape Verde</option>
+							<option data-code="+1" value="KY">Cayman Islands</option>
+							<option data-code="+236" value="CF">Central African Republic</option>
+							<option data-code="+235" value="ID">Chad</option>
+							<option data-code="+56" value="CL">Chile</option>
+							<option data-code="+86" value="CN">China</option>
+							<option data-code="+57" value="CO">Colombia</option>
+							<option data-code="+269" value="KM">Comoros</option>
+							<option data-code="+682" value="CK">Cook Islands</option>
+							<option data-code="+506" value="CR">Costa Rica</option>
+							<option data-code="+225" value="CI">Côte d'Ivoire</option>
+							<option data-code="+385" value="HR">Croatia</option>
+							<option data-code="+53" value="CU">Cuba</option>
+							<option data-code="+357" value="CY">Cyprus</option>
+							<option data-code="+420" value="CZ">Czech Republic</option>
+							<option data-code="+243" value="CD">Democratic Republic of Congo</option>
+							<option data-code="+45" value="DK">Denmark</option>
+							<option data-code="+253" value="DJ">Djibouti</option>
+							<option data-code="+1" value="DM">Dominica</option>
+							<option data-code="+1" value="DO">Dominican Republic</option>
+							<option data-code="+593" value="EC">Ecuador</option>
+							<option data-code="+20" value="EG">Egypt</option>
+							<option data-code="+503" value="SV">El Salvador</option>
+							<option data-code="+240" value="GQ">Equatorial Guinea</option>
+							<option data-code="+291" value="ER">Eritrea</option>
+							<option data-code="+372" value="EE">Estonia</option>
+							<option data-code="+251" value="ET">Ethiopia</option>
+							<option data-code="+500" value="FK">Falkland Islands</option>
+							<option data-code="+298" value="FO">Faroe Islands</option>
+							<option data-code="+691" value="FM">Federated States of Micronesia</option>
+							<option data-code="+679" value="FJ">Fiji</option>
+							<option data-code="+358" value="FI">Finland</option>
+							<option data-code="+33" value="FR">France</option>
+							<option data-code="+594" value="GF">French Guiana</option>
+							<option data-code="+689" value="PF">French Polynesia</option>
+							<option data-code="+241" value="GA">Gabon</option>
+							<option data-code="+995" value="GE">Georgia</option>
+							<option data-code="+49" value="DE">Germany</option>
+							<option data-code="+233" value="GH">Ghana</option>
+							<option data-code="+350" value="GI">Gibraltar</option>
+							<option data-code="+30" value="GR">Greece</option>
+							<option data-code="+299" value="GL">Greenland</option>
+							<option data-code="+1" value="GD">Grenada</option>
+							<option data-code="+590" value="GP">Guadeloupe</option>
+							<option data-code="+1" value="GU">Guam</option>
+							<option data-code="+502" value="GT">Guatemala</option>
+							<option data-code="+224" value="GN">Guinea</option>
+							<option data-code="+245" value="GW">Guinea-Bissau</option>
+							<option data-code="+592" value="GY">Guyana</option>
+							<option data-code="+509" value="HT">Haiti</option>
+							<option data-code="+504" value="HN">Honduras</option>
+							<option data-code="+852" value="HK">Hong Kong</option>
+							<option data-code="+36" value="HU">Hungary</option>
+							<option data-code="+354" value="IS">Iceland</option>
+							<option data-code="+91" value="IN">India</option>
+							<option data-code="+62" value="ID">Indonesia</option>
+							<option data-code="+98" value="IR">Iran</option>
+							<option data-code="+964" value="IQ">Iraq</option>
+							<option data-code="+353" value="IE">Ireland</option>
+							<option data-code="+972" value="IL">Israel</option>
+							<option data-code="+39" value="IT">Italy</option>
+							<option data-code="+1" value="JM">Jamaica</option>
+							<option data-code="+81" value="JP">Japan</option>
+							<option data-code="+962" value="JO">Jordan</option>
+							<option data-code="+7" value="KZ">Kazakhstan</option>
+							<option data-code="+254" value="KE">Kenya</option>
+							<option data-code="+686" value="KI">Kiribati</option>
+							<option data-code="+381" value="XK">Kosovo</option>
+							<option data-code="+965" value="KW">Kuwait</option>
+							<option data-code="+996" value="KG">Kyrgyzstan</option>
+							<option data-code="+856" value="LA">Laos</option>
+							<option data-code="+371" value="LV">Latvia</option>
+							<option data-code="+961" value="LB">Lebanon</option>
+							<option data-code="+266" value="LS">Lesotho</option>
+							<option data-code="+231" value="LR">Liberia</option>
+							<option data-code="+218" value="LY">Libya</option>
+							<option data-code="+423" value="LI">Liechtenstein</option>
+							<option data-code="+370" value="LT">Lithuania</option>
+							<option data-code="+352" value="LU">Luxembourg</option>
+							<option data-code="+853" value="MO">Macau</option>
+							<option data-code="+389" value="MK">Macedonia</option>
+							<option data-code="+261" value="MG">Madagascar</option>
+							<option data-code="+265" value="MW">Malawi</option>
+							<option data-code="+60" value="MY">Malaysia</option>
+							<option data-code="+960" value="MV">Maldives</option>
+							<option data-code="+223" value="ML">Mali</option>
+							<option data-code="+356" value="MT">Malta</option>
+							<option data-code="+692" value="MH">Marshall Islands</option>
+							<option data-code="+596" value="MQ">Martinique</option>
+							<option data-code="+222" value="MR">Mauritania</option>
+							<option data-code="+230" value="MU">Mauritius</option>
+							<option data-code="+262" value="YT">Mayotte</option>
+							<option data-code="+52" value="MX">Mexico</option>
+							<option data-code="+373" value="MD">Moldova</option>
+							<option data-code="+377" value="MC">Monaco</option>
+							<option data-code="+976" value="MN">Mongolia</option>
+							<option data-code="+382" value="ME">Montenegro</option>
+							<option data-code="+1" value="MS">Montserrat</option>
+							<option data-code="+212" value="MA">Morocco</option>
+							<option data-code="+258" value="MZ">Mozambique</option>
+							<option data-code="+264" value="NA">Namibia</option>
+							<option data-code="+674" value="NR">Nauru</option>
+							<option data-code="+977" value="NP">Nepal</option>
+							<option data-code="+31" value="NL">Netherlands</option>
+							<option data-code="+599" value="AN">Netherlands Antilles</option>
+							<option data-code="+687" value="NC">New Caledonia</option>
+							<option data-code="+64" value="NZ">New Zealand</option>
+							<option data-code="+505" value="NI">Nicaragua</option>
+							<option data-code="+227" value="NE">Niger</option>
+							<option data-code="+234" value="NG">Nigeria</option>
+							<option data-code="+683" value="NU">Niue</option>
+							<option data-code="+672" value="NF">Norfolk Island</option>
+							<option data-code="+850" value="KP">North Korea</option>
+							<option data-code="+1" value="MP">Northern Mariana Islands</option>
+							<option data-code="+47" value="NO">Norway</option>
+							<option data-code="+968" value="OM">Oman</option>
+							<option data-code="+92" value="PK">Pakistan</option>
+							<option data-code="+680" value="PW">Palau</option>
+							<option data-code="+970" value="PS">Palestine</option>
+							<option data-code="+507" value="PA">Panama</option>
+							<option data-code="+675" value="PG">Papua New Guinea</option>
+							<option data-code="+595" value="PY">Paraguay</option>
+							<option data-code="+51" value="PE">Peru</option>
+							<option data-code="+63" value="PH">Philippines</option>
+							<option data-code="+48" value="PL">Poland</option>
+							<option data-code="+351" value="PT">Portugal</option>
+							<option data-code="+1" value="PR">Puerto Rico</option>
+							<option data-code="+974" value="QA">Qatar</option>
+							<option data-code="+242" value="CG">Republic of the Congo</option>
+							<option data-code="+262" value="RE">Réunion</option>
+							<option data-code="+40" value="RO">Romania</option>
+							<option data-code="+7" value="RU">Russia</option>
+							<option data-code="+250" value="RW">Rwanda</option>
+							<option data-code="+590" value="BL">Saint Barthélemy</option>
+							<option data-code="+290" value="SH">Saint Helena</option>
+							<option data-code="+1" value="KN">Saint Kitts and Nevis</option>
+							<option data-code="+590" value="MF">Saint Martin</option>
+							<option data-code="+508" value="PM">Saint Pierre and Miquelon</option>
+							<option data-code="+1" value="VC">Saint Vincent and the Grenadines</option>
+							<option data-code="+685" value="WS">Samoa</option>
+							<option data-code="+378" value="SM">San Marino</option>
+							<option data-code="+239" value="ST">São Tomé and Príncipe</option>
+							<option data-code="+966" value="SA">Saudi Arabia</option>
+							<option data-code="+221" value="SN">Senegal</option>
+							<option data-code="+381" value="RS">Serbia</option>
+							<option data-code="+248" value="SC">Seychelles</option>
+							<option data-code="+232" value="SL">Sierra Leone</option>
+							<option data-code="+65" value="SG">Singapore</option>
+							<option data-code="+421" value="SK">Slovakia</option>
+							<option data-code="+386" value="SI">Slovenia</option>
+							<option data-code="+677" value="SB">Solomon Islands</option>
+							<option data-code="+252" value="SO">Somalia</option>
+							<option data-code="+27" value="ZA">South Africa</option>
+							<option data-code="+82" value="KR">South Korea</option>
+							<option data-code="+34" value="ES">Spain</option>
+							<option data-code="+94" value="LK">Sri Lanka</option>
+							<option data-code="+1" value="LC">St. Lucia</option>
+							<option data-code="+249" value="SD">Sudan</option>
+							<option data-code="+597" value="SR">Suriname</option>
+							<option data-code="+268" value="SZ">Swaziland</option>
+							<option data-code="+46" value="SE">Sweden</option>
+							<option data-code="+41" value="CH">Switzerland</option>
+							<option data-code="+963" value="SY">Syria</option>
+							<option data-code="+886" value="TW">Taiwan</option>
+							<option data-code="+992" value="TJ">Tajikistan</option>
+							<option data-code="+255" value="TZ">Tanzania</option>
+							<option data-code="+66" value="TH">Thailand</option>
+							<option data-code="+1" value="BS">The Bahamas</option>
+							<option data-code="+220" value="GM">The Gambia</option>
+							<option data-code="+670" value="TL">Timor-Leste</option>
+							<option data-code="+228" value="TG">Togo</option>
+							<option data-code="+690" value="TK">Tokelau</option>
+							<option data-code="+676" value="TO">Tonga</option>
+							<option data-code="+1" value="TT">Trinidad and Tobago</option>
+							<option data-code="+216" value="TN">Tunisia</option>
+							<option data-code="+90" value="TR">Turkey</option>
+							<option data-code="+993" value="TM">Turkmenistan</option>
+							<option data-code="+1" value="TC">Turks and Caicos Islands</option>
+							<option data-code="+688" value="TV">Tuvalu</option>
+							<option data-code="+256" value="UG">Uganda</option>
+							<option data-code="+380" value="UA">Ukraine</option>
+							<option data-code="+971" value="AE">United Arab Emirates</option>
+							<option data-code="+44" value="GB">United Kingdom</option>
+							<option data-code="+1" value="US">United States</option>
+							<option data-code="+598" value="UY">Uruguay</option>
+							<option data-code="+1" value="VI">US Virgin Islands</option>
+							<option data-code="+998" value="UZ">Uzbekistan</option>
+							<option data-code="+678" value="VU">Vanuatu</option>
+							<option data-code="+39" value="VA">Vatican City</option>
+							<option data-code="+58" value="VE">Venezuela</option>
+							<option data-code="+84" value="VN">Vietnam</option>
+							<option data-code="+681" value="WF">Wallis and Futuna</option>
+							<option data-code="+967" value="YE">Yemen</option>
+							<option data-code="+260" value="ZM">Zambia</option>
+							<option data-code="+263" value="ZW">Zimbabwe</option>
+						</select>
+						<br>
+						<button class="btn btn-secondary form-button" id="bankSubscribe" type="button">Notify</button>
+					</div>
+				</form>
+	
+			</div>
+		</div>
+	</div>
+
+	<div class="d-block d-md-none">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 text-center">
+					<img class="logo imd-fluid d-block mx-auto" src="{% static 'avibank/logo.png' %}">
+					<h3 class="color-white">Bank on us, Bank with us</h3>
+					<h5 class="color-white">virtual money real wealth</h5>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 text-center">
+					<h2 class="color-white">Join the Team</h2>
+					<form class="">
+						<input type="text" class="form-control" placeholder="Name.jhhh.." aria-label="Name..." aria-describedby="basic-addon" required>
+						<br>
+						<input type="text" class="form-control" placeholder="Country..." aria-label="Country..." aria-describedby="basic-addon" required>
+						<br>
+						<input type="number" class="form-control" placeholder="Mobile..." aria-label="Mobile..." aria-describedby="basic-addon" required>
+						<br>
+						<input type="email" class="form-control" placeholder="Email..." aria-label="Email..." aria-describedby="basic-addon" required>
+						<br>
+						<button class="btn btn-secondary form-button" type="button">Notify</button>
+						<!-- <a class="btn btn-primary-outline form-button" id="">Notify</a> -->
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap core JavaScript -->
+	<script src="{% static 'avibank/vendor/jquery/jquery.min.js' %}"></script>
+	<script src="{% static 'avibank/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+	<!-- Plugin JavaScript -->
+	<script src="{% static 'avibank/vendor/vide/jquery.vide.min.js' %}"></script>
+	<script>
+		bankMp4 = "{% static 'avibank/mp4/bg02.mp4' %}"
+		//bankPoster = "{% static 'avibank/img/bg-mobile-fallback.jpg' %}"
+	</script>
+	
+	<!-- Custom scripts for this template -->
+	<script type="text/javascript" src="{% static 'vendors/js/extensions/toastr.min.js' %}"></script>
+	<script src="{% static 'avibank/js/coming-soon.js' %}"></script>
+	<!-- <script type="text/javascript" src="{% static 'js/pages/login.min.js' %}"></script> -->
+	
+
+</body>
+
+</html>

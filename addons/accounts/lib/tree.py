@@ -7,9 +7,11 @@ from django.conf import settings
 from urllib2 import urlparse
 from functools import wraps
 
-from addons.packages.lib.payout_aux import binary_txns, direct_txns, roi_txns, binary_child, direct_child
+from addons.packages.lib.payout_aux import get_package, binary_txns, direct_txns, roi_txns, binary_child, direct_child
 from django.conf import settings
 EPOCH_BEGIN = settings.EPOCH_BEGIN
+
+# from avicrypto.settings import EPOCH_BEGIN
 import datetime
 import pytz
 from addons.accounts.models import Profile, Members, User
@@ -99,7 +101,7 @@ def new_user_text(ref_code, *ref_kw):
     sibling = '1'
     relationship = parent+sibling+children
     return dict(
-        name='<a href= {}><img src="https://github.com/avicrypto-us/avi.github.io/blob/master/staticfiles/images/logo_add_tree.png"/><p>Add New User</p></a>'.format(href),
+        name='<a href= {}><img src="https://avicrypto-us.github.io/avi.github.io/staticfiles/images/logo_add_tree.png"/><p>Add New User</p></a>'.format(href),
         relationship=relationship
     )
 
@@ -310,7 +312,8 @@ def get_user_json(user, profile):
     investment = user_investment[0]['investment'] if user_investment else 0
 
     today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
-    
+    pkg = get_package(user)
+    pkg_dt = pkg.created_at.strftime("%D") if pkg else None
     return dict(id=user.id,
                 avi_id=profile.user_auto_id,
                 relationship=get_relationship(user),
@@ -331,7 +334,8 @@ def get_user_json(user, profile):
                 binary_left=binary_child(user, EPOCH_BEGIN, today, leg='l'),
                 binary_right=binary_child(user, EPOCH_BEGIN, today, leg='r'),
                 left_members_count=get_user_count(user, 'l'),
-                right_members_count=get_user_count(user, 'r')
+                right_members_count=get_user_count(user, 'r'),
+                package_active_date=pkg_dt
                 )
 
 
