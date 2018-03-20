@@ -102,7 +102,7 @@ def new_user_text(ref_code, *ref_kw):
     sibling = '1'
     relationship = parent+sibling+children
     return dict(
-        name="<a href= {}>Add New User</a>".format(href),
+        name='<a href= {}><img src="https://github.com/avicrypto-us/avi.github.io/blob/master/staticfiles/images/logo_add_tree.png"/><p>Add New User</p></a>'.format(href),
         relationship=relationship
     )
 
@@ -292,6 +292,14 @@ def get_relationship(user):
     children = '1' if len(Members.objects.filter(parent_id=user)) > 0 else '0'
     return parent + sibling + children
 
+def get_user_count(user, leg = 'l'):
+    child = get_left(user) if leg == 'l' else get_right(user)
+    if child:
+        return 1 + get_user_count(child, leg = 'l') + get_user_count(child, leg = 'r')
+    else:
+        return 0
+        
+        
 def get_user_json(user, profile):
     
     # try:
@@ -305,7 +313,7 @@ def get_user_json(user, profile):
     investment = user_investment[0]['investment'] if user_investment else 0
 
     today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
-
+    
     return dict(id=user.id,
                 avi_id=profile.user_auto_id,
                 relationship=get_relationship(user),
@@ -315,7 +323,7 @@ def get_user_json(user, profile):
                 placement_id=None if profile.placement_id is None else profile.placement_id.id,
                 placement_position=profile.placement_position, image=ICON,
                 link=dict(href=urlparse.urljoin("https://www.avicrypto.us", "/network") + "#"),
-                # package=package,
+                image_Name= "inactive" if investment is 0 else "active",
                 investment=investment,
                 transaction=tot_txn_vol(user),
                 binary=binary_txns(user, EPOCH_BEGIN, today),
@@ -324,7 +332,9 @@ def get_user_json(user, profile):
                 direct_left=direct_child(user, EPOCH_BEGIN, today, leg='l'),
                 direct_right=direct_child(user, EPOCH_BEGIN, today, leg='r'),
                 binary_left=binary_child(user, EPOCH_BEGIN, today, leg='l'),
-                binary_right=binary_child(user, EPOCH_BEGIN, today, leg='r')
+                binary_right=binary_child(user, EPOCH_BEGIN, today, leg='r'),
+                left_members_count=get_user_count(user, 'l'),
+                right_members_count=get_user_count(user, 'r')
                 )
 
 
