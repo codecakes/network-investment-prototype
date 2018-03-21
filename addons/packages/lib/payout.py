@@ -287,15 +287,16 @@ def calc_weekly(user, last_date, next_date, dry=True):
     num_weeks = 0
     # user_doj = user.date_joined.date()
     # user_doj = date(user_doj.year, user_doj.month, user_doj.day)
-    old_date = greater_date(user_doj, date(
-        last_date.year, last_date.month, last_date.day))
+    old_date_time = pkg.created_at if pkg.created_at > last_date else last_date
+    old_date = greater_date(user_doj, date(last_date.year, last_date.month, last_date.day))
     new_date = next_date.date()
     if old_date < new_date:
         delta = new_date - old_date
         num_weeks = floor(delta.days/7.0)
-        pkg = get_package(user)
-        payout = (pkg.package.payout/100.) * pkg.package.price
-        res = (round((payout * num_weeks), 2), 'direct')
+        # pkg = get_package(user)
+        # payout = (pkg.package.payout/100.) * pkg.package.price
+        # res = (round((payout * num_weeks), 2), 'direct')
+        res = payout, _ = calc_daily(user, old_date_time, next_date)
     else:
         res = payout, _ = (0.0, 'direct')
     if num_weeks and dry == False:
@@ -403,7 +404,7 @@ def calc_txns(start_dt, end_dt, **kw):
         kw['user_btc'],
         kw['user_eth'],
         kw['user_xrp']
-        ]) & Q(tx_type__in=["W", "U", "topup"], status__in=["pending", "processing", "C", "paid"])
+        ]) & Q(tx_type__in=["W", "U", "topup"]) #status__in=["pending", "processing", "C", "paid"])
     # deduct withdrawals from all wallet types
     diff_txns = Transactions.objects.filter(diff_subquery, created_at__range=(start_dt, end_dt)).annotate(data_sum=Sum('amount'))
     # pdb.set_trace()
@@ -430,7 +431,17 @@ def update_wallet_dt(user, wallet, wallet_type, last_date):
     wallet.created_at = p.created_at if wallet.created_at > p.created_at else wallet.created_at
     wallet.save(update_fields=['created_at'])
     return wallet
-    
+
+def check_pkg_investment(func):
+    @wraps(func)
+    def wrapped_f(*args, **kw):
+        user, pkg, last_date, next_payout = args
+        if pkg:
+            return func(*args, **kw)
+        return
+    return wrapped_f
+
+@check_pkg_investment
 def run_investment_calc(user, pkg, last_date, next_payout, **admin_param):
     # get user and avicrypto wallets
     user_btc = Wallet.objects.filter(owner=user, wallet_type='BTC')

@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^package/', include('addons.packages.urls', namespace="package")),
     url(r'^transaction/', include('addons.transactions.urls', namespace="transaction")),
     url(r'^wallet/', include('addons.wallet.urls', namespace="wallet")),
+    url(r'^bank/', include('avibank.urls', namespace="banks")),
     url(r'^admin/', admin.site.urls),
     url(r'^django-rq/', include('django_rq.urls'))
 ]

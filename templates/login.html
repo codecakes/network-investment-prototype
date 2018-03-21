@@ -19,39 +19,65 @@
 						</h6>
 					</div>
 					<div class="card-body collapse in">
-						<div class="card-block">
-							<form id="loginForm" method="post" action="" class="form-horizontal form-simple" novalidate>
-								{% csrf_token %}
-								<fieldset class="form-group position-relative has-icon-left">
-									<input type="text" class="form-control form-control-lg input-lg" name="username" placeholder="Your Username" required data-validation-required-message="Please enter email address.">
-									<div class="form-control-position">
-										<i class="icon-head"></i>
-									</div>
-									<div class="help-block font-small-3"></div>
-								</fieldset>
-								<fieldset class="form-group position-relative has-icon-left">
-									<input type="password" class="form-control form-control-lg input-lg" name="password" placeholder="Enter Password" required data-validation-required-message="Please enter password.">
-									<div class="form-control-position">
-										<i class="icon-key3"></i>
-									</div>
-									<div class="help-block font-small-3"></div>
-								</fieldset>
-								<button type="submit" class="btn btn-primary btn-lg btn-block">
-									<i class="icon-unlock2"></i> Login
-								</button>
-							</form>
-						</div>
-					</div>
-					<div class="card-footer">
-						<div class="">
-							<p class="float-sm-left text-xs-center m-0">
-								<a href="/forgot-password" class="card-link">Forgot password ?</a>
-							</p>
-							<p class="float-sm-right text-xs-center m-0">
-								<!-- <a href="register-simple.html" class="card-link">Sign Up</a> -->
-							</p>
-						</div>
-					</div>
+                        <div class="card-block">
+                            <div id="login_verification">
+                                <form id="loginForm" method="post" action="" class="form-horizontal form-simple" novalidate>
+                                    {% csrf_token %}
+                                    <fieldset class="form-group position-relative has-icon-left">
+                                        <input type="text" class="form-control form-control-lg input-lg" name="username" placeholder="Your Username" required data-validation-required-message="Please enter email address.">
+                                        <div class="form-control-position">
+                                            <i class="icon-head"></i>
+                                        </div>
+                                        <div class="help-block font-small-3"></div>
+                                    </fieldset>
+                                    <fieldset class="form-group position-relative has-icon-left">
+                                        <input type="password" class="form-control form-control-lg input-lg" name="password" placeholder="Enter Password" required data-validation-required-message="Please enter password.">
+                                        <div class="form-control-position">
+                                            <i class="icon-key3"></i>
+                                        </div>
+                                        <div class="help-block font-small-3"></div>
+                                    </fieldset>
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                        <i class="icon-unlock2"></i> Login
+                                    </button>
+                                </form>
+                            </div>
+                            <div id="otp_verification" class="hidden">
+                                <form id="otpLoginForm" method="post" action="/varify/" class="form-horizontal form-simple" novalidate>
+                                    {% csrf_token %}
+                                    <fieldset>
+                                        <h4>Kindly check your email for OTP</h4>
+                                        <br>
+                                    </fieldset>
+                                    <fieldset class="form-group position-relative has-icon-left">
+                                        <input type="text" name="mobileOtp" id="mobileOtp" class="form-control input-lg" placeholder="OTP" pattern="^\+?1?\d{6}$" required data-validation-required-message="Please enter valid OTP" data-validation-pattern-message="Please enter 6 digit valid OTP number">
+                                        <div class="form-control-position">
+                                            <i class="icon-head"></i>
+                                        </div>
+                                        <div class="help-block font-small-3"></div>
+                                    </fieldset>
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                        <i class="icon-unlock2"></i> Verifiy
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div  id="forget_password_container" class="">
+                            <p class="float-sm-left text-xs-center m-0">
+                                <a href="/forgot-password" class="card-link">Forgot password ?</a>
+                            </p>
+                            <p class="float-sm-right text-xs-center m-0">
+                                <!-- <a href="register-simple.html" class="card-link">Sign Up</a> -->
+                            </p>
+                        </div>
+                        <div  id="otp_resend_container" class="hidden">
+                            <p class="float-sm-left text-xs-center m-0">
+                                <a href="" class="card-link">Resend OTP</a>
+                            </p>
+                        </div>
+                    </div>
 				</div>
 			</div>
 			<div class="col-md-5 offset-md-1 col-xs-10 offset-xs-1 box-shadow-2 p-0 mb-2">

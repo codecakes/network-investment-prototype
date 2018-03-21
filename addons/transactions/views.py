@@ -139,6 +139,9 @@ class TransactionsSummary(ListView):
             roi['total'] += roi[key]
 
         context = {
+            'roi':roi,
+            'binary':binary,
+            'direct':direct,
             'packages': packages,
             'transactions': transactions,
             'wallets': wallets,

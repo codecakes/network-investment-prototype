@@ -16,7 +16,7 @@
                         {% if enable_withdraw %}
                         <button type="button" class="btn btn-primary btn-min-width" data-toggle="modal" data-target="#withdrawModal">Withdraw</button>
                         {% else %}
-                        <button type="button" class="btn btn-danger btn-min-width" disabled>Withdraw</button>
+                        <button type="button" id="dashboard_withdrawal" class="btn btn-danger btn-min-width">Withdraw</button>
                         {% endif %}
                     </div>
                 </div>
@@ -235,6 +235,31 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="dashboard_withdrawal_otp_modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Kindly check your email for OTP</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="otpWithdrawlForm" class="form-horizontal form-simple" novalidate>
+                        {% csrf_token %}
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input type="text" name="mobileOtp" id="dashboard_withdrawal_otp" class="form-control input-lg" placeholder="OTP" pattern="^\+?1?\d{6}$" required data-validation-required-message="Please enter valid OTP" data-validation-pattern-message="Please enter 6 digit valid OTP number">
+                            <div class="form-control-position">
+                                <i class="icon-head"></i>
+                            </div>
+                            <div class="help-block font-small-3"></div>
+                        </fieldset>
+                        <button id="dashboard_withdrawal_otp_send" class="btn btn-primary btn-lg btn-block">
+                            <i class="icon-unlock2"></i> Ok
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
