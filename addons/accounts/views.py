@@ -448,7 +448,7 @@ def home(request):
         # TODO: CHANGE BACK. ONLY FOR TODAY!
         # if 0<= is_day < 2:
         # changed to 
-        if is_day == 2:
+        if 0 <= is_day <= 2:
             context["enable_withdraw"] = True
 
         user_active_package = [package for package in packages if package.status == 'A']
