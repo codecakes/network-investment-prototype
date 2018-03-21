@@ -696,3 +696,18 @@ def find_next_monday():
 
 def greater_date(dt1, dt2):
     return max(dt1, dt2)
+
+
+
+######## HARDCODED FOR NOW ################
+
+def run_realtime_invest():    
+    wallets = Wallet.objects.filter(owner=user)
+
+    Transactions.objects.filter(Q(reciever_wallet__in=[w for w in wallets])).exclude(tx_type='W').delete()
+    admin_param = {
+            'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
+            'start_dt': EPOCH_BEGIN,
+            'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 18)))
+        }
+    run_investment_calc(user, get_package(user), EPOCH_BEGIN, admin_param['end_dt'], **admin_param)

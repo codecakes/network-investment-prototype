@@ -10,7 +10,7 @@ from pytz import UTC
 import calendar
 import hashlib
 import time
-from addons.packages.lib.payout import run_investment_calc
+from addons.packages.lib.payout import run_investment_calc, run_realtime_invest
 from django.conf import settings
 EPOCH_BEGIN = settings.EPOCH_BEGIN
 from django.contrib import messages
@@ -145,14 +145,7 @@ def app_login(request):
                 user = authenticate(username=username, password=password)
                 if user is not None:
                     login(request, user)
-                    wallets = Wallet.objects.filter(owner=user)
-                    Transactions.objects.filter(Q(reciever_wallet__in=[w for w in wallets])).exclude(tx_type='W').delete()
-                    admin_param = {
-                            'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
-                            'start_dt': EPOCH_BEGIN,
-                            'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 18)))
-                        }
-                    run_investment_calc(user, get_package(user), EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
+                    run_realtime_invest()
                     return HttpResponse(json.dumps({
                         "status": "ok"
                     }))
@@ -955,14 +948,7 @@ def withdraw(request):
                             }
                             body = render_to_string('mail/transaction-admin.html', email_data)
                             services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
-                            wallets = Wallet.objects.filter(owner=user)
-                            Transactions.objects.filter(Q(reciever_wallet__in=[w for w in wallets])).exclude(tx_type='W').delete()
-                            admin_param = {
-                                    'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
-                                    'start_dt': EPOCH_BEGIN,
-                                    'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 18)))
-                                }
-                            run_investment_calc(user, get_package(user), EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
+                            run_realtime_invest()
                             
                             return HttpResponse(json.dumps({
                                 "status": "ok",
