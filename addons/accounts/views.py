@@ -933,6 +933,8 @@ def withdraw(request):
                             user_wallet.save()
 
                             user_packages.total_payout = 0
+                            user_packages.binary = user_packages.direct = user_packages.weekly = 0
+                            
                             user_packages.save()
 
                             services.send_email_mailgun('AVI Crypto Transaction Success', "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account.", user.email, from_email="postmaster")
