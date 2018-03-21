@@ -9,61 +9,59 @@
         </div>
 
         {% for package in packages %}
-            {% if package.package_name != 'USD 500,00,000' %}
-                <div class="col-xl-4 col-md-6 col-xs-12">
-                    <div class="card">
-                        <div class="text-xs-center">
-                            <div class="card-block">
-                                <h4 class="card-title">{{package.package_name}}</h4>
-                            </div>
-                        </div>
-                        <div class="list-group list-group-flush">
-                            <a class="list-group-item">
-                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.payout}} PAY-OUT %</a>
-                            <a class="list-group-item">
-                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.directout}} DIRECT OUT</a>
-                            <a class="list-group-item">
-                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.binary_payout}} BINARY PAY-OUT</a>
-                            <a class="list-group-item">
-                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.capping}} CAPPING (USD)</a>
-                            <a class="list-group-item">
-                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.no_payout}} NO OF PAY-OUT</a>
-                            <a class="list-group-item">
-                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.loyality}} LOYALITY</a>
-                            <a class="list-group-item">
-                                <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.roi}} ROI IN USD</a>
-                        </div>
-                        <div class="text-xs-center">
-                            {% if package_access_disable %}
-                                <div class="card-block">
-                                    <div class="col-md-12 center">
-                                        <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" >Crypto</button>
-                                    </div>
-                                   <!--  <div class="col-md-6">
-                                        <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
-                                    </div> -->
-                                </div>
-                            {% else %}
-                                <div class="card-block">
-                                    <div class="col-md-12 center">
-                                        <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
-                                    </div>
-                                    <!-- <div class="col-md-6">
-                                        <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
-                                    </div> -->
-                                </div>
-                            {% endif %}
+            <div class="col-xl-4 col-md-6 col-xs-12">
+                <div class="card">
+                    <div class="text-xs-center">
+                        <div class="card-block">
+                            <h4 class="card-title">{{package.package_name}}</h4>
                         </div>
                     </div>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item">
+                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.payout}} PAY-OUT %</a>
+                        <a class="list-group-item">
+                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.directout}} DIRECT OUT</a>
+                        <a class="list-group-item">
+                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.binary_payout}} BINARY PAY-OUT</a>
+                        <a class="list-group-item">
+                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.capping}} CAPPING (USD)</a>
+                        <a class="list-group-item">
+                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.no_payout}} NO OF PAY-OUT</a>
+                        <a class="list-group-item">
+                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.loyality}} LOYALITY</a>
+                        <a class="list-group-item">
+                            <i class="icon-briefcase4"></i>&nbsp;&nbsp;{{package.roi}} ROI IN USD</a>
+                    </div>
+                    <div class="text-xs-center">
+                        {% if package_access_disable %}
+                            <div class="card-block">
+                                <div class="col-md-12 center">
+                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary" >Crypto</button>
+                                </div>
+                               <!--  <div class="col-md-6">
+                                    <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
+                                </div> -->
+                            </div>
+                        {% else %}
+                            <div class="card-block">
+                                <div class="col-md-12 center">
+                                    <button id="subscribeCrypto" onclick="subscribePackage('{{package.package_name}}','{{package.package_code}}')" class="btn btn-primary">Crypto</button>
+                                </div>
+                                <!-- <div class="col-md-6">
+                                    <button id="subscribeCash" class="btn btn-primary" disabled>Cash</button>
+                                </div> -->
+                            </div>
+                        {% endif%}
+                    </div>
                 </div>
-            {% endif %}
+            </div>
         {% endfor %}
             <div id="subscribeModal" class="modal fade">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 id="subscribeTitle" class="modal-title"></h4>
+                            <h4 id="subscribeTitle"class="modal-title"></h4>
                         </div>
                         <div class="modal-body">
                             <div id="packCode"></div>
@@ -125,61 +123,46 @@
                                 <div class="card">
                                     <div id="message"></div>
                                     <div class="card-header">
-                                        <h4 class="card-title" id="basic-layout-colored-form-control">Required Details</h4>
+                                        <h4 class="card-title" id="basic-layout-colored-form-control">Required Crypto Details</h4>
                                     </div>
                                     <div class="card-body collapse in">
                                         <div class="card-block">
                                             <form id="purchasePackageForm">
-                                                    {% csrf_token %}
-                                                <div id="purchasePackageFormContainer">  
-                                                    <div class="form-body">
-                                                        <div class="form-group">
-                                                            <label>Crypto Type</label>
-                                                            <input id="cryptoPackage" name="coin" class="form-control border-primary" type="text" readonly>
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label>Company Wallet Address</label>
-                                                            <input id="company_wallet_address" name="company_wallet_address" class="form-control border-primary" type="text" readonly="">
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label>Package Code</label>
-                                                            <input id="cryptoPackageCode" name="code" class="form-control border-primary" type="text" readonly>
-                                                            <input id="cryptoPackageAmount" name="amount" class="form-control border-primary" type="hidden">
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label>Transaction Id*</label>
-                                                            <input id="transaction_id" class="form-control border-primary" name="txn_id" type="text" placeholder="Wallet Address" required/>
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label>Wallet Address*</label>
-                                                            <input id="wallet_adddress" class="form-control border-primary" name="source_address" type="text" placeholder="Wallet Address" required/>
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label>Destination Tag</label>
-                                                            <input id="destinationTag"class="form-control border-primary" name="destination_tag" type="text" placeholder="Destination Tag">
-                                                        </div>
+                                                {% csrf_token %}
+                                                <div class="form-body">
+                                                    <div class="form-group">
+                                                        <label>Crypto Type</label>
+                                                        <input id="cryptoPackage" name="coin" class="form-control border-primary" type="text" readonly>
                                                     </div>
-                                                    <div class="form-actions">
-                                                        <button id="cryptoSubmit" class="subscribe-package btn btn-primary">Purchase</button>
+
+                                                    <div class="form-group">
+                                                        <label>Company Wallet Address</label>
+                                                        <input id="company_wallet_address" name="company_wallet_address" class="form-control border-primary" type="text" readonly="">
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Package Code</label>
+                                                        <input id="cryptoPackageCode" name="code" class="form-control border-primary" type="text" readonly>
+                                                        <input id="cryptoPackageAmount" name="amount" class="form-control border-primary" type="hidden">
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Transaction Id*</label>
+                                                        <input id="transaction_id" class="form-control border-primary" name="txn_id" type="text" placeholder="Wallet Address" required/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Wallet Address*</label>
+                                                        <input id="wallet_adddress" class="form-control border-primary" name="source_address" type="text" placeholder="Wallet Address" required/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label>Destination Tag</label>
+                                                        <input id="destinationTag"class="form-control border-primary" name="destination_tag" type="text" placeholder="Destination Tag">
                                                     </div>
                                                 </div>
-                                                <div id="otpContainer" class="form-group">
-                                                    <fieldset class="form-group position-relative has-icon-left">
-                                                        <input type="text" name="mobile_otp" id="package_otp" class="form-control input-lg" placeholder="OTP" pattern="^\+?1?\d{6}$" required data-validation-required-message="Please enter valid OTP" data-validation-pattern-message="Please enter 6 digit valid OTP number">
-                                                        <div class="form-control-position">
-                                                            <i class="icon-head"></i>
-                                                        </div>
-                                                        <div class="help-block font-small-3"></div>
-                                                    </fieldset>
-                                                    <button id="package_otp_send" type="submit" class="btn btn-primary btn-lg btn-block">
-                                                        <i class="icon-unlock2"></i> Ok
-                                                    </button>
-                                                    </form>
+                                                <div class="form-actions">
+                                                    <button id="cryptoSubmit" type="submit" class="subscribe-package btn btn-primary">Purchase</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -201,7 +184,6 @@
     $("#cryptoDetails").toggle();
     $("#packCode").toggle();
     $("#packName").toggle();
-    //$("#otpContainer").toggle();
 
     $('#subscribeModal').on('hidden', function() {
         clear();
@@ -242,12 +224,9 @@
     }
     
     $("#btcBuy,#xrpBuy,#ethBuy").click(function(event){
-        $("#transaction_id,#wallet_adddress,#destinationTag,#package_otp").val("");
+        $("#transaction_id,#wallet_adddress,#destinationTag").val("");
         $("#cryptoContainer").toggle();
         $("#cryptoDetails").toggle();
-        $("#message").show();
-        $("#purchasePackageFormContainer").show();
-        $("#otpContainer").toggle();
         $($("#destinationTag").parent().get(0)).toggle();
         var cryptoType=""
         var cryptoName = ""
@@ -255,21 +234,15 @@
             cryptoType="BTC";
             cryptoName = "Bitcoin";
             $($("#destinationTag").parent().get(0)).show();
-            $("#company_wallet_address").val('1HAjKqPNjFMS7vKR3qPUHCkXgrfLbHkW1v');
-            //$("#company_wallet_address").val('15VtVKWj1YyHXFAW2uhAfQg1DKdpsjYLgh');
-            //$("#company_wallet_address").val('13EwqEyfm8DfTVRcfLCxXYQdCUadXB1xXs');
+            $("#company_wallet_address").val('13EwqEyfm8DfTVRcfLCxXYQdCUadXB1xXs');
         } else if(event.target.id==='xrpBuy'){
             $($("#destinationTag").parent().get(0)).show();
-            $("#company_wallet_address").val('rsfYuF1eLofJG1XUJZSMc6b2TRT8F9qfS1')
-            //$("#company_wallet_address").val('rLaKuE49Sg1MjSH6K9nqo3UkCdGkTCLdjQ');
-            //$("#company_wallet_address").val('rsfYuF1eLofJG1XUJZSMc6b2TRT8F9qfS1');
+            $("#company_wallet_address").val('rsfYuF1eLofJG1XUJZSMc6b2TRT8F9qfS1');
             cryptoType="XRP";
             cryptoName = "Ripple";
         } else {
             $($("#destinationTag").parent().get(0)).show();
-            $("#company_wallet_address").val('0xD331Eb30d287AF5C84E828bbB7fb4092DFAAaD1e');
-            //$("#company_wallet_address").val('0xe5b8b0ee07f1e1ea73052d7af4ec19292c060afe');
-            //$("#company_wallet_address").val('0xe5b8b0ee07f1e1ea73052d7af4ec19292c060afes');
+            $("#company_wallet_address").val('0xe5b8b0ee07f1e1ea73052d7af4ec19292c060afes');
             cryptoType="ETH";
             cryptoName = "Ethereum";
 
@@ -293,95 +266,50 @@
         return indexed_array;
     }
 
-    $("#cryptoSubmit").click(function(event){
+    $("#purchasePackageForm").submit(function(event){
         event.preventDefault();
-        if($("#transaction_id").val() && $("#wallet_adddress").val() && $("#destinationTag").val()){
-            $.ajax({
-                type: "POST",
-                url: "/send/",
-                data: {'type':'buy'},
-                success: function(data) {
-                    if (data.status == "error") {
-                        toastr.warning(data.message, "Error", toastr_options);
-                    } else {
-                        $("#subscribeTitle").html("Kindly check your email for OTP")
-                      $("#otpContainer").toggle()
-                      $("#message").hide();
-                      $("#purchasePackageFormContainer").hide()    
-                    }
-                }
-            });
-        } else {
-          toastr.warning("Provide Details", "Error", toastr_options);  
-        }
-    })
-
-    $("#package_otp_send").click(function(event){
-        event.preventDefault();
+        var data = getFormData($(this));
         $.ajax({
-            type: "POST",
-            url: "/varify/",
-            data: {
-                "type":"package",
-                "mobileOtp": $("#package_otp").val() 
-                },
-            success: function(data) {
-                if (data.status == "error") {
-                    toastr.warning(data.message, "Error", toastr_options);
-                } else {
-                  var formData = getFormData($("#purchasePackageForm"));
-                  $.ajax({
-                      type: "POST",
-                      url: "/validate-user-transaction",
-                      data: formData,
-                      success: function(data) {
-                          data = JSON.parse(data)
-                          if(data.status == "error") {
-                            toastr.warning(data.message, "Error", toastr_options);
-                          } else {
-                            jQuery("#subscribeModal").modal('hide');
-                            toastr.success(data.message, "Success", toastr_options);
-                          }
-                      }
-                  });
-                }
+        type: "POST",
+        url: "/validate-user-transaction",
+        data: data,
+        success: function(data) {
+            data = JSON.parse(data)
+            if(data.status == "error") {
+            toastr.warning(data.message, "Error");
+            } else {
+            toastr.success(data.message, "Success");
             }
+        }
         });
     })
 
-    $("#package_otp").jqBootstrapValidation();
+    function getFormData($form) {
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function(n, i) {
+        indexed_array[n["name"]] = n["value"];
+        });
+
+        return indexed_array;
+    }
 
     $("#purchasePackageForm").submit(function(event){
         event.preventDefault();
         var data = getFormData($(this));
         $.ajax({
-            type: "POST",
-            url: "",
-            data: {
-                "type":"",
-                "value":data["mobileOtp"]
-            },
-            success: function(data) {
-                data = JSON.parse(data)
-                if(data.status == "error") {
-                    toastr.warning(data.message, "Error", toastr_options);
-                } else {
-                    delete data["mobileOtp"];
-                    $.ajax({
-                        type: "POST",
-                        url: "/validate-user-transaction",
-                        data: data,
-                        success: function(data) {
-                            data = JSON.parse(data)
-                            if(data.status == "error") {
-                                toastr.warning(data.message, "Error", toastr_options);
-                            } else {
-                                toastr.success(data.message, "Success", toastr_options);
-                            }
-                        }
-                    });
-                }
+        type: "POST",
+        url: "/validate-user-transaction",
+        data: data,
+        success: function(data) {
+            data = JSON.parse(data)
+            if(data.status == "error") {
+            toastr.warning(data.message, "Error");
+            } else {
+            toastr.success(data.message, "Success");
             }
+        }
         });
     })
 </script>
