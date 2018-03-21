@@ -96,18 +96,18 @@
                                         <span class="col-md-1" id="countryCode">+93</span>
                                         {% if user.profile.verified %}
                                             <div class="col-md-7">
-                                                <input type="text" name="mobile" id="mobile_profile" class="form-control" placeholder="Mobile Number" pattern="^\+?1?\d{9,15}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number." name="user_mobile" value="{{user.profile.mobile|default_if_none:""}}" aria-describedby="countryCode" disabled>
+                                                <input type="text" name="mobile" id="mobile_profile" class="form-control" placeholder="Mobile Number" pattern="^\+?1?\d{9,15}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number." name="user_mobile" value="{{user.profile.mobile|default_if_none:""}}" aria-describedby="countryCode">
                                             </div>
-                                            <div class="col-md-3">
+                                            <!-- <div class="col-md-3">
                                                 <span class="btn btn-green  btn-primary"> Verified</span>
-                                            </div>
+                                            </div> -->
                                         {% else %}
                                             <div class="col-md-7">
                                                 <input readonly type="text" name="mobile" id="mobile_profile" class="form-control" placeholder="Mobile Number" pattern="^\+?1?\d{9,15}$" required data-validation-required-message="Please enter mobile number." data-validation-pattern-message="Please enter valid mobile number." name="user_mobile" value="{{user.profile.mobile|default_if_none:""}}" aria-describedby="countryCode" required>
                                             </div>
-                                            <div class="col-md-3">
-                                                <!-- <button id="verifiy_mobile_otp" class="btn btn-primary">Send OTP</button> -->
-                                            </div>
+                                            <!-- <div class="col-md-3">
+                                                <button id="verifiy_mobile_otp" class="btn btn-primary">Send OTP</button>
+                                            </div> -->
                                         {% endif %}
                                     </div>
                                 </div>
