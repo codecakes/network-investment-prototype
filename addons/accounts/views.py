@@ -41,6 +41,8 @@ from avicrypto import services
 from lib.tree import (find_min_max, has_child, is_member_of, is_parent_of, is_valid_leg, load_users)
 from addons.accounts.lib.blockexplorer import validate_transaction
 
+from functools import wraps
+
 sys.path.append(settings.BASE_DIR)
 
 def app_404(request):
@@ -1065,6 +1067,15 @@ def verify_otp(request):
                     HttpResponse({'message': 'Invalid OTP', 'status':'error'})    
         return  HttpResponse({'message': 'Invalid OTP', 'status':'error'})
 
+
+def bool_otp(func):
+    @wraps(func)
+    def wrapped_f(*args, **kwargs):
+        print "phuddi Chooooooo!!!!!!"
+        return
+    return wrapped_f
+
+@bool_otp
 def genearte_user_otp(user, type):
     hash = hashlib.sha1()
     hash.update(str(time.time()))
