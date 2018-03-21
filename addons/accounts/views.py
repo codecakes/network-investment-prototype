@@ -145,7 +145,7 @@ def app_login(request):
                 user = authenticate(username=username, password=password)
                 if user is not None:
                     login(request, user)
-                    run_realtime_invest()
+                    run_realtime_invest(user)
                     return HttpResponse(json.dumps({
                         "status": "ok"
                     }))
@@ -934,7 +934,7 @@ def withdraw(request):
 
                             user_packages.total_payout = 0
                             user_packages.binary = user_packages.direct = user_packages.weekly = 0
-                            
+
                             user_packages.save()
 
                             services.send_email_mailgun('AVI Crypto Transaction Success', "Your withdrawal is successful, your transaction is pending. Your transaction is settled within 48 hours in your chosen account.", user.email, from_email="postmaster")
@@ -950,7 +950,7 @@ def withdraw(request):
                             }
                             body = render_to_string('mail/transaction-admin.html', email_data)
                             services.send_email_mailgun('AVI Crypto Transaction Success', body, "admin@avicrypto.us", from_email="postmaster")
-                            run_realtime_invest()
+                            run_realtime_invest(user)
                             
                             return HttpResponse(json.dumps({
                                 "status": "ok",

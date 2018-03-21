@@ -701,7 +701,7 @@ def greater_date(dt1, dt2):
 
 ######## HARDCODED FOR NOW ################
 
-def run_realtime_invest():    
+def run_realtime_invest(user):    
     wallets = Wallet.objects.filter(owner=user)
 
     today = UTC.normalize(UTC.localize(datetime.utcnow()))
