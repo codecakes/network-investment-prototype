@@ -66,6 +66,7 @@
                                 <tr>
                                     <th>Transation ID</th>
                                     <th>Date and Time</th>
+                                    <th>Nature of Transaction</th>
                                     <th>Receiver's Wallet</th>
                                     <th>Sender's Wallet</th>
                                     <th>Amount Withdral</th>
@@ -77,6 +78,7 @@
                                     <tr>
                                         <td>{{ transaction.pk }}</td>
                                         <td>{{ transaction.created_at }}</td>
+                                        <td>{{ transaction.tx_type.get_transaction_display }}</td>
                                         <td>{{ transaction.reciever_wallet.owner.username }}</td>
                                         <td>
                                             {% if transaction.sender_wallet.owner.username == 'harshul' %}
