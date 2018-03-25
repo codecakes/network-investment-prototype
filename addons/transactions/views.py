@@ -68,7 +68,8 @@ class TransactionsList(ListView):
             'transactions': transactions
         }
         return HttpResponse(self.template.render(context, request))
-
+from pytz import UTC
+import datetime
 class TransactionsSummary(ListView):
     template = loader.get_template('transactions.html')
     model = Transactions
@@ -91,12 +92,14 @@ class TransactionsSummary(ListView):
             roi['till_now'] += pkg.weekly
             binary['till_now'] += pkg.binary
             direct['till_now'] += pkg.direct
+            dt = UTC.normalize(UTC.localize(datetime.datetime.now())) - pkg.created_at
+            roi['pending'] += pkg.package.price*pkg.package.payout/100*(pkg.package.no_payout - (dt.days/7))
 # get the total paid withdraw 
         for txns in transactions:
-            if txns.status == 'paid' and txns.tx_type == 'roi':
+            if txns.status == 'paid' and txns.tx_type == 'W':
                 roi['withdraw'] += txns.amount
             elif txns.status == 'P' or txns.status=='C' or txns.status=='processing' and txns.tx_type == 'roi':
-                roi['pending'] += txns.amount
+                roi['pending'] += 0
             elif txns.status == 'paid' and txns.tx_type == 'binary':
                 binary['withdraw'] += txns.amount
             elif txns.status == 'P' or txns.status=='C' or txns.status=='processing' and txns.tx_type == 'roi':
@@ -106,7 +109,7 @@ class TransactionsSummary(ListView):
             elif txns.status == 'P' or txns.status=='C' or txns.status=='processing' and txns.tx_type == 'roi':
                 direct['pending'] += txns.amount
 
-        roi['total'] = float(sum(roi.values()))
+        roi['total'] = float(sum(roi.values())) - float(roi['withdraw'])
         binary['total'] = float(sum(binary.values()))
         direct['total'] = float(sum(direct.values()))
         context = {
