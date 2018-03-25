@@ -145,7 +145,7 @@ def app_login(request):
                 user = authenticate(username=username, password=password)
                 if user is not None:
                     login(request, user)
-                    run_realtime_invest(user)
+                    # run_realtime_invest(user)
                     return HttpResponse(json.dumps({
                         "status": "ok"
                     }))
