@@ -40,7 +40,7 @@ class UserPackagesAdmin(admin.ModelAdmin):
 
 	def total(self,obj):
 		# import pdb; pdb.set_trace()
-		total_value =  obj.binary + obj.direct + obj.weekly
+		total_value =  float(obj.binary) + float(obj.direct) + float(obj.weekly)
 		return total_value
 
 	total.short_description = 'Total Amount'
