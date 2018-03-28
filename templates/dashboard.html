@@ -244,9 +244,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Kindly check your email for OTP</h4>
                 </div>
                 <div class="modal-body">
-                    <form id="otpWithdrawlForm" method="post" action="" class="form-horizontal form-simple" novalidate>
+                    <form id="otpWithdrawlForm" class="form-horizontal form-simple" novalidate>
                         {% csrf_token %}
                         <fieldset class="form-group position-relative has-icon-left">
                             <input type="text" name="mobileOtp" id="dashboard_withdrawal_otp" class="form-control input-lg" placeholder="OTP" pattern="^\+?1?\d{6}$" required data-validation-required-message="Please enter valid OTP" data-validation-pattern-message="Please enter 6 digit valid OTP number">

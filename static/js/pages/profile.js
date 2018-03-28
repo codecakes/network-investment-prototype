@@ -73,26 +73,26 @@ $(document).ready(function() {
 		}
 	})
 
-	$("#profile_mobile_verify_otp_send").click(function(){
-		event.preventDefault();
-        $.ajax({
-            type: "POST",
-			url: "/varify/",
-			data: {
-                "type":"mobile",
-                "mobileOtp": $("#profile_mobile_verify_otp").val() 
-                },
-            success: function(data) {
-                if (data.status == "error") {
-                    toastr.warning(data.message, "Error", toastr_options);
-                } else {
-  				  $("#profile_mobile_verify_otp_modal").modal('hide')
-                  $("#profile_mobile_verify_otp").val();
-                  toastr.success(data.message, "Success", toastr_options);
-                }
-            }
-        });
-	})
+	// $("#profile_mobile_verify_otp_send").click(function(){
+	// 	event.preventDefault();
+ //        $.ajax({
+ //            type: "POST",
+	// 		url: "/varify/",
+	// 		data: {
+ //                "type":"mobile",
+ //                "mobileOtp": $("#profile_mobile_verify_otp").val() 
+ //                },
+ //            success: function(data) {
+ //                if (data.status == "error") {
+ //                    toastr.warning(data.message, "Error", toastr_options);
+ //                } else {
+ //  				  $("#profile_mobile_verify_otp_modal").modal('hide')
+ //                  $("#profile_mobile_verify_otp").val();
+ //                  toastr.success(data.message, "Success", toastr_options);
+ //                }
+ //            }
+ //        });
+	// })
 	
 	$("#profile_crypto_accounts_form").submit(function(event) {
 		event.preventDefault();

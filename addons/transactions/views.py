@@ -83,7 +83,6 @@ class TransactionsSummary(ListView):
         transactions = Transactions.objects.filter(reciever_wallet__owner=user)
         packages = User_packages.objects.filter(user=user)
         wallets = Wallet.objects.filter(owner=user)
-        #  get the current payout of weeks 
         roi = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
         binary = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
         direct = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
@@ -110,7 +109,6 @@ class TransactionsSummary(ListView):
         roi['total'] = float(sum(roi.values()))
         binary['total'] = float(sum(binary.values()))
         direct['total'] = float(sum(direct.values()))
-        
         context = {
             'roi':roi,
             'binary':binary,
