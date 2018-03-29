@@ -35,7 +35,7 @@ def reset_these():
             admin_param = {
                 'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
                 'start_dt': EPOCH_BEGIN,
-                'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 18)))
+                'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 28)))
             }
             # print "calling run_investment_calc(u, pkg, EPOCH_BEGIN, today, **admin_param)"
             run_investment_calc(u, pkg, EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
