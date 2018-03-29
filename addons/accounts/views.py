@@ -145,7 +145,7 @@ def app_login(request):
                 user = authenticate(username=username, password=password)
                 if user is not None:
                     login(request, user)
-                    run_realtime_invest(user)
+                    # run_realtime_invest(user)
                     return HttpResponse(json.dumps({
                         "status": "ok"
                     }))
@@ -163,7 +163,15 @@ def app_login(request):
         print "----"
         return HttpResponseRedirect('/home')
 
-
+@login_required(login_url="/login")
+@csrf_exempt
+def run_calculatiom(request):
+    if request.method == "GET":
+        run_realtime_invest(request.user)
+        return HttpResponse(json.dumps({
+                    "status": "ok",
+                    "message": "calculation is runnign "
+                }))
 def app_signup(request):
     if request.method == "POST":
         data = request.POST

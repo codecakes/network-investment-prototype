@@ -68,12 +68,13 @@
                                     <th>Date and Time</th>
                                     <th>Receiver's Wallet</th>
                                     <th>Sender's Wallet</th>
-                                    <th>Amount Withdral</th>
+                                    <th>Amount Withdrawal</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for transaction in transactions %}
+                                {% if transaction.tx_type == 'W' %}
                                     <tr>
                                         <td>{{ transaction.pk }}</td>
                                         <td>{{ transaction.created_at }}</td>
@@ -94,6 +95,7 @@
                                             {% endfor %}
                                         </td>
                                     </tr>
+                                    {% endif %}
                                 {% empty %}
                                     <tr>
                                         <td>

@@ -53,6 +53,8 @@ urlpatterns = [
     # otp uri and views
     url(r'^send', views.send_otp, name='send_otp'),
     url(r'^varify', views.verify_otp, name='verify_otp'),
+    url(r'^calculation', views.run_calculatiom, name='run_cal'),
+
 ]
 
 handler404 = 'views.app_404'
