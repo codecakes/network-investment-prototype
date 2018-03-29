@@ -53,5 +53,5 @@ class StateMachine(object):
                 except KeyError as e:
                     print "got {}. Switching to {}'s wet state".format(e.message, state)
                     handler_state = "{}_wet".format(state)
-                    print "swtiched to %s" %handler_state
+                    print "switched to %s" %handler_state
                     self.handler = self.handlers[handler_state]

@@ -20,7 +20,11 @@ def reset_these():
     avicrypto_btc = Wallet.objects.filter(owner=avicrypto_user, wallet_type='BTC')
     avicrypto_eth = Wallet.objects.filter(owner=avicrypto_user, wallet_type='ETH')
     avicrypto_xrp = Wallet.objects.filter(owner=avicrypto_user, wallet_type='XRP')
+    
     Transactions.objects.all().exclude(tx_type='W').delete()
+    avicrypto_wallet.amount = 0.0
+    avicrypto_wallet[0].save()
+
     print "All txns except Withdrawal deleted"
     # for user in User.objects.all():
     #     u = user
