@@ -30,13 +30,13 @@ def reset_these():
             pkg.left_binary_cf = 0.0
             pkg.right_binary_cf = 0.0
             pkg.save()
-            today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
+            # today = UTC.normalize(UTC.localize(datetime.datetime.utcnow()))
             # # pdb.set_trace()
             admin_param = {
                 'admin': User.objects.get(username='harshul', email = 'harshul.kaushik@avicrypto.us'),
                 'start_dt': EPOCH_BEGIN,
-                # 'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 26)))
-                'end_dt': today
+                'end_dt': UTC.normalize(UTC.localize(datetime.datetime(2018, 3, 30)))
+                # 'end_dt': today
             }
             # print "calling run_investment_calc(u, pkg, EPOCH_BEGIN, today, **admin_param)"
             run_investment_calc(u, pkg, EPOCH_BEGIN, admin_param['end_dt'], **admin_param)
