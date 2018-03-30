@@ -24,11 +24,12 @@ def calc_weekly(user, last_date, next_date, dry=True):
     num_weeks = 0
     # user_doj = user.date_joined.date()
     # user_doj = date(user_doj.year, user_doj.month, user_doj.day)
-    old_date_time = pkg.created_at if pkg.created_at > last_date else last_date
-    old_date = greater_date(user_doj, date(last_date.year, last_date.month, last_date.day))
+    # old_date_time = pkg.created_at if pkg.created_at > last_date else last_date
+    old_date_time = greater_date(pkg.created_at, last_date)
     new_date = next_date.date()
-    if old_date < new_date:
-        delta = new_date - old_date
+    old_date = old_date_time.date()
+    if old_date_time < next_date:
+        delta = next_date - old_date_time
         num_weeks = floor(delta.days/7.0)
         # pkg = get_package(user)
         # payout = (pkg.package.payout/100.) * pkg.package.price
