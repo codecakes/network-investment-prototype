@@ -81,9 +81,9 @@ class TransactionsSummary(ListView):
 
     def get(self, request):
         user = request.user
-        transactions = Transactions.objects.filter(reciever_wallet__owner=user)
+        transactions = Transactions.objects.filter(reciever_wallet__owner=user).order_by('created_at')
         packages = User_packages.objects.filter(user=user)
-        wallets = Wallet.objects.filter(owner=user)
+        wallets = Wallet.objects.filter(owner=user).order_by('created_at')
         roi = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
         binary = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
         direct = {'till_now':0.0, 'pending':0.0, 'withdraw':0.0, 'total':0.0}
