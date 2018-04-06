@@ -91,3 +91,6 @@ def valid_payout_user(sponsor_id, member, last_date, next_date, dry=True):
         return (last_date <= doj < next_date) and (member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id) and pkg
     except:
         return False
+
+def is_sponsored_by(child, parent):
+    return child.profile.sponser_id.profile.user_auto_id == parent.profile.user_auto_id
