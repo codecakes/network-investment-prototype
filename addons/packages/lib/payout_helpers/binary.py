@@ -2,7 +2,7 @@ from math import ceil, floor
 from datetime import date
 from django.db.models import Q
 from payout_aux import get_package
-from helpers import is_eligible, is_valid_date, greater_date, filter_by_sponsor
+from helpers import is_eligible, is_valid_date, greater_date, filter_by_sponsor, is_sponsored_by
 from gen_txn import gen_txn_binary
 from direct import get_direct_pair
 
@@ -36,15 +36,9 @@ def binary_wet(user, last_date, next_date):
     - If so, calc_binary
     - Once exhausted, exit
     """
-    sponsor_id = user.profile.user_auto_id
-    return rec_binary(user, last_date, next_date, user, sponsor_id)
-
-
-@gen_txn_binary
-@is_eligible
-def calc_binary(user, last_date, next_date, dry=True, date=None):
-    """calculate the binary on minimum of two legs"""
     # calculate if binary has atleast one direct pair
+    # It can happen that binary gets calculated and yet there is not direct pair. 
+    # In that case binary gets set to txn type='P' viz Pending
     pairs = get_direct_pair(user, last_date, next_date)
     pkg = get_package(user)
     if pairs:
@@ -63,18 +57,24 @@ def calc_binary(user, last_date, next_date, dry=True, date=None):
             owner=avicrypto_user, wallet_type='AW').first()
         
         bn_status = 'C' if pkg.binary_enable else 'P'
-        bn_txns = Transactions.objects.filter(
+        # set txns's status to 'Confirmed' from Pending
+        Transactions.objects.filter(
             sender_wallet=avicrypto_wallet,
             reciever_wallet=user_BN_wallet,
             tx_type="binary", status='P'
         ).update(status=bn_status)
-        
+   
+    sponsor_id = user.profile.user_auto_id
+    return rec_binary(user, last_date, next_date, user, sponsor_id)
+
+
+@gen_txn_binary
+@is_eligible
+def calc_binary(user, last_date, next_date, dry=True, date=None):
+    """calculate the binary on minimum of two legs"""
+
     pdb.pprint.pprint([pkg.weekly, pkg.direct, pkg.binary, pairs])
     # assert pkg.direct > 0.
-
-    # It can happen that binary gets calculated and yet there is not direct pair. 
-    # In that case binary gets set to txn type='P' viz Pending
-
     binary_payout = pkg.package.binary_payout/100.0
     # finds leg with minimium total package prices
     res = get_left_right_agg(user, last_date, next_date)
@@ -92,17 +92,20 @@ def get_left_right_agg(user, last_date, next_date):
     left_user = get_left(user)
     right_user = get_right(user)
     #print "left user {} and right users {}".format(left_user.username, right_user.username)
-    return [calc_aggregate_left(left_user, last_date, next_date), calc_aggregate_right(right_user, last_date, next_date)]
+    return [calc_aggregate_left(left_user, user, last_date, next_date), calc_aggregate_right(right_user, user, last_date, next_date)]
+
+
 
 
 @is_valid_date
-def calc_aggregate_left(user, last_date, next_date):
+def calc_aggregate_left(user, sponsor_user, last_date, next_date):
     """Find the aggregate sum of all packages in left leg"""
     if user:
         left_user = get_left(user)
         pkg = get_package(user)
         if pkg:
-            return pkg.package.price + calc_aggregate_left(left_user, last_date, next_date) + calc_aggregate_right(left_user, last_date, next_date)
+            price = pkg.package.price if is_sponsored_by(user, sponsor_user) else 0
+            return price + calc_aggregate_left(left_user, sponsor_user, last_date, next_date) + calc_aggregate_right(left_user, sponsor_user, last_date, next_date)
         return 0.0
     return 0.0
 
@@ -110,13 +113,14 @@ def calc_aggregate_left(user, last_date, next_date):
 
 
 @is_valid_date
-def calc_aggregate_right(user, last_date, next_date):
+def calc_aggregate_right(user, sponsor_user, last_date, next_date):
     """Find the aggregate sum of all packages in right leg"""
     if user:
         right_user = get_right(user)
         pkg = get_package(user)
         if pkg:
-            return pkg.package.price + calc_aggregate_left(right_user, last_date, next_date) + calc_aggregate_right(right_user, last_date, next_date)
+            price = pkg.package.price if is_sponsored_by(user, sponsor_user) else 0
+            return price + calc_aggregate_left(right_user, sponsor_user, last_date, next_date) + calc_aggregate_right(right_user, sponsor_user, last_date, next_date)
         return 0.0
     return 0.0
 
