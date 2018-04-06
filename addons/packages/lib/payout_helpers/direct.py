@@ -1,7 +1,7 @@
 from math import ceil, floor
 from datetime import date
 from payout_aux import get_package
-from helpers import is_eligible, is_valid_date, greater_date, filter_by_sponsor
+from helpers import is_eligible, is_valid_date, greater_date, filter_by_sponsor, filter_by_sponsor_direct
 from addons.accounts.lib.tree import divide_conquer, LEG, get_left, get_right
 from gen_txn import gen_txn_direct
 
@@ -93,8 +93,9 @@ def find_pair(user, last_date, next_date, sponsor_id):
 
     members = Members.objects.filter(parent_id=user.id)
     # filter paying sponsored members by left and right branch
-    filtered_members = filter_by_sponsor(
+    filtered_members = filter_by_sponsor_direct(
         sponsor_id, last_date, next_date, members, dry=True)
+    
     active_left_members = filter(
         lambda m: LEG['l'](m), filtered_members)
     active_right_members = filter(
