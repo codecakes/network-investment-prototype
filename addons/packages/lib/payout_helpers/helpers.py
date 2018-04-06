@@ -5,6 +5,8 @@ from pytz import UTC
 from payout_aux import get_package
 from gen_txn import gen_txn_direct
 
+from addons.accounts.models import Profile
+
 
 def is_eligible(func):
     """Decorator for calculation function"""
@@ -75,6 +77,10 @@ def filter_by_sponsor(sponsor_id, last_date, next_date, members, dry=True):
     # print "filter_by_sponsor members ", members
     return [m for m in members if valid_payout_user(sponsor_id, m, last_date, next_date, dry=dry)]
 
+def filter_by_sponsor_direct(sponsor_id, last_date, next_date, members, dry=True):
+    sponsor_profile = Profile.objects.get(user_auto_id=sponsor_id)
+    sponsor_pkg = get_package(sponsor_profile.user) 
+    return [m for m in members if valid_payout_user_direct(sponsor_id, m, last_date, next_date, sponsor_pkg)]
 
 @gen_txn_direct
 def valid_payout_user(sponsor_id, member, last_date, next_date, dry=True):
@@ -90,6 +96,21 @@ def valid_payout_user(sponsor_id, member, last_date, next_date, dry=True):
     try:
         return (last_date <= doj < next_date) and (member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id) and pkg
     except:
+        return False
+
+def valid_payout_user_direct(sponsor_id, m, last_date, next_date, sponsor_pkg):
+    doj = UTC.normalize(member.child_id.date_joined)
+    # check if member is active
+    pkg = get_package(member.child_id)
+     
+    # check if member falls within this cycle.
+    # check if is a direct sponsor    
+    try:
+        if pkg:
+            return (last_date <= doj < next_date) and (member.child_id.profile.sponser_id.profile.user_auto_id == sponsor_id) and pkg >= sponsor_pkg
+        return False
+    except Exception as e:
+        print e.message
         return False
 
 def is_sponsored_by(child, parent):
